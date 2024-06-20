@@ -13,7 +13,6 @@ const userRoute = require("./routes/user.r");
 const topDealsRoute = require("./routes/topDeals.r");
 const contactUsRoute = require("./routes/contact_us.r");
 const blogRoute = require("./routes/blog.r");
-const testModel = require("./test/test.m");
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -35,20 +34,12 @@ app.use("/api/top-deals", topDealsRoute);
 app.use("/api/contact-us", contactUsRoute);
 app.use("/api/category", state_and_activities_route);
 
-// app.post("/test", async (req, res) => {
-//   const { name, rating } = req.body;
-//   try {
-//     const data = await testModel({ name, rating });
-//     await data.save();
-
-//     res.json({ success: true, message: "ok", data });
-//   } catch (error) {
-//     res.json({ succe: false, error });
-//   }
-// });
+app.get("/test", async (req, res) => {
+  res.json({ success: true, message: "server ok" });
+});
 
 // app.use("/api/booking", bookingRoute);
-
-app.listen(8080, () => {
-  console.log("server started at port 8080");
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`server started at port ${PORT}`);
 });
