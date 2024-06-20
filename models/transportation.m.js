@@ -1,0 +1,24 @@
+const mongoose = require("mongoose");
+
+const transportationSchema = new mongoose.Schema(
+  {
+    tourID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tour",
+      required: true,
+    },
+    transportationType: { type: String, required: true },
+    costPerPerson: { type: Number, required: true },
+    transportationDesc: { type: String, default: "" },
+    contactNumber: { type: String, required: true },
+    duration: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+const transportationModel = mongoose.model(
+  "Transportation",
+  transportationSchema
+);
+
+module.exports = transportationModel;

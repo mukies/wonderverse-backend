@@ -1,0 +1,41 @@
+const jwt = require("jsonwebtoken");
+const adminModel = require("../models/admin.m");
+
+exports.adminProtection = async (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
+
+    if (!token) return res.json({ success: false, message: "Token not found" });
+
+    const decode = jwt.verify(token, process.env.JWT_KEY);
+    if (!decode) return res.json({ success: false, message: "Invalid token" });
+
+    const admin = await adminModel
+      .findOne({ _id: decode.userID })
+      .select("-password");
+
+    if (!admin)
+      return res.json({ success: false, message: "Admin account not found" });
+
+    if (!admin?.isVerified)
+      return res.json({
+        success: false,
+        message: "Admin account is not verified",
+      });
+
+    const adminData = {
+      fullName: admin.fullName,
+      email: admin.email,
+      isVerified: admin.isVerified,
+      _id: admin._id,
+    };
+
+    req.admin = adminData;
+    next();
+  } catch (error) {
+    console.log("Error in admin protection route.", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error in admin protection route." });
+  }
+};
