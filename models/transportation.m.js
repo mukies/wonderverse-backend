@@ -7,11 +7,13 @@ const transportationSchema = new mongoose.Schema(
       ref: "Tour",
       required: true,
     },
+    from: { type: String, required: true },
     transportationType: { type: String, required: true },
     costPerPerson: { type: Number, required: true },
     transportationDesc: { type: String, default: "" },
     contactNumber: { type: String, required: true },
-    duration: { type: String, required: true },
+    contactEmail: { type: String, required: true },
+    estimatedDuration: { type: String, required: true },
   },
   { timestamps: true }
 );

@@ -7,6 +7,7 @@ const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const stateModel = require("../models/state.m");
 const activityModel = require("../models/activity.m");
 const { validationResult } = require("express-validator");
+const transportationModel = require("../models/transportation.m");
 
 exports.createTour = async (req, res) => {
   const {
@@ -134,7 +135,7 @@ exports.singleTour = async (req, res) => {
 
     const availableGuides = await guideModel.find({ tourID });
     const availableHotels = await hotelModel.find({ tourID });
-    const availableTransportations = await transportationModel.find({ tourID });
+    // const availableTransportations = await transportationModel.find({ tourID });
 
     const tour = await tourModel
       .findById(tourID)
@@ -154,6 +155,22 @@ exports.singleTour = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error while getting tour details.", success: false });
+  }
+};
+
+exports.fetchTransportation = async (req, res) => {
+  const { tourID } = req.params;
+  const { from } = req.body;
+  try {
+    const transportations = await transportationModel.find({ from, tourID });
+
+    res.status(200).json({ success: true, transportations });
+  } catch (error) {
+    console.log("Error while fetching transportation.");
+    res.status(500).json({
+      message: "Error while fetching transportation.",
+      success: false,
+    });
   }
 };
 
