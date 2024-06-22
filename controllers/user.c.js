@@ -191,7 +191,7 @@ exports.tourRating = async (req, res) => {
     const tour = await tourModel.findById(tourID);
 
     if (!tour)
-      return res.status(401).json({
+      return res.status(403).json({
         success: false,
         message: "Tour not found. Invalid tour ID.",
       });
@@ -217,5 +217,32 @@ exports.tourRating = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error while rating a tour." });
+  }
+};
+
+exports.fetchUser = async (req, res) => {
+  const { userID } = req.params;
+
+  try {
+    const user = await userModel.findById(userID).select("-password");
+
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+
+    const userData = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      isVerified: user.isVerified,
+    };
+
+    res.status(200).json({ success: true, message: "User found", userData });
+  } catch (error) {
+    console.log("Error while fetching user data.", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while fetching user data." });
   }
 };

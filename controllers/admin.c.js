@@ -129,7 +129,7 @@ exports.verifyAdmin = async (req, res) => {
 
     if (!admin)
       return res
-        .status(401)
+        .status(404)
         .json({ success: false, message: "Admin account not found." });
 
     if (OTP !== admin.OTP)

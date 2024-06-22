@@ -171,7 +171,7 @@ exports.adminDeletePost = async (req, res) => {
     const post = await blogModel.findById(postID);
     if (!post)
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, message: "Post not found." });
 
     await blogModel.findByIdAndDelete(postID);

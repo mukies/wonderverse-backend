@@ -5,7 +5,10 @@ exports.adminProtection = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
 
-    if (!token) return res.json({ success: false, message: "Token not found" });
+    if (!token)
+      return res
+        .status(404)
+        .json({ success: false, message: "Token not found" });
 
     const decode = jwt.verify(token, process.env.JWT_KEY);
     if (!decode) return res.json({ success: false, message: "Invalid token" });
@@ -15,10 +18,12 @@ exports.adminProtection = async (req, res, next) => {
       .select("-password");
 
     if (!admin)
-      return res.json({ success: false, message: "Admin account not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin account not found" });
 
     if (!admin?.isVerified)
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Admin account is not verified",
       });
