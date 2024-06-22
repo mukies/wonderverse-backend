@@ -7,7 +7,9 @@ exports.addTransportation = async (req, res) => {
     costPerPerson,
     transportationDesc,
     contactNumber,
+    contactEmail,
     duration,
+    from,
   } = req.body;
 
   //todo validation
@@ -16,9 +18,11 @@ exports.addTransportation = async (req, res) => {
       tourID,
       transportationType,
       costPerPerson,
-      transportationDesc: transportationDesc || "",
+      transportationDesc,
       contactNumber,
       duration,
+      from,
+      contactEmail,
     });
 
     await newTransportation.save();
@@ -44,6 +48,8 @@ exports.editTransportationDetails = async (req, res) => {
     transportationDesc,
     contactNumber,
     duration,
+    contactEmail,
+    from,
   } = req.body;
 
   const { id } = req.params;
@@ -56,9 +62,11 @@ exports.editTransportationDetails = async (req, res) => {
         tourID,
         transportationType,
         costPerPerson,
-        transportationDesc: transportationDesc || "",
+        transportationDesc,
         contactNumber,
         duration,
+        contactEmail,
+        from,
       }
     );
 
@@ -92,17 +100,25 @@ exports.fetchAllTransportation = async (req, res) => {
   }
 };
 
-exports.fetchTransportationByTourId = async (req, res) => {
+exports.fetchTransportationByTourIdAndLocation = async (req, res) => {
   const { tourID } = req.params;
+  const { from } = req.body;
+
+  if (!tourID || !from)
+    return res.status(400).json({
+      success: false,
+      message: "Tour id and customer location is required.",
+    });
+
   try {
-    const transportations = await transportationModel.find({ tourID });
+    const transportations = await transportationModel.find({ from, tourID });
 
     res.status(200).json({ success: true, transportations });
   } catch (error) {
-    console.log("Error while fetching Transportations.", error);
+    console.log("Error while fetching transportation.");
     res.status(500).json({
+      message: "Error while fetching transportation.",
       success: false,
-      message: "Error while fetching Transportations.",
     });
   }
 };

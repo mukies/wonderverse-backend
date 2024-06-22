@@ -11,14 +11,16 @@ exports.registerUser = async (req, res) => {
 
   if (!firstName || !lastName || !email || !password)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "Please provide required field." });
 
   try {
     const isEmailExist = await userModel.findOne({ email });
 
     if (isEmailExist && isEmailExist.isVerified) {
-      return res.json({ success: false, message: "Email already exist." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Email already exist." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -73,14 +75,14 @@ exports.loginUser = async (req, res) => {
 
   if (!email || !password)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "Please provide required field." });
 
   try {
     const isRegister = await userModel.findOne({ email });
 
     if (!isRegister || !isRegister?.isVerified)
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Invalid email or password.",
       });
@@ -90,7 +92,7 @@ exports.loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, isRegister.password);
 
     if (!isMatch)
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Invalid email or password.",
       });
@@ -119,7 +121,7 @@ exports.verifyUser = async (req, res) => {
 
   if (!OTP)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "OTP code and userID required" });
 
   try {
@@ -131,7 +133,7 @@ exports.verifyUser = async (req, res) => {
       return res.json({ success: false, message: "Invalid OTP code." });
 
     if (user.OTPExpiryDate < new Date())
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "OTP code has been expired. Register again.",
       });
@@ -174,7 +176,7 @@ exports.tourRating = async (req, res) => {
   const { tourID } = req.params;
 
   if (!rating || !comment)
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: "Rating and message is required to submit a review.",
     });
@@ -189,7 +191,7 @@ exports.tourRating = async (req, res) => {
     const tour = await tourModel.findById(tourID);
 
     if (!tour)
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Tour not found. Invalid tour ID.",
       });

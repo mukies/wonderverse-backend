@@ -3,8 +3,8 @@ const userModel = require("../models/user.m");
 
 exports.newBooking = async (req, res) => {
   const { id: tourID } = req.params;
-  // const userID = req.user?._id;
-  const userID = "1234hshjs";
+  const userID = req.user?._id;
+
   const {
     selectedGuide,
     selectedHotel,
@@ -30,10 +30,8 @@ exports.newBooking = async (req, res) => {
     });
 
     const user = await userModel.findById(userID);
-    user.bookings.push(newBooking);
 
     await newBooking.save();
-    await user.save();
     //todo:send booking confirmation email
 
     res.status(200).json({

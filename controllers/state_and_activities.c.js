@@ -12,7 +12,7 @@ exports.addState = async (req, res) => {
 
   if (!name)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "State name is required." });
 
   try {
@@ -20,7 +20,9 @@ exports.addState = async (req, res) => {
       $or: [{ name }, { slug: name.toLowerCase() }],
     });
     if (isNameExist)
-      return res.json({ success: false, message: "State name already exist." });
+      return res
+        .status(403)
+        .json({ success: false, message: "State name already exist." });
 
     const newState = new stateModel({
       name,
@@ -53,7 +55,7 @@ exports.updateState = async (req, res) => {
 
   if (!name)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "State name is required." });
 
   try {
@@ -61,7 +63,9 @@ exports.updateState = async (req, res) => {
       $or: [{ name }, { slug: name.toLowerCase() }],
     });
     if (isNameExist)
-      return res.json({ success: false, message: "State name already exist." });
+      return res
+        .status(403)
+        .json({ success: false, message: "State name already exist." });
 
     const updatedState = await stateModel.findByIdAndUpdate(id, {
       name,
@@ -132,7 +136,7 @@ exports.addActivity = async (req, res) => {
 
   if (!title)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "Activity title is required." });
 
   try {
@@ -140,7 +144,7 @@ exports.addActivity = async (req, res) => {
       $or: [{ title }, { slug: title.toLowerCase() }],
     });
     if (isTitleExist)
-      return res.json({
+      return res.status(403).json({
         success: false,
         message: "Activity title already exist.",
       });
@@ -175,7 +179,7 @@ exports.updateActivity = async (req, res) => {
 
   if (!title)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "Activity title is required." });
 
   try {
@@ -183,7 +187,7 @@ exports.updateActivity = async (req, res) => {
       $or: [{ title }, { slug: title.toLowerCase() }],
     });
     if (isTitleExist)
-      return res.json({
+      return res.status(403).json({
         success: false,
         message: "Activity title already exist.",
       });

@@ -2,12 +2,19 @@ const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const guideModel = require("../models/guide.m");
 
 exports.addGuide = async (req, res) => {
-  const { tourID, guideName, price, guideDesc, guideContactNumber } = req.body;
+  const {
+    tourID,
+    guideName,
+    price,
+    guideDesc,
+    guideContactNumber,
+    guideEmail,
+  } = req.body;
   let { guidePhoto } = req.body;
 
   //todo validation
   try {
-    if (!guidePhoto.startsWith("http")) {
+    if (guidePhoto && !guidePhoto.startsWith("http")) {
       //todo generate cloudinary link
 
       guidePhoto = await generateLink(guidePhoto);
@@ -17,9 +24,10 @@ exports.addGuide = async (req, res) => {
       tourID,
       guideName,
       price,
-      guideDesc: guideDesc || "",
+      guideDesc,
       guideContactNumber,
       guidePhoto,
+      guideEmail,
     });
 
     await newGuide.save();
@@ -38,7 +46,14 @@ exports.addGuide = async (req, res) => {
 };
 
 exports.editGuideDetails = async (req, res) => {
-  const { tourID, guideName, price, guideDesc, guideContactNumber } = req.body;
+  const {
+    tourID,
+    guideEmail,
+    guideName,
+    price,
+    guideDesc,
+    guideContactNumber,
+  } = req.body;
   let { guidePhoto } = req.body;
   const { id } = req.params;
 
@@ -52,9 +67,10 @@ exports.editGuideDetails = async (req, res) => {
       tourID,
       guideName,
       price,
-      guideDesc: guideDesc || "",
+      guideDesc,
       guideContactNumber,
       guidePhoto,
+      guideEmail,
     });
 
     await updatedGuide.save();

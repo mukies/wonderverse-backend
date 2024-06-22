@@ -7,17 +7,17 @@ exports.createPost = async (req, res) => {
   const postedBy = req.user._id;
 
   if (!postedBy)
-    return res.json({
+    return res.status(401).json({
       success: false,
       message: "Login to post a blog.",
     });
   if (!blogContent && !blogTitle)
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: "Blog title and content required.",
     });
   if (!blogContent && !image)
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: "Blog content required.",
     });
@@ -31,7 +31,7 @@ exports.createPost = async (req, res) => {
     await newBlog.save();
 
     res
-      .status(200)
+      .status(201)
       .json({ success: true, message: "New blog created.", newBlog });
   } catch (error) {
     console.log("Error while creating blog post", error);
@@ -49,7 +49,7 @@ exports.deletePost = async (req, res) => {
     const post = await blogModel.findById(postID);
 
     if (post.postedBy.toString() !== userID.toString())
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "You are not allowed to delete others post.",
       });
@@ -73,12 +73,12 @@ exports.editPost = async (req, res) => {
   const { postID } = req.params;
 
   if (!postedBy)
-    return res.json({
+    return res.status(401).json({
       success: false,
       message: "Login to post a blog.",
     });
   if (!blogContent && !blogTitle)
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: "Blog title and content required.",
     });
@@ -87,7 +87,7 @@ exports.editPost = async (req, res) => {
     const post = await blogModel.findById(postID);
 
     if (post.postedBy.toString() !== userID.toString())
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "You are not allowed to edit others post.",
       });
@@ -151,7 +151,7 @@ exports.singlePost = async (req, res) => {
 
     if (!post)
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, message: "Post not found" });
 
     res.status(200).json({ success: true, post });

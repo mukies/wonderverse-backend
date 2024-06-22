@@ -9,6 +9,7 @@ exports.addHotel = async (req, res) => {
     hotelDesc,
     hotelContactNumber,
     hotelLocation,
+    hotelEmail,
   } = req.body;
   let { hotelMainImage, featureImages } = req.body;
 
@@ -33,11 +34,12 @@ exports.addHotel = async (req, res) => {
       tourID,
       hotelName,
       livingCostPerDayPerPerson,
-      hotelDesc: hotelDesc || "",
+      hotelDesc,
       hotelContactNumber,
       hotelLocation,
       hotelMainImage,
       featureImages,
+      hotelEmail,
     });
 
     await newHotel.save();
@@ -63,6 +65,7 @@ exports.editHotelDetails = async (req, res) => {
     hotelDesc,
     hotelContactNumber,
     hotelLocation,
+    hotelEmail,
   } = req.body;
   let { hotelMainImage, featureImages } = req.body;
 
@@ -85,11 +88,12 @@ exports.editHotelDetails = async (req, res) => {
       tourID,
       hotelName,
       livingCostPerDayPerPerson,
-      hotelDesc: hotelDesc || "",
+      hotelDesc,
       hotelContactNumber,
       hotelLocation,
       hotelMainImage,
       featureImages,
+      hotelEmail,
     });
 
     await updatedHotel.save();

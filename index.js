@@ -41,7 +41,10 @@ app.use("/api/contact-us", contactUsRoute);
 app.use("/api/category", state_and_activities_route);
 
 app.get("/test", async (req, res) => {
-  res.json({ success: true, message: "server ok" });
+  res.status(401).json({ success: false, message: "server not ok" });
+});
+app.get("/test1", async (req, res) => {
+  res.status(200).json({ success: true, message: "server ok" });
 });
 
 // app.use("/api/booking", bookingRoute);

@@ -4,7 +4,7 @@ exports.add_in_topDeals = async (req, res) => {
   const { tour } = req.body;
 
   if (!tour)
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: "Tour id is required.",
     });
@@ -12,7 +12,7 @@ exports.add_in_topDeals = async (req, res) => {
   try {
     const topDeals = await topDealModel.find();
     if (topDeals.length == 8)
-      return res.json({
+      return res.status(400).json({
         success: false,
         message: "No more than 8 tour item is allowed into top deal section.",
       });
@@ -20,7 +20,7 @@ exports.add_in_topDeals = async (req, res) => {
     const isAreadyExist = await topDealModel.findOne({ tour });
 
     if (isAreadyExist)
-      return res.json({
+      return res.status(403).json({
         success: false,
         message: "Tour already exist in top deal section.",
       });
@@ -45,7 +45,7 @@ exports.update_top_deals_items = async (req, res) => {
   const { tour } = req.body;
   const { id } = req.params;
   if (!tour)
-    return res.json({
+    return res.status(400).json({
       success: false,
       message: "Tour id is required.",
     });
@@ -54,7 +54,7 @@ exports.update_top_deals_items = async (req, res) => {
     const isAreadyExist = await topDealModel.findOne({ tour });
 
     if (isAreadyExist)
-      return res.json({
+      return res.status(403).json({
         success: false,
         message: "Tour already exist in top deal section.",
       });

@@ -8,6 +8,7 @@ const hotelSchema = new mongoose.Schema(
       required: true,
     },
     hotelName: { type: String, required: true },
+    hotelEmail: { type: String, required: true },
     hotelMainImage: { type: String, required: true },
     livingCostPerDayPerPerson: { type: Number, required: true },
     hotelDesc: { type: String, default: "" },

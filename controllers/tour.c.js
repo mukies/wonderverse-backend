@@ -39,7 +39,9 @@ exports.createTour = async (req, res) => {
     });
 
     if (isNameExist)
-      return res.json({ success: false, message: "Tour name already exist." });
+      return res
+        .status(403)
+        .json({ success: false, message: "Tour name already exist." });
 
     if (!mainImage.startsWith("http")) {
       mainImage = await generateLink(mainImage);
@@ -63,7 +65,7 @@ exports.createTour = async (req, res) => {
       featureImages,
     });
     await newTour.save();
-    res.json({ success: true, message: "tour created", newTour });
+    res.status(201).json({ success: true, message: "tour created", newTour });
   } catch (error) {
     console.log("Error while creating the tour.", error);
     res
@@ -93,7 +95,9 @@ exports.getToursByState = async (req, res) => {
     const state = await stateModel.findOne({ slug });
 
     if (!state)
-      return res.json({ success: false, message: "State not found." });
+      return res
+        .status(403)
+        .json({ success: false, message: "State not found." });
 
     const tours = await tourModel
       .find({ state: state._id })
@@ -114,7 +118,9 @@ exports.getToursByActivity = async (req, res) => {
     const activity = await activityModel.findOne({ slug });
 
     if (!activity)
-      return res.json({ success: false, message: "Activity not found." });
+      return res
+        .status(403)
+        .json({ success: false, message: "Activity not found." });
 
     const tours = await tourModel
       .find({ activity: activity._id })
@@ -158,22 +164,6 @@ exports.singleTour = async (req, res) => {
   }
 };
 
-exports.fetchTransportation = async (req, res) => {
-  const { tourID } = req.params;
-  const { from } = req.body;
-  try {
-    const transportations = await transportationModel.find({ from, tourID });
-
-    res.status(200).json({ success: true, transportations });
-  } catch (error) {
-    console.log("Error while fetching transportation.");
-    res.status(500).json({
-      message: "Error while fetching transportation.",
-      success: false,
-    });
-  }
-};
-
 exports.editTour = async (req, res) => {
   const { placeName, state, activity, description, location } = req.body;
   let { featureImages, mainImage } = req.body;
@@ -195,7 +185,9 @@ exports.editTour = async (req, res) => {
     });
 
     if (isNameExist)
-      return res.json({ success: false, message: "Tour name already exist." });
+      return res
+        .status(403)
+        .json({ success: false, message: "Tour name already exist." });
 
     //use cloudinary
     featureImages = featureImages.map(async (item) => {
@@ -221,7 +213,9 @@ exports.editTour = async (req, res) => {
       featureImages,
     });
     await tourUpdate.save();
-    res.json({ success: true, message: "Tour has been updated", tourUpdate });
+    res
+      .status(200)
+      .json({ success: true, message: "Tour has been updated", tourUpdate });
   } catch (error) {
     console.log("Error while creating the tour.", error);
     res
@@ -257,7 +251,7 @@ exports.featuredTrips = async (req, res) => {
     const trips = await tourModel
       .find()
       .sort({ avgRating: -1 })
-      .limit(7)
+      .limit(8)
       .populate("state")
       .populate("activity");
 

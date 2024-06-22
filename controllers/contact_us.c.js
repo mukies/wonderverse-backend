@@ -4,7 +4,7 @@ exports.submit_message = async (req, res) => {
   const { fullName, email, subject, message } = req.body;
 
   if (!fullName || !email || !subject || !message)
-    return res.status(204).json({
+    return res.status(400).json({
       success: false,
       message: "Please provide required information.",
     });

@@ -13,7 +13,7 @@ exports.addSponsor = async (req, res) => {
 
   if (!sponsorName || !sponsorImage)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "Sponsor name and image required." });
   try {
     //todo:cloudinary
@@ -25,7 +25,7 @@ exports.addSponsor = async (req, res) => {
     }
 
     const newSponsor = new sponsorModel({
-      sponsorDescription: sponsorDescription || [],
+      sponsorDescription,
       sponsorImage,
       sponsorName,
     });
@@ -72,7 +72,7 @@ exports.editSponsor = async (req, res) => {
 
   if (!sponsorName || !sponsorImage)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "Sponsor name and image required." });
 
   try {
@@ -81,7 +81,7 @@ exports.editSponsor = async (req, res) => {
     }
 
     const updatedSponsor = await sponsorModel.findByIdAndUpdate(id, {
-      sponsorDescription: sponsorDescription || [],
+      sponsorDescription,
       sponsorImage,
       sponsorName,
     });

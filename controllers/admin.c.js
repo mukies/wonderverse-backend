@@ -11,14 +11,16 @@ exports.registerAdmin = async (req, res) => {
 
   if (!fullName || !email || !password)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "Please provide required field." });
 
   try {
     const isEmailExist = await adminModel.find({ isVerified: true });
 
     if (isEmailExist.length > 0) {
-      return res.json({ success: false, message: "Admin already register." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Admin already register." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -71,14 +73,14 @@ exports.loginAdmin = async (req, res) => {
 
   if (!email || !password)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "Please provide required field." });
 
   try {
     const isRegister = await adminModel.findOne({ email });
 
     if (!isRegister || !isRegister?.isVerified)
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Invalid email or password.",
       });
@@ -88,7 +90,7 @@ exports.loginAdmin = async (req, res) => {
     const isMatch = await bcrypt.compare(password, isRegister.password);
 
     if (!isMatch)
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Invalid email or password.",
       });
@@ -119,20 +121,24 @@ exports.verifyAdmin = async (req, res) => {
 
   if (!OTP)
     return res
-      .status(204)
+      .status(400)
       .json({ success: false, message: "OTP code and userID required" });
 
   try {
     const admin = await userModel.findById(uid);
 
     if (!admin)
-      return res.json({ success: false, message: "Admin account not found." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Admin account not found." });
 
     if (OTP !== admin.OTP)
-      return res.json({ success: false, message: "Invalid OTP code." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid OTP code." });
 
     if (admin.OTPExpiryDate < new Date())
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "OTP code has been expired. Register again.",
       });
