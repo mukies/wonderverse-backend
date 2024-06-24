@@ -5,14 +5,15 @@ const {
 const tourModel = require("../models/tour.m");
 const { sendEmail } = require("../nodemailer/sendEmail");
 const adminModel = require("../models/admin.m");
+const { validationResult } = require("express-validator");
 
 exports.registerAdmin = async (req, res) => {
   const { fullName, email, password } = req.body;
 
-  if (!fullName || !email || !password)
-    return res
-      .status(400)
-      .json({ success: false, message: "Please provide required field." });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, message: errors.array() });
+  }
 
   try {
     const isEmailExist = await adminModel.find({ isVerified: true });
@@ -71,10 +72,10 @@ exports.registerAdmin = async (req, res) => {
 exports.loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password)
-    return res
-      .status(400)
-      .json({ success: false, message: "Please provide required field." });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, message: errors.array() });
+  }
 
   try {
     const isRegister = await adminModel.findOne({ email });

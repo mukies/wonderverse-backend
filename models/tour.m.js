@@ -29,6 +29,8 @@ const tourSchema = new mongoose.Schema(
       },
     ],
     description: { type: String, default: "" },
+    included: { type: String, default: "" },
+    excluded: { type: String, default: "" },
     featureImages: { type: [String], required: true },
   },
   { timestamps: true }

@@ -3,7 +3,7 @@ const app = express();
 
 require("dotenv").config();
 require("./database");
-
+const multer = require("multer");
 const cookie = require("cookie-parser");
 const cors = require("cors");
 const { v2 } = require("cloudinary");
@@ -13,6 +13,11 @@ const userRoute = require("./routes/user.r");
 const topDealsRoute = require("./routes/topDeals.r");
 const contactUsRoute = require("./routes/contact_us.r");
 const blogRoute = require("./routes/blog.r");
+
+//multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+app.use(upload.none());
 
 app.use(
   cors({

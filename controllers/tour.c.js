@@ -14,8 +14,10 @@ exports.createTour = async (req, res) => {
     placeName, //todo string
     state,
     activity,
-    description, //not required
+    description,
     location,
+    included,
+    excluded,
   } = req.body;
   const { featureImages, mainImage } = req.body;
   try {
@@ -23,8 +25,7 @@ exports.createTour = async (req, res) => {
     if (!result.isEmpty())
       return res.status(400).json({
         success: false,
-        message: "Validation error",
-        error: result.array(),
+        message: result.array(),
       });
 
     const isNameExist = await tourModel.findOne({
@@ -63,6 +64,8 @@ exports.createTour = async (req, res) => {
       description,
       location,
       featureImages,
+      included,
+      excluded,
     });
     await newTour.save();
     res.status(201).json({ success: true, message: "tour created", newTour });
@@ -165,7 +168,15 @@ exports.singleTour = async (req, res) => {
 };
 
 exports.editTour = async (req, res) => {
-  const { placeName, state, activity, description, location } = req.body;
+  const {
+    placeName,
+    state,
+    activity,
+    description,
+    location,
+    included,
+    excluded,
+  } = req.body;
   let { featureImages, mainImage } = req.body;
 
   const { tourID } = req.params;
@@ -176,8 +187,7 @@ exports.editTour = async (req, res) => {
     if (!result.isEmpty())
       return res.status(400).json({
         success: false,
-        message: "Validation error",
-        error: result.array(),
+        message: result.array(),
       });
 
     const isNameExist = await tourModel.findOne({
@@ -211,6 +221,8 @@ exports.editTour = async (req, res) => {
       description,
       location,
       featureImages,
+      included,
+      excluded,
     });
     await tourUpdate.save();
     res

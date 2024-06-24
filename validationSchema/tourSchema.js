@@ -6,6 +6,10 @@ exports.tourSchema = {
     isString: {
       errorMessage: "Place Name must be in string format",
     },
+    isLength: {
+      options: { min: 3 },
+      errorMessage: "Place Name must be at least 3 characters long",
+    },
   },
   state: {
     notEmpty: {
@@ -36,7 +40,7 @@ exports.tourSchema = {
       errorMessage: "Main image is required.",
     },
     isString: {
-      errorMessage: "mainImage must be in string format",
+      errorMessage: "Main image must be in nase64 string format.",
     },
   },
   featureImages: {
@@ -44,7 +48,31 @@ exports.tourSchema = {
       errorMessage: "Feature images is required.",
     },
     isArray: {
-      errorMessage: "Feature images is must be an array of strings.",
+      errorMessage: "Feature Images must be an array",
+    },
+    custom: {
+      options: (value) => {
+        return value.every((item) => typeof item === "string");
+      },
+      errorMessage: "All elements of Feature Images must be strings",
+    },
+  },
+  included: {
+    optional: true,
+    isString: {
+      errorMessage: "What's Included field must be in string format",
+    },
+  },
+  excluded: {
+    optional: true,
+    isString: {
+      errorMessage: "What's Excluded field must be in string format",
+    },
+  },
+  description: {
+    optional: true,
+    isString: {
+      errorMessage: "Description must be in string format",
     },
   },
 };

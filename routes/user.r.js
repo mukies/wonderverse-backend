@@ -1,3 +1,4 @@
+const { checkSchema } = require("express-validator");
 const {
   loginUser,
   registerUser,
@@ -7,11 +8,15 @@ const {
   fetchUser,
 } = require("../controllers/user.c");
 const { userProtection } = require("../middlewares/userProtection");
+const {
+  loginSchema,
+  userRegisterSchema,
+} = require("../validationSchema/authSchema");
 
 const router = require("express").Router();
 
-router.post("/login", loginUser);
-router.post("/register", registerUser);
+router.post("/login", checkSchema(loginSchema), loginUser);
+router.post("/register", checkSchema(userRegisterSchema), registerUser);
 router.post("/logout", logoutUser);
 router.put("/verify-user/:uid", verifyUser); //payload = otp
 router.get("/get/:userID", fetchUser);
