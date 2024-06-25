@@ -10,6 +10,7 @@ const transportationSchema = new mongoose.Schema(
     from: { type: String, required: true },
     transportationType: { type: String, required: true },
     costPerPerson: { type: Number, required: true },
+    capacity: { type: Number, default: "N/A" },
     transportationDesc: { type: String, default: "" },
     contactNumber: { type: String, required: true },
     contactEmail: { type: String, required: true },

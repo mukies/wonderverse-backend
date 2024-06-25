@@ -40,7 +40,7 @@ exports.tourSchema = {
       errorMessage: "Main image is required.",
     },
     isString: {
-      errorMessage: "Main image must be in nase64 string format.",
+      errorMessage: "Main image must be in base64 string format.",
     },
   },
   featureImages: {

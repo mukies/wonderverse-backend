@@ -13,6 +13,7 @@ const userRoute = require("./routes/user.r");
 const topDealsRoute = require("./routes/topDeals.r");
 const contactUsRoute = require("./routes/contact_us.r");
 const blogRoute = require("./routes/blog.r");
+const { body, validationResult } = require("express-validator");
 
 //multer
 const storage = multer.memoryStorage();
@@ -48,6 +49,18 @@ app.use("/api/category", state_and_activities_route);
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "server is ok." });
 });
+
+app.post(
+  "/test",
+  body("age").isNumeric().withMessage("must be in number format"),
+  (req, res) => {
+    const error = validationResult(req);
+
+    const { age } = req.body;
+
+    res.json({ success: true, age, error });
+  }
+);
 
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Invalid API endpoint." });

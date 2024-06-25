@@ -7,12 +7,15 @@ const bookingschema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    userDetails: {
-      fullName: { type: String, required: true },
-      contactNumber: { type: String, required: true },
-      passportNumber: { type: String, default: "" },
-      country: { type: String, default: "" },
-    },
+    userDetails: [
+      {
+        fullName: { type: String, required: true },
+        email: { type: String, required: true },
+        contactNumber: { type: String, required: true },
+        country: { type: String, required: true },
+        passportNumber: { type: String, default: "" },
+      },
+    ],
 
     tourID: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,7 +25,7 @@ const bookingschema = new mongoose.Schema(
     selectedGuide: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Guide",
-      required: true,
+      default: "",
     },
     selectedTransportation: {
       transportation: {

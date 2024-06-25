@@ -128,10 +128,15 @@ exports.verifyUser = async (req, res) => {
   try {
     const user = await userModel.findById(uid);
 
-    if (!user) return res.json({ success: false, message: "User not found." });
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
 
     if (OTP !== user.OTP)
-      return res.json({ success: false, message: "Invalid OTP code." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid OTP code." });
 
     if (user.OTPExpiryDate < new Date())
       return res.status(401).json({
@@ -192,7 +197,7 @@ exports.tourRating = async (req, res) => {
     const tour = await tourModel.findById(tourID);
 
     if (!tour)
-      return res.status(403).json({
+      return res.status(404).json({
         success: false,
         message: "Tour not found. Invalid tour ID.",
       });

@@ -3,61 +3,58 @@ exports.mailTemplate = (username, otp) => {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Code - ${otp}</title>
+    <title>Verification Code</title>
   </head>
-  <body style="font-family: Verdana, Geneva, Tahoma, sans-serif">
-    <div style="padding-inline: 5px">
-      <p style="font-size: 20px">Hello ${username},</p>
-      <p>
-        Thank you for registering. Please use the following verification code to
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    "
+  >
+    <div
+      style="
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <h2 style="color: #333333">Verify Your Email Address</h2>
+      <p style="color: #666666">Dear ${username},</p>
+      <p style="color: #666666">
+        Thank you for signing up! Please use the following verification code to
         complete your registration:
       </p>
-      <div>
-        <p style="margin: 0px; padding: 0px">Varification Code:</p>
-        <p
+      <div style="text-align: center; margin: 20px 0">
+        <span
           style="
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 24px;
             font-weight: bold;
-            font-size: 28px;
-            margin-block: 3px;
-            padding: 0px;
+            color: #ffffff;
+            background-color: #4caf50;
+            border-radius: 4px;
           "
+          >${otp}</span
         >
-          ${otp}
-        </p>
-        <p style="font-size: 15px; margin-top: 0px; margin-bottom: 10px">
-          (This code is valid only for 1 hour.)
-        </p>
       </div>
-
-      <p>If you did not request this code, please ignore this email.</p>
-
-      <div>
-        <p style="margin-bottom: 3px; font-size: 18px">Thank You !</p>
-        <p style="margin-top: 3px; font-weight: 600">Wonderverse Nepal Team</p>
-      </div>
-
-      <div
-        style="
-          height: 150px;
-          width: 150px;
-          overflow: hidden;
-          border-radius: 100%;
-        "
-      >
-        <img
-          style="
-            object-fit: cover;
-            object-position: center;
-            height: 100%;
-            width: 100%;
-          "
-          src="https://res.cloudinary.com/dslt6nblj/image/upload/v1718525434/assets/vixw6al2fl3dbea8k1ap.jpg"
-          alt="Wonderverse Nepal"
-        />
-      </div>
+      <p style="color: #666666">
+        This code is only valid for 1 hour, <br />
+        If you did not request this code, please ignore this email.
+      </p>
+      <p style="color: #666666">Best regards,<br />Wanderverse Nepal Team</p>
     </div>
   </body>
 </html>
 `;
 };
+
+exports.bookingTemplateForUser = () => {};
+exports.contactMessageTemplate = () => {};
+exports.bookingTemplateForHotel = () => {};
+exports.bookingTemplateForTransportation = () => {};
+exports.bookingTemplateForGuide = () => {};

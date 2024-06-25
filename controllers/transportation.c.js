@@ -8,8 +8,9 @@ exports.addTransportation = async (req, res) => {
     transportationDesc,
     contactNumber,
     contactEmail,
-    duration,
+    estimatedDuration,
     from,
+    capacity,
   } = req.body;
 
   //todo validation
@@ -20,9 +21,10 @@ exports.addTransportation = async (req, res) => {
       costPerPerson,
       transportationDesc,
       contactNumber,
-      duration,
+      estimatedDuration,
       from,
       contactEmail,
+      capacity,
     });
 
     await newTransportation.save();
@@ -47,9 +49,10 @@ exports.editTransportationDetails = async (req, res) => {
     costPerPerson,
     transportationDesc,
     contactNumber,
-    duration,
+    estimatedDuration,
     contactEmail,
     from,
+    capacity,
   } = req.body;
 
   const { id } = req.params;
@@ -64,9 +67,10 @@ exports.editTransportationDetails = async (req, res) => {
         costPerPerson,
         transportationDesc,
         contactNumber,
-        duration,
+        estimatedDuration,
         contactEmail,
         from,
+        capacity,
       }
     );
 
