@@ -62,7 +62,7 @@ exports.createTour = async (req, res) => {
       state,
       activity,
       description,
-      location,
+      location: location.toLowerCase(),
       featureImages,
       included,
       excluded,
@@ -150,7 +150,7 @@ exports.singleTour = async (req, res) => {
       .findById(tourID)
       .populate("state")
       .populate("activity")
-      .populate("reviews.userID", "firstName lastName");
+      .populate("reviews.userID", "firstName lastName photo country");
 
     const tourDetails = {
       tour,
@@ -219,7 +219,7 @@ exports.editTour = async (req, res) => {
       state,
       activity,
       description,
-      location,
+      location: location.toLowerCase(),
       featureImages,
       included,
       excluded,

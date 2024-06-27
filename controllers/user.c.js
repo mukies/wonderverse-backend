@@ -6,13 +6,21 @@ const {
 const tourModel = require("../models/tour.m");
 const { sendEmail } = require("../nodemailer/sendEmail");
 const { validationResult } = require("express-validator");
+const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 
 exports.registerUser = async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, country } = req.body;
+  let { photo } = req.body;
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, message: errors.array() });
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
+  }
+
+  if (!photo.startsWith("http")) {
+    photo = await generateLink(photo);
   }
 
   try {
@@ -35,6 +43,8 @@ exports.registerUser = async (req, res) => {
     if (isEmailExist && !isEmailExist.isVerified) {
       isEmailExist.firstName = firstName;
       isEmailExist.lastName = lastName;
+      isEmailExist.country = country;
+      isEmailExist.photo = photo;
       isEmailExist.password = hashedPassword;
       isEmailExist.OTP = OTP;
       isEmailExist.OTPExpiryDate = OTPExpiryDate;
@@ -49,6 +59,8 @@ exports.registerUser = async (req, res) => {
         password: hashedPassword,
         OTP,
         OTPExpiryDate,
+        photo,
+        country,
       });
       await newUser.save();
       userID = newUser._id;
@@ -100,6 +112,7 @@ exports.loginUser = async (req, res) => {
 
     const userData = {
       _id: isRegister._id,
+      photo: isRegister.photo,
       email: isRegister.email,
       firstName: isRegister.firstName,
       lastName: isRegister.lastName,
@@ -153,6 +166,8 @@ exports.verifyUser = async (req, res) => {
       firstName: user.firstName,
       lastName: user.lastName,
     };
+
+    generateTokenAndSetCookie(user._id, res);
 
     res
       .status(200)
@@ -227,7 +242,7 @@ exports.tourRating = async (req, res) => {
 };
 
 exports.fetchUser = async (req, res) => {
-  const { userID } = req.params;
+  const userID = req.user._id;
 
   try {
     const user = await userModel.findById(userID).select("-password");

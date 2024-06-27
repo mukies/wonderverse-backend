@@ -1,4 +1,18 @@
 exports.userRegisterSchema = {
+  photo: {
+    optional: true,
+    isString: {
+      errorMessage: "Photo must be in string format",
+    },
+  },
+  country: {
+    notEmpty: {
+      errorMessage: "Country is required.",
+    },
+    isString: {
+      errorMessage: "Country must be in string format",
+    },
+  },
   firstName: {
     notEmpty: {
       errorMessage: "First Name is required.",

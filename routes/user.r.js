@@ -7,6 +7,7 @@ const {
   logoutUser,
   fetchUser,
 } = require("../controllers/user.c");
+
 const { userProtection } = require("../middlewares/userProtection");
 const {
   loginSchema,
@@ -19,7 +20,7 @@ router.post("/login", checkSchema(loginSchema), loginUser);
 router.post("/register", checkSchema(userRegisterSchema), registerUser);
 router.post("/logout", logoutUser);
 router.put("/verify-user/:uid", verifyUser); //payload = otp
-router.get("/get/:userID", fetchUser);
+router.get("/loggedin-user", userProtection, fetchUser);
 router.post("/tour-rating/:tourID", userProtection, tourRating); //payload = rating, comment
 
 module.exports = router;

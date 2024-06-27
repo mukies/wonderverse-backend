@@ -123,10 +123,10 @@ exports.verifyAdmin = async (req, res) => {
   if (!OTP)
     return res
       .status(400)
-      .json({ success: false, message: "OTP code and userID required" });
+      .json({ success: false, message: "OTP code required" });
 
   try {
-    const admin = await userModel.findById(uid);
+    const admin = await adminModel.findById(uid);
 
     if (!admin)
       return res
@@ -153,6 +153,8 @@ exports.verifyAdmin = async (req, res) => {
       fullName: admin.fullName,
       isVerified: admin.isVerified,
     };
+
+    generateTokenAndSetCookie(admin._id, res);
 
     res
       .status(200)

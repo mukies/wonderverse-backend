@@ -114,7 +114,7 @@ exports.allBlogPost = async (req, res) => {
   try {
     const posts = await blogModel
       .find()
-      .populate("postedBy", "firstName lastName ");
+      .populate("postedBy", "firstName lastName photo country");
     res.status(200).json({ success: true, posts });
   } catch (error) {
     console.log("Error while fetching blog post", error);
@@ -128,7 +128,7 @@ exports.personalPost = async (req, res) => {
   try {
     const posts = await blogModel
       .find({ postedBy: req.user._id })
-      .populate("postedBy", "firstName lastName ");
+      .populate("postedBy", "firstName lastName photo country");
 
     res.status(200).json({ success: true, posts });
   } catch (error) {
@@ -145,7 +145,7 @@ exports.singlePost = async (req, res) => {
   try {
     const post = await blogModel
       .findById(postID)
-      .populate("postedBy", "firstName lastName")
+      .populate("postedBy", "firstName lastName photo country")
       .populate("likes", "firstName lastName")
       .populate("comments.commentedBy", "firstName lastName");
 

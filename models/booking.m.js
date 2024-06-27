@@ -22,13 +22,15 @@ const bookingschema = new mongoose.Schema(
       ref: "Tour",
       required: true,
     },
+
     selectedGuide: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Guide",
       default: "",
     },
+
     selectedTransportation: {
-      transportation: {
+      transportationID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Transportation",
         required: true,
@@ -36,8 +38,9 @@ const bookingschema = new mongoose.Schema(
       numberOfPeople: { type: Number, required: true },
       totalCost: { type: Number, required: true },
     },
+
     selectedHotel: {
-      hotel: {
+      hotelID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Hotel",
         required: true,
@@ -46,6 +49,7 @@ const bookingschema = new mongoose.Schema(
       stayingDays: { type: Number, required: true },
       totalHotelCost: { type: Number, required: true },
     },
+
     bookingDate: { type: Date, required: true },
     tourStartingDate: { type: Date, required: true },
     participants: { type: Number, required: true },
