@@ -22,7 +22,7 @@ app.use(upload.none());
 
 app.use(
   cors({
-    origin: "*",
+    origin: [/./],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
