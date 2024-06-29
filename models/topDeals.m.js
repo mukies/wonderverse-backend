@@ -2,11 +2,7 @@ const mongoose = require("mongoose");
 
 const topDealSchema = new mongoose.Schema(
   {
-    tour: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Tour",
-      required: true,
-    },
+    deals: { type: Object, required: true },
   },
   { timestamps: true }
 );

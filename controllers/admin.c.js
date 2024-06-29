@@ -12,20 +12,24 @@ exports.registerAdmin = async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, message: errors.array() });
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
   }
 
   try {
-    const isEmailExist = await adminModel.find({ isVerified: true });
+    const isAdminExist = await adminModel.findOne({ isVerified: true });
 
-    if (isEmailExist.length > 0) {
+    if (isAdminExist) {
       return res
         .status(401)
         .json({ success: false, message: "Admin already register." });
     }
 
+    const isEmailExist = await adminModel.findOne({ email });
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const OTP = Math.floor(100000 * Math.random() + 900000).toString();
+    const OTP = Math.floor(100000 + Math.random() * 900000).toString();
 
     const OTPExpiryDate = new Date();
     OTPExpiryDate.setHours(OTPExpiryDate.getHours() + 1);
@@ -62,7 +66,7 @@ exports.registerAdmin = async (req, res) => {
       adminID,
     });
   } catch (error) {
-    console.log("Error while registering admin.");
+    console.log("Error while registering admin.", error);
     res
       .status(500)
       .json({ success: false, message: "Error while registering admin." });

@@ -53,7 +53,16 @@ const bookingschema = new mongoose.Schema(
     bookingDate: { type: Date, required: true },
     tourStartingDate: { type: Date, required: true },
     participants: { type: Number, required: true },
-    status: { type: String, default: "pending" },
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "cancelled"],
+      default: "pending",
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed"],
+      default: "pending",
+    },
     totalTourCost: { type: Number, required: true },
   },
   { timestamps: true }

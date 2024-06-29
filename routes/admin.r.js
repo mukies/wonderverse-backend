@@ -17,6 +17,6 @@ const router = require("express").Router();
 router.post("/login", checkSchema(loginSchema), loginAdmin);
 router.post("/register", checkSchema(adminRegisterSchema), registerAdmin);
 router.post("/logout", logoutAdmin);
-router.put("/verify-user/:uid", verifyAdmin); //payload = otp
+router.put("/verify-admin/:uid", verifyAdmin); //payload = otp
 
 module.exports = router;

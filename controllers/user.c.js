@@ -19,7 +19,7 @@ exports.registerUser = async (req, res) => {
       .json({ success: false, message: errors.array()[0].msg });
   }
 
-  if (!photo.startsWith("http")) {
+  if (photo && !photo.startsWith("http")) {
     photo = await generateLink(photo);
   }
 
@@ -33,7 +33,7 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const OTP = Math.floor(100000 * Math.random() + 900000).toString();
+    const OTP = Math.floor(100000 + Math.random() * 900000).toString();
 
     const OTPExpiryDate = new Date();
     OTPExpiryDate.setHours(OTPExpiryDate.getHours() + 1);
@@ -102,7 +102,7 @@ exports.loginUser = async (req, res) => {
 
     //check password
 
-    const isMatch = await bcrypt.compare(password, isRegister.password);
+    const isMatch = bcrypt.compare(password, isRegister.password);
 
     if (!isMatch)
       return res.status(401).json({
@@ -158,6 +158,7 @@ exports.verifyUser = async (req, res) => {
       });
 
     user.isVerified = true;
+
     await user.save();
 
     const userData = {
