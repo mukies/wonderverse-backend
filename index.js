@@ -15,7 +15,6 @@ const adminRoute = require("./routes/admin.r");
 const topDestinationRoute = require("./routes/top_Destination.r");
 const contactUsRoute = require("./routes/contact_us.r");
 const blogRoute = require("./routes/blog.r");
-const testModel = require("./test/test.m");
 const { sendEmail } = require("./nodemailer/sendEmail");
 
 //multer
@@ -51,7 +50,7 @@ app.use("/api/top-destination", topDestinationRoute);
 app.use("/api/contact-us", contactUsRoute);
 app.use("/api/category", state_and_activities_route);
 app.get("/", (req, res) => {
-  res.status(200).json({ success: true, message: "server is ok." });
+  res.status(200).json({ success: true, message: "server is very ok." });
 });
 
 // app.post("/test", async (req, res) => {
