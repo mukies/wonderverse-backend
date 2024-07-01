@@ -3,7 +3,9 @@ const userModel = require("../models/user.m");
 
 exports.userProtection = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    // const token = req.cookies.jwt;
+    const token = req.headers.Authorization.split(" ")[1];
+
     console.log("token", token);
     if (!token)
       return res
