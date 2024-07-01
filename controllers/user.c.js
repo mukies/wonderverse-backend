@@ -118,7 +118,7 @@ exports.loginUser = async (req, res) => {
       lastName: isRegister.lastName,
     };
 
-    const token = generateTokenAndSetCookie(isRegister._id, res);
+    const token = await generateTokenAndSetCookie(isRegister._id, res);
 
     res
       .status(200)
