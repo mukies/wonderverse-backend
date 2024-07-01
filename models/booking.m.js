@@ -47,6 +47,7 @@ const bookingschema = new mongoose.Schema(
       },
       numberOfPeople: { type: Number, required: true },
       stayingDays: { type: Number, required: true },
+      checkIn: { type: Date, required: true },
       totalHotelCost: { type: Number, required: true },
     },
 
@@ -58,11 +59,13 @@ const bookingschema = new mongoose.Schema(
       enum: ["pending", "confirmed", "cancelled"],
       default: "pending",
     },
+
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed"],
       default: "pending",
     },
+
     totalTourCost: { type: Number, required: true },
   },
   { timestamps: true }

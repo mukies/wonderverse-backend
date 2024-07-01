@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
     facebookID: { type: String, unique: true, default: "" },
     photo: { type: String, default: "" },
     firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    lastName: { type: String },
     country: String,
     email: { type: String, unique: true, required: true },
     password: String,
@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema(
     passwordRecoveryCode: { type: String, default: "" },
     isTravelAgent: { type: Boolean, default: false },
     isGuideAgent: { type: Boolean, default: false },
-    // bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
   },
 
   { timestamps: true }
