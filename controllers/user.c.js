@@ -118,11 +118,11 @@ exports.loginUser = async (req, res) => {
       lastName: isRegister.lastName,
     };
 
-    generateTokenAndSetCookie(isRegister._id, res);
+    const token = generateTokenAndSetCookie(isRegister._id, res);
 
     res
       .status(200)
-      .json({ success: true, message: "Login successful", userData });
+      .json({ success: true, message: "Login successful", userData, token });
   } catch (error) {
     console.log("Error while login.");
     res.status(500).json({ success: false, message: "Error while login." });
@@ -168,11 +168,9 @@ exports.verifyUser = async (req, res) => {
       lastName: user.lastName,
     };
 
-    generateTokenAndSetCookie(user._id, res);
+    // generateTokenAndSetCookie(user._id, res);
 
-    res
-      .status(200)
-      .json({ success: true, message: "User has been verified", userData });
+    res.status(200).json({ success: true, message: "User has been verified" });
   } catch (error) {
     console.log("Error while verifying user.");
     res

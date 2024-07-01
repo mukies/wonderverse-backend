@@ -46,9 +46,9 @@ router.get(
     session: false,
   }),
   (req, res) => {
-    generateTokenAndSetCookie(req.user, res);
-
+    const token = generateTokenAndSetCookie(req.user, res);
     res.redirect(process.env.FRONTEND_URL);
+    res.json({ token });
   }
 );
 module.exports = router;
