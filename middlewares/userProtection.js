@@ -5,19 +5,28 @@ exports.userProtection = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
     console.log("token", token);
-    if (!token) return res.json({ success: false, message: "Token not found" });
+    if (!token)
+      return res
+        .status(404)
+        .json({ success: false, message: "Token not found" });
 
     const decode = jwt.verify(token, process.env.JWT_KEY);
-    if (!decode) return res.json({ success: false, message: "Invalid token" });
+    if (!decode)
+      return res.status(400).json({ success: false, message: "Invalid token" });
 
     const user = await userModel
       .findOne({ _id: decode.userID })
       .select("-password");
 
-    if (!user) return res.json({ success: false, message: "User not found" });
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
 
     if (!user?.isVerified)
-      return res.json({ success: false, message: "User is not verified" });
+      return res
+        .status(401)
+        .json({ success: false, message: "User is not verified" });
 
     const userData = {
       firstName: user.firstName,
