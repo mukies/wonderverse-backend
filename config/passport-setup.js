@@ -28,9 +28,9 @@ passport.use(
           await user.save();
         }
 
-        done(null, user._id.toString());
+        return done(null, user._id.toString());
       } catch (error) {
-        done(error, null);
+        return done(error);
       }
     }
   )

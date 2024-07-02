@@ -88,7 +88,9 @@ exports.loginUser = async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, message: errors.array() });
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
   }
 
   try {
@@ -118,11 +120,11 @@ exports.loginUser = async (req, res) => {
       lastName: isRegister.lastName,
     };
 
-    const token = await generateTokenAndSetCookie(isRegister._id, res);
+    await generateTokenAndSetCookie(isRegister._id, res);
 
     res
       .status(200)
-      .json({ success: true, message: "Login successful", userData, token });
+      .json({ success: true, message: "Login successful", userData });
   } catch (error) {
     console.log("Error while login.");
     res.status(500).json({ success: false, message: "Error while login." });
@@ -136,7 +138,7 @@ exports.verifyUser = async (req, res) => {
   if (!OTP)
     return res
       .status(400)
-      .json({ success: false, message: "OTP code and userID required" });
+      .json({ success: false, message: "OTP code required" });
 
   try {
     const user = await userModel.findById(uid);
@@ -181,9 +183,8 @@ exports.verifyUser = async (req, res) => {
 
 exports.logoutUser = async (req, res) => {
   try {
-    res.cookie("jwt", "", {
-      maxAge: 0,
-    });
+    res.clearCookie("jwt");
+
     res.status(200).json({ success: true, message: "Logout successfull" });
   } catch (error) {
     console.log("Error while logout", error);
@@ -195,15 +196,16 @@ exports.tourRating = async (req, res) => {
   const { rating, comment } = req.body;
   const { tourID } = req.params;
 
-  if (!rating || !comment)
-    return res.status(400).json({
-      success: false,
-      message: "Rating and message is required to submit a review.",
-    });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
+  }
 
   try {
     const review = {
-      userID: req.user._id,
+      userID: req.user,
       rating,
       comment,
     };
@@ -241,9 +243,14 @@ exports.tourRating = async (req, res) => {
 };
 
 exports.fetchUser = async (req, res) => {
-  const userID = req.user._id;
+  const userID = req.user;
 
   try {
+    if (!userID)
+      return res
+        .status(401)
+        .json({ success: false, message: "Please Login first." });
+
     const user = await userModel.findById(userID).select("-password");
 
     if (!user)
@@ -256,6 +263,8 @@ exports.fetchUser = async (req, res) => {
       lastName: user.lastName,
       email: user.email,
       isVerified: user.isVerified,
+      photo: user.photo,
+      _id: user._id,
     };
 
     res.status(200).json({ success: true, message: "User found", userData });

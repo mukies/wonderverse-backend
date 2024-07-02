@@ -3,12 +3,8 @@ const userModel = require("../models/user.m");
 
 exports.userProtection = async (req, res, next) => {
   try {
-    // const token = req.cookies.jwt;
-    let token = req.headers.authorization;
-    if (token) {
-      token = token.split(" ")[1];
-    }
-    console.log("token", token);
+    const token = req.cookies.jwt;
+
     if (!token)
       return res
         .status(404)
@@ -32,15 +28,7 @@ exports.userProtection = async (req, res, next) => {
         .status(401)
         .json({ success: false, message: "User is not verified" });
 
-    const userData = {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      isVerified: user.isVerified,
-      _id: user._id,
-    };
-
-    req.user = userData;
+    req.user = user._id;
 
     next();
   } catch (error) {

@@ -18,6 +18,7 @@ const contactUsRoute = require("./routes/contact_us.r");
 const blogRoute = require("./routes/blog.r");
 require("./config/passport-setup");
 const googleAuthRoute = require("./routes/googleAuth.r");
+const partnerRoute = require("./routes/partner.r");
 // const {
 //   generateTokenAndSetCookie,
 // } = require("./helper/generateTokenAndSendCookie");
@@ -29,7 +30,7 @@ app.use(upload.none());
 
 app.use(
   cors({
-    origin: [/./],
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -38,23 +39,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookie());
 
-//passport js
-app.use(
-  session({
-    secret: process.env.SESSION_KEY,
-    resave: false,
-    saveUninitialized: true,
-    name: "session",
-    cookie: {
-      secure: false,
-      maxAge: 15 * 24 * 60 * 60 * 1000,
-      sameSite: "strict",
-    },
-  })
-);
-
 app.use(passport.initialize());
-app.use(passport.session());
 
 //cloudinary
 v2.config({
@@ -67,6 +52,7 @@ v2.config({
 app.use("/auth", googleAuthRoute);
 app.use("/api/tour", tourRoute);
 app.use("/api/user", userRoute);
+app.use("/api/partner", partnerRoute);
 app.use("/api/admin", adminRoute);
 app.use("/api/blog", blogRoute);
 app.use("/api/top-destination", topDestinationRoute);
