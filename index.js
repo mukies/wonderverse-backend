@@ -19,6 +19,7 @@ const blogRoute = require("./routes/blog.r");
 require("./config/passport-setup");
 const googleAuthRoute = require("./routes/googleAuth.r");
 const partnerRoute = require("./routes/partner.r");
+const testModel = require("./test/test.m");
 // const {
 //   generateTokenAndSetCookie,
 // } = require("./helper/generateTokenAndSendCookie");
@@ -62,11 +63,14 @@ app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "server is very ok." });
 });
 
-// app.post("/test", async (req, res) => {
-//   const payload = "hello_this_is_token";
-//   generateTokenAndSetCookie(payload, res);
-//   res.status(200).json({ success: true, message: "server is ok." });
-// });
+app.post("/test", async (req, res) => {
+  const { data, data2 } = req.body;
+  const newData = new testModel({ data, data2 });
+
+  console.log(newData);
+  // generateTokenAndSetCookie(payload, res);
+  res.status(200).json({ success: true, newData, message: "server is ok." });
+});
 
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Invalid API endpoint." });

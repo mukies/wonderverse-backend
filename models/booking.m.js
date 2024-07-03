@@ -7,15 +7,13 @@ const bookingschema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    userDetails: [
-      {
-        fullName: { type: String, required: true },
-        email: { type: String, required: true },
-        contactNumber: { type: String, required: true },
-        country: { type: String, required: true },
-        passportNumber: { type: String, default: "" },
-      },
-    ],
+    userDetails: {
+      fullName: { type: String, required: true },
+      email: { type: String, required: true },
+      contactNumber: { type: String, required: true },
+      country: { type: String, required: true },
+      passportNumber: { type: String, default: "" },
+    },
 
     tourID: {
       type: mongoose.Schema.Types.ObjectId,
@@ -26,7 +24,7 @@ const bookingschema = new mongoose.Schema(
     selectedGuide: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Guide",
-      default: "",
+      sparse: true,
     },
 
     selectedTransportation: {
@@ -35,6 +33,7 @@ const bookingschema = new mongoose.Schema(
         ref: "Transportation",
         required: true,
       },
+      journeyStartingDate: { type: Date, required: true },
       numberOfPeople: { type: Number, required: true },
       totalCost: { type: Number, required: true },
     },
@@ -47,13 +46,12 @@ const bookingschema = new mongoose.Schema(
       },
       numberOfPeople: { type: Number, required: true },
       stayingDays: { type: Number, required: true },
-      checkIn: { type: Date, required: true },
+      checkInDate: { type: Date, required: true },
       totalHotelCost: { type: Number, required: true },
     },
 
     bookingDate: { type: Date, required: true },
-    tourStartingDate: { type: Date, required: true },
-    participants: { type: Number, required: true },
+
     status: {
       type: String,
       enum: ["pending", "confirmed", "cancelled"],
