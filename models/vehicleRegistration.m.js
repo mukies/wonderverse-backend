@@ -16,14 +16,14 @@ const vehicleRegistrationSchema = new mongoose.Schema(
       driverName: { type: String, required: true },
       driverLicencePhoto: { type: String, required: true },
       driverContactNumber: { type: String, required: true },
-      conducterName: { type: String, default: "" },
+      conducterName: { type: String, sparse: true },
     },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
-    rejectionMessage: { type: String, default: "" },
+    rejectionMessage: { type: String, sparse: true },
   },
   { timestamps: true }
 );
