@@ -22,6 +22,8 @@ router.get(
     session: false,
   }),
   async (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "https://localhost:5173");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
     await generateTokenAndSetCookie(req.user, res);
     res.redirect(process.env.FRONTEND_URL);
   }
