@@ -1,13 +1,13 @@
 const tourModel = require("../models/tour.m");
 const slugify = require("slugify");
 const categoryModel = require("../models/state.m");
-const guideModel = require("../models/guide.m");
+// const guideModel = require("../models/guide.m");
 const hotelModel = require("../models/hotel.m");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const stateModel = require("../models/state.m");
 const activityModel = require("../models/activity.m");
 const { validationResult } = require("express-validator");
-const transportationModel = require("../models/transportation.m");
+// const transportationModel = require("../models/transportation.m");
 
 exports.createTour = async (req, res) => {
   const {
@@ -142,8 +142,8 @@ exports.singleTour = async (req, res) => {
   try {
     const { tourID } = req.params;
 
-    const availableGuides = await guideModel.find({ tourID });
-    const availableHotels = await hotelModel.find({ tourID });
+    // const availableGuides = await guideModel.find({ tourID });
+    // const availableHotels = await hotelModel.find({ tourID });
     // const availableTransportations = await transportationModel.find({ tourID });
 
     const tour = await tourModel
@@ -152,13 +152,13 @@ exports.singleTour = async (req, res) => {
       .populate("activity")
       .populate("reviews.userID", "firstName lastName photo country");
 
-    const tourDetails = {
-      tour,
-      availableGuides,
-      availableHotels,
-      availableTransportations,
-    };
-    res.status(200).json({ success: true, tourDetails });
+    // const tourDetails = {
+    //   tour,
+    //   availableGuides,
+    //   availableHotels,
+    //   availableTransportations,
+    // };
+    res.status(200).json({ success: true, tour });
   } catch (error) {
     console.log("Error while getting tour details.");
     res
