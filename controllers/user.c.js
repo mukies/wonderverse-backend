@@ -7,6 +7,7 @@ const tourModel = require("../models/tour.m");
 const { sendEmail } = require("../nodemailer/sendEmail");
 const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
+const partnerModel = require("../models/partnerModel.m");
 
 exports.registerUser = async (req, res) => {
   const { firstName, lastName, email, password, country } = req.body;
@@ -66,15 +67,25 @@ exports.registerUser = async (req, res) => {
       userID = newUser._id;
     }
 
-    //todo: send verification code into the email.
-    await sendEmail(firstName, OTP, email);
-
-    res.status(201).json({
-      success: true,
-      message:
-        "User created successfully.  Verification code has been sent to the email address.",
-      userID,
+    const isVerifiedEmail = await partnerModel.findOne({
+      isVerified: true,
+      email,
     });
+
+    if (!isVerifiedEmail) {
+      //todo: send verification code into the email.
+      await sendEmail(firstName, OTP, email);
+      res.status(201).json({
+        success: true,
+        message: "Verification code has been sent to the email address.",
+        userID,
+      });
+    } else {
+      res.status(201).json({
+        success: true,
+        message: "User created successfully.",
+      });
+    }
   } catch (error) {
     console.log("Error while registering user.");
     res

@@ -8,6 +8,7 @@ const { sendEmail } = require("../nodemailer/sendEmail");
 const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const partnerModel = require("../models/partnerModel.m");
+const userModel = require("../models/user.m");
 
 exports.registerPartner = async (req, res) => {
   const { firstName, lastName, email, password, partnerType } = req.body;
@@ -67,14 +68,26 @@ exports.registerPartner = async (req, res) => {
       partnerID = newPartner._id;
     }
 
-    //todo: send verification code into the email.
-    await sendEmail(firstName, OTP, email);
-
-    res.status(201).json({
-      success: true,
-      message: "Verification code has been sent to the email address.",
-      partnerID,
+    const isVerifiedEmail = await userModel.findOne({
+      isVerified: true,
+      email,
     });
+
+    if (!isVerifiedEmail) {
+      //todo: send verification code into the email.
+      await sendEmail(firstName, OTP, email);
+
+      res.status(201).json({
+        success: true,
+        message: "Verification code has been sent to the email address.",
+        partnerID,
+      });
+    } else {
+      res.status(201).json({
+        success: true,
+        message: "Partner registered. Login now.",
+      });
+    }
   } catch (error) {
     console.log("Error while registering a partner", error);
     res
