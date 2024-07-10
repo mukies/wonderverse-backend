@@ -34,13 +34,22 @@ exports.editRoute = async (req, res) => {
 
   //todo validation
   try {
-    const updateRoute = await routeModel.findByIdAndUpdate(id, {
-      destination,
-      from,
-      costPerPerson,
-    });
+    const isExist = await routeModel.findOne({ destination, from });
 
-    await updateRoute.save();
+    const updateRoute = await routeModel.findByIdAndUpdate(
+      id,
+      {
+        destination,
+        from,
+        costPerPerson,
+      },
+      { new: true }
+    );
+
+    if (!updateRoute)
+      return res
+        .status(404)
+        .json({ success: false, message: "Vehicle route not found" });
 
     res.status(200).json({
       success: true,

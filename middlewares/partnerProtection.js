@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const partnerModel = require("../models/partnerModel.m");
+const partnerModel = require("../models/partner.m");
 
 exports.travelPartnerProtection = async (req, res, next) => {
   try {

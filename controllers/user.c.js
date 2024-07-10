@@ -7,7 +7,7 @@ const tourModel = require("../models/tour.m");
 const { sendEmail } = require("../nodemailer/sendEmail");
 const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
-const partnerModel = require("../models/partnerModel.m");
+const partnerModel = require("../models/partner.m");
 
 exports.registerUser = async (req, res) => {
   const { firstName, lastName, email, password, country } = req.body;

@@ -7,7 +7,7 @@ const {
 const { sendEmail } = require("../nodemailer/sendEmail");
 const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
-const partnerModel = require("../models/partnerModel.m");
+const partnerModel = require("../models/partner.m");
 const userModel = require("../models/user.m");
 
 exports.registerPartner = async (req, res) => {

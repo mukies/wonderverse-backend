@@ -80,11 +80,15 @@ exports.editSponsor = async (req, res) => {
       sponsorImage = await generateLink(sponsorImage);
     }
 
-    const updatedSponsor = await sponsorModel.findByIdAndUpdate(id, {
-      sponsorDescription,
-      sponsorImage,
-      sponsorName,
-    });
+    const updatedSponsor = await sponsorModel.findByIdAndUpdate(
+      id,
+      {
+        sponsorDescription,
+        sponsorImage,
+        sponsorName,
+      },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,

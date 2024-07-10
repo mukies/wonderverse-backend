@@ -17,7 +17,9 @@ const routeSchema = new mongoose.Schema(
       ref: "Tour",
       required: true,
     },
+
     from: { type: String, required: true },
+    isAvailable: { type: Boolean, default: true },
     costPerPerson: { type: Number, required: true },
   },
   { timestamps: true }

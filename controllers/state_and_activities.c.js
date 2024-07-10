@@ -61,18 +61,21 @@ exports.updateState = async (req, res) => {
   try {
     const isNameExist = await stateModel.findOne({
       $or: [{ name }, { slug: name.toLowerCase() }],
+      _id: { $ne: id },
     });
     if (isNameExist)
       return res
         .status(403)
         .json({ success: false, message: "State name already exist." });
 
-    const updatedState = await stateModel.findByIdAndUpdate(id, {
-      name,
-      slug: slugify(name.toLowerCase(), "+"),
-    });
-
-    await updatedState.save();
+    const updatedState = await stateModel.findByIdAndUpdate(
+      id,
+      {
+        name,
+        slug: slugify(name.toLowerCase(), "+"),
+      },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -110,13 +113,34 @@ exports.deleteState = async (req, res) => {
   }
 };
 
-exports.getState = async (req, res) => {
+exports.getAllStates = async (req, res) => {
   try {
     const states = await stateModel.find();
 
     res.status(200).json({
       success: true,
       states,
+    });
+  } catch (error) {
+    console.log("Error while fetching state", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while fetching state." });
+  }
+};
+exports.getSingleState = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const state = await stateModel.findById(id);
+
+    if (!state)
+      return res
+        .status(404)
+        .json({ success: false, message: "State not found" });
+
+    res.status(200).json({
+      success: true,
+      state,
     });
   } catch (error) {
     console.log("Error while fetching state", error);
@@ -185,6 +209,7 @@ exports.updateActivity = async (req, res) => {
   try {
     const isTitleExist = await activityModel.findOne({
       $or: [{ title }, { slug: title.toLowerCase() }],
+      _id: { $ne: id },
     });
     if (isTitleExist)
       return res.status(403).json({
@@ -192,12 +217,14 @@ exports.updateActivity = async (req, res) => {
         message: "Activity title already exist.",
       });
 
-    const updatedActivity = await activityModel.findByIdAndUpdate(id, {
-      title,
-      slug: slugify(title.toLowerCase(), "+"),
-    });
-
-    await updatedActivity.save();
+    const updatedActivity = await activityModel.findByIdAndUpdate(
+      id,
+      {
+        title,
+        slug: slugify(title.toLowerCase(), "+"),
+      },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -242,6 +269,28 @@ exports.getActivities = async (req, res) => {
     res.status(200).json({
       success: true,
       activities,
+    });
+  } catch (error) {
+    console.log("Error while fetching activities", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while fetching activities." });
+  }
+};
+exports.getSingleActivity = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const activity = await activityModel.findById(id);
+
+    if (!activity)
+      return res.status(404).json({
+        success: true,
+        message: "Activity not found",
+      });
+
+    res.status(200).json({
+      success: true,
+      activity,
     });
   } catch (error) {
     console.log("Error while fetching activities", error);
