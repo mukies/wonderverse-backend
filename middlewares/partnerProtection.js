@@ -32,10 +32,10 @@ exports.partnerProtection = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log("Error in travel partner protection route.", error);
+    console.log("Error in partner protection route.", error);
     res.status(500).json({
       success: false,
-      message: "Error in travel partner protection route.",
+      message: "Error in partner protection route.",
     });
   }
 };
