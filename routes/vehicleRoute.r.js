@@ -6,27 +6,15 @@ const {
   fetchSingleRouteData,
   fetchPersonalRoutes,
 } = require("../controllers/route.c");
-const { travelPartnerProtection } = require("../middlewares/partnerProtection");
+const { partnerProtection } = require("../middlewares/partnerProtection");
 
 const router = require("express").Router();
 
-router.get(
-  "/single-route-data/:id",
-  travelPartnerProtection,
-  fetchSingleRouteData
-);
-router.get("/personal-routes", travelPartnerProtection, fetchPersonalRoutes);
-router.post("/:vehicleID/create-route", travelPartnerProtection, createRoute);
-router.put(
-  "/:vehicleID/update-route/:routeID",
-  travelPartnerProtection,
-  editRoute
-);
+router.get("/single-route-data/:id", partnerProtection, fetchSingleRouteData);
+router.get("/personal-routes", partnerProtection, fetchPersonalRoutes);
+router.post("/:vehicleID/create-route", partnerProtection, createRoute);
+router.put("/:vehicleID/update-route/:routeID", partnerProtection, editRoute);
 
-router.put(
-  "/toggle-availability/:id",
-  travelPartnerProtection,
-  toggleAvailable
-);
-router.delete("/delete-route/:id", travelPartnerProtection, deleteRoute);
+router.put("/toggle-availability/:id", partnerProtection, toggleAvailable);
+router.delete("/delete-route/:id", partnerProtection, deleteRoute);
 module.exports = router;

@@ -77,10 +77,9 @@ exports.deleteVehicle = async (req, res) => {
       .json({ success: false, message: "Error while deleting vehicle" });
   }
 };
-exports.fetchAllApprovedVehicle = async (req, res) => {
+exports.fetch_Personal_Vehicles = async (req, res) => {
   try {
     const vehicles = await vehicleRegistrationModel.find({
-      status: "approved",
       requestedBy: req.partner,
     });
 
@@ -93,6 +92,7 @@ exports.fetchAllApprovedVehicle = async (req, res) => {
     });
   }
 };
+
 exports.fetchSingleVehicleData = async (req, res) => {
   const { id } = req.params; //vehicle id
   try {
