@@ -2,16 +2,11 @@ const mongoose = require("mongoose");
 
 const partnerSchema = new mongoose.Schema(
   {
-    photo: { type: String, default: "" },
+    photo: { type: String, required: true },
     firstName: { type: String, required: true },
-    lastName: { type: String },
+    lastName: { type: String, required: true },
     email: { type: String, unique: true, required: true },
-    password: String,
-    partnerType: {
-      type: String,
-      enum: ["travel", "guide", "hotel"],
-      required: true,
-    },
+    password: { type: String, required: true },
     OTP: { type: String }, // for registration
     OTPExpiryDate: { type: Date }, // for registration
     isVerified: { type: Boolean, default: false },

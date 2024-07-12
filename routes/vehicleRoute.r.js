@@ -22,6 +22,7 @@ router.put(
   travelPartnerProtection,
   editRoute
 );
+
 router.put(
   "/toggle-availability/:id",
   travelPartnerProtection,

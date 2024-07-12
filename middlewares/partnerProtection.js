@@ -15,7 +15,7 @@ exports.travelPartnerProtection = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Invalid token" });
 
     const partner = await partnerModel
-      .findOne({ _id: decode.userID })
+      .findOne({ _id: decode?.userID })
       .select("-password");
 
     if (!partner)
@@ -27,12 +27,6 @@ exports.travelPartnerProtection = async (req, res, next) => {
       return res
         .status(401)
         .json({ success: false, message: "Partner account is not verified" });
-
-    if (partner?.partnerType !== "travel")
-      return res.status(401).json({
-        success: false,
-        message: "You're not registered as a travel partner",
-      });
 
     req.partner = partner._id;
 
@@ -60,7 +54,7 @@ exports.guidePartnerProtection = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Invalid token" });
 
     const partner = await partnerModel
-      .findOne({ _id: decode.userID })
+      .findOne({ _id: decode?.userID })
       .select("-password");
 
     if (!partner)
@@ -72,12 +66,6 @@ exports.guidePartnerProtection = async (req, res, next) => {
       return res
         .status(401)
         .json({ success: false, message: "Partner account is not verified" });
-
-    if (partner?.partnerType !== "guide")
-      return res.status(401).json({
-        success: false,
-        message: "You're not registered as a guide partner",
-      });
 
     req.partner = partner._id;
 

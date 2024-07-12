@@ -1,33 +1,30 @@
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
-const guideModel = require("../models/guide.m");
+const guideRegistrationModel = require("../models/guideRegistration.m");
 
 exports.addGuide = async (req, res) => {
-  const {
-    tourID,
-    guideName,
-    price,
-    guideDesc,
-    guideContactNumber,
-    guideEmail,
-  } = req.body;
-  let { guidePhoto } = req.body;
+  const { contactNumber, guidingDestinations } = req.body;
+  let { citizenshipPhoto, nationalIdPhoto } = req.body;
 
   //todo validation
+
   try {
-    if (guidePhoto && !guidePhoto.startsWith("http")) {
+    if (nationalIdPhoto && !nationalIdPhoto.startsWith("http")) {
       //todo generate cloudinary link
 
-      guidePhoto = await generateLink(guidePhoto);
+      nationalIdPhoto = await generateLink(nationalIdPhoto);
     }
 
-    const newGuide = new guideModel({
-      tourID,
-      guideName,
-      price,
-      guideDesc,
-      guideContactNumber,
-      guidePhoto,
-      guideEmail,
+    if (!citizenshipPhoto.startsWith("http")) {
+      //todo generate cloudinary link
+
+      citizenshipPhoto = await generateLink(citizenshipPhoto);
+    }
+    const newGuide = new guideRegistrationModel({
+      citizenshipPhoto,
+      nationalIdPhoto,
+      contactNumber,
+      requestedBy: req.partner,
+      guidingDestinations,
     });
 
     await newGuide.save();
@@ -46,36 +43,42 @@ exports.addGuide = async (req, res) => {
 };
 
 exports.editGuideDetails = async (req, res) => {
-  const {
-    tourID,
-    guideEmail,
-    guideName,
-    price,
-    guideDesc,
-    guideContactNumber,
-  } = req.body;
-  let { guidePhoto } = req.body;
+  const { contactNumber, guidingDestinations } = req.body;
+  let { citizenshipPhoto, nationalIdPhoto } = req.body;
   const { id } = req.params;
-
   //todo validation
+
   try {
-    if (!guidePhoto.startsWith("http")) {
-      guidePhoto = await generateLink(guidePhoto);
+    if (nationalIdPhoto && !nationalIdPhoto.startsWith("http")) {
+      //todo generate cloudinary link
+
+      nationalIdPhoto = await generateLink(nationalIdPhoto);
     }
 
-    const updatedGuide = await guideModel.findByIdAndUpdate(id, {
-      tourID,
-      guideName,
-      price,
-      guideDesc,
-      guideContactNumber,
-      guidePhoto,
-      guideEmail,
-    });
+    if (!citizenshipPhoto.startsWith("http")) {
+      //todo generate cloudinary link
 
-    await updatedGuide.save();
+      citizenshipPhoto = await generateLink(citizenshipPhoto);
+    }
 
-    res.status(201).json({
+    const updatedGuide = await guideRegistrationModel.findByIdAndUpdate(
+      id,
+      {
+        citizenshipPhoto,
+        nationalIdPhoto,
+        contactNumber,
+        status: "pending",
+        guidingDestinations,
+      },
+      { new: true }
+    );
+
+    if (!updatedGuide)
+      return res
+        .status(404)
+        .json({ success: false, message: "Guide not found" });
+
+    res.status(200).json({
       success: true,
       message: "Guide details has been updated.",
       updatedGuide,
@@ -88,22 +91,14 @@ exports.editGuideDetails = async (req, res) => {
   }
 };
 
-exports.fetchAllGuide = async (req, res) => {
-  try {
-    const guides = await guideModel.find();
-
-    res.status(200).json({ success: true, guides });
-  } catch (error) {
-    console.log("Error while fetching guide.", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error while fetching guide." });
-  }
-};
 exports.fetchGuideByTourId = async (req, res) => {
   const { tourID } = req.params;
   try {
-    const guides = await guideModel.find({ tourID });
+    const guides = await guideRegistrationModel
+      .find({
+        guidingDestinations: tourID,
+      })
+      .populate("requestedBy", "photo firstName lastName email");
 
     res.status(200).json({ success: true, guides });
   } catch (error) {
@@ -117,7 +112,7 @@ exports.fetchGuideByTourId = async (req, res) => {
 exports.deleteGuide = async (req, res) => {
   const { id } = req.params;
   try {
-    await guideModel.findByIdAndDelete(id);
+    await guideRegistrationModel.findByIdAndDelete(id);
 
     res
       .status(200)
@@ -127,5 +122,19 @@ exports.deleteGuide = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error while deleting guide." });
+  }
+};
+
+//admin action
+exports.fetchAllGuide = async (req, res) => {
+  try {
+    const guides = await guideRegistrationModel.find({ status: "approved" });
+
+    res.status(200).json({ success: true, guides });
+  } catch (error) {
+    console.log("Error while fetching all guide.", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while fetching all guide." });
   }
 };
