@@ -1,8 +1,17 @@
+const { validationResult } = require("express-validator");
 const routeModel = require("../models/route.m");
 
 exports.createRoute = async (req, res) => {
   const { destination, from, costPerPerson } = req.body;
   const { vehicleID: vehicle } = req.params; //vehicle id
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
+  }
 
   try {
     const isAlreadyExist = await routeModel.findOne({

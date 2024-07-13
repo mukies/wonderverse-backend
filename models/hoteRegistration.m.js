@@ -7,6 +7,11 @@ const hotelRegistrationSchema = new mongoose.Schema(
       ref: "Partner",
       required: true,
     },
+    tour: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tour",
+      required: true,
+    },
     hotelDocuments: {
       ownerName: { type: String, required: true },
       ownerCitizenshipPhoto: { type: String, required: true },

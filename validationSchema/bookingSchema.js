@@ -1,6 +1,6 @@
 exports.bookingSchema = {
   selectedGuide: {
-    isOptional: true,
+    optional: true,
     isString: {
       errorMessage: "Selected Guide ID must be in string format.",
     },

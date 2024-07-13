@@ -97,6 +97,7 @@ exports.fetchGuideByTourId = async (req, res) => {
     const guides = await guideRegistrationModel
       .find({
         guidingDestinations: tourID,
+        status: "approved",
       })
       .populate("requestedBy", "photo firstName lastName email");
 

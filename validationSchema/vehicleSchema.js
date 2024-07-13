@@ -72,7 +72,7 @@ exports.vehicleSchema = {
     },
   },
   "driverDetails.conducterName": {
-    isOptional: true,
+    optional: true,
     isString: {
       errorMessage: "Conducter Name must be in string format.",
     },

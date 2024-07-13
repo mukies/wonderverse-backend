@@ -11,7 +11,7 @@ const partnerModel = require("../models/partner.m");
 const userModel = require("../models/user.m");
 
 exports.registerPartner = async (req, res) => {
-  const { firstName, lastName, email, password, partnerType } = req.body;
+  const { firstName, lastName, email, password } = req.body;
   let { photo } = req.body;
 
   const errors = validationResult(req);
@@ -45,7 +45,6 @@ exports.registerPartner = async (req, res) => {
     if (isEmailExist && !isEmailExist.isVerified) {
       isEmailExist.firstName = firstName;
       isEmailExist.lastName = lastName;
-      isEmailExist.partnerType = partnerType;
       isEmailExist.photo = photo;
       isEmailExist.password = hashedPassword;
       isEmailExist.OTP = OTP;
@@ -62,7 +61,6 @@ exports.registerPartner = async (req, res) => {
         OTP,
         OTPExpiryDate,
         photo,
-        partnerType,
       });
       await newPartner.save();
       partnerID = newPartner._id;
@@ -85,7 +83,7 @@ exports.registerPartner = async (req, res) => {
     } else {
       res.status(201).json({
         success: true,
-        message: "Partner registered. Login now.",
+        message: "Partner Registered.",
       });
     }
   } catch (error) {

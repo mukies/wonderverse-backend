@@ -164,6 +164,8 @@ exports.singlePost = async (req, res) => {
   }
 };
 
+//admin action
+
 exports.adminDeletePost = async (req, res) => {
   const { postID } = req.params;
 

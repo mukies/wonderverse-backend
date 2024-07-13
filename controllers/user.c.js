@@ -83,7 +83,7 @@ exports.registerUser = async (req, res) => {
     } else {
       res.status(201).json({
         success: true,
-        message: "User created successfully.",
+        message: "User Registered.",
       });
     }
   } catch (error) {
@@ -237,8 +237,8 @@ exports.tourRating = async (req, res) => {
       tour.reviews.map((item) => {
         totelRating += Number(item.rating);
       });
-
-      tour.avgRating = Number(totelRating) / tour.reviews.length;
+      const avg = Number(totelRating) / tour.reviews.length;
+      tour.avgRating = Math.round(avg * 2) / 2;
     }
     await tour.save();
 
