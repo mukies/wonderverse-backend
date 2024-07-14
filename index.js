@@ -15,6 +15,7 @@ const hotelRoute = require("./routes/hotel.r");
 const state_and_activities_route = require("./routes/state_and_activities.r");
 const userRoute = require("./routes/user.r");
 const adminRoute = require("./routes/admin.r");
+const locationRoute = require("./routes/location.r");
 const passport = require("passport");
 const topDestinationRoute = require("./routes/top_Destination.r");
 const contactUsRoute = require("./routes/contact_us.r");
@@ -55,6 +56,7 @@ v2.config({
 //routes
 app.use("/auth", googleAuthRoute);
 app.use("/api/tour", tourRoute);
+app.use("/api/location", locationRoute);
 app.use("/api/vehicle-route", vehicle_Route);
 app.use("/api/vehicle", vehicle);
 app.use("/api/user", userRoute);
