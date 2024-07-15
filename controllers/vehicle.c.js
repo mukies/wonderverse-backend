@@ -4,8 +4,13 @@ const routeModel = require("../models/route.m");
 const vehicleRegistrationModel = require("../models/vehicleRegistration.m");
 
 exports.addVehicle = async (req, res) => {
-  const { vehicleName, vehicleNumberPlate, vehicleCapacity, driverDetails } =
-    req.body;
+  const {
+    vehicleName,
+    vehicleNumberPlate,
+    vehicleCapacity,
+    driverDetails,
+    vehicleType,
+  } = req.body;
 
   let { vehiclePhoto, billBookPhoto } = req.body;
   //todo: validation
@@ -40,6 +45,7 @@ exports.addVehicle = async (req, res) => {
       vehiclePhoto,
       billBookPhoto,
       requestedBy: req.partner,
+      vehicleType,
     });
 
     await newVehicle.save();
@@ -108,36 +114,69 @@ exports.fetchSingleVehicleData = async (req, res) => {
       .json({ success: false, message: "Error while fetching vehicle data" });
   }
 };
-exports.updateDriverDetails = async (req, res) => {
-  const { driverName, driverLicencePhoto, driverContactNumber, conducterName } =
-    req.body;
+exports.updateVehicleDetails = async (req, res) => {
+  const {
+    vehicleName,
+    vehicleNumberPlate,
+    vehicleCapacity,
+    driverDetails,
+    vehicleType,
+  } = req.body;
+
+  let { vehiclePhoto, billBookPhoto } = req.body;
+
   const { vehicleID } = req.params;
+  //todo: validation
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ success: false, message: errors.array()[0].msg });
+  }
+
+  if (!vehiclePhoto.startsWith("http")) {
+    vehiclePhoto = await generateLink(vehiclePhoto);
+  }
+
+  if (!billBookPhoto.startsWith("http")) {
+    billBookPhoto = await generateLink(billBookPhoto);
+  }
+
+  if (!driverDetails.driverLicencePhoto.startsWith("http")) {
+    driverDetails.driverLicencePhoto = await generateLink(
+      driverDetails.driverLicencePhoto
+    );
+  }
 
   try {
-    const vehicle = await vehicleRegistrationModel.findById(vehicleID);
-
-    if (!vehicle)
-      return res
-        .status(404)
-        .json({ success: false, message: "Vehicle not found" });
-
-    vehicle.driverDetails.driverContactNumber = driverContactNumber;
-    vehicle.driverDetails.driverLicencePhoto = driverLicencePhoto;
-    vehicle.driverDetails.driverName = driverName;
-    vehicle.driverDetails.conducterName = conducterName;
-    vehicle.status = "pending";
-    await vehicle.save();
-
+    const updatedVehicle = await vehicleRegistrationModel.findByIdAndUpdate(
+      vehicleID,
+      {
+        vehicleName,
+        vehicleNumberPlate,
+        vehicleCapacity,
+        driverDetails,
+        vehiclePhoto,
+        billBookPhoto,
+        vehicleType,
+        status: "pending",
+      },
+      { new: true }
+    );
     res.json({
       success: true,
       message: "Vehicle submitted for review",
-      vehicle,
+      updatedVehicle,
     });
   } catch (error) {
-    console.log("Error while updating driver details", error);
+    console.log("Error while updating vehicle details", error);
     res
       .status(500)
-      .json({ success: false, message: "Error while updating driver details" });
+      .json({
+        success: false,
+        message: "Error while updating vehicle details",
+      });
   }
 };
 

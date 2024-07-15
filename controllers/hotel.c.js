@@ -3,7 +3,7 @@ const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const hotelRegistrationModel = require("../models/hoteRegistration.m");
 
 exports.addHotel = async (req, res) => {
-  const { tourID: tour, hotelDocuments, hotelDetails } = req.body;
+  const { tour, hotelDocuments, hotelDetails } = req.body;
 
   //validation
   const errors = validationResult(req);
@@ -15,11 +15,16 @@ exports.addHotel = async (req, res) => {
   }
   try {
     //hotel documents
-    if (!hotelDocuments.ownerCitizenshipPhoto.startsWith("http")) {
-      hotelDocuments.ownerCitizenshipPhoto = await generateLink(
-        hotelDocuments.ownerCitizenshipPhoto
-      );
-    }
+
+    hotelDocuments.ownerCitizenshipPhoto =
+      hotelDocuments.ownerCitizenshipPhoto.map(async (photo) => {
+        if (!photo.startsWith("http")) {
+          //todo generate cloudinary link
+
+          return await generateLink(photo);
+        }
+        return photo;
+      });
 
     if (!hotelDocuments.hotelRegistrationPhoto.startsWith("http")) {
       hotelDocuments.hotelRegistrationPhoto = await generateLink(
@@ -74,7 +79,7 @@ exports.addHotel = async (req, res) => {
 };
 
 exports.editHotelDetails = async (req, res) => {
-  const { hotelDocuments, tourID: tour, hotelDetails } = req.body;
+  const { hotelDocuments, tour, hotelDetails } = req.body;
   const { id } = req.params;
   //validation
   const errors = validationResult(req);
@@ -99,11 +104,15 @@ exports.editHotelDetails = async (req, res) => {
       });
 
     //hotel documents
-    if (!hotelDocuments.ownerCitizenshipPhoto.startsWith("http")) {
-      hotelDocuments.ownerCitizenshipPhoto = await generateLink(
-        hotelDocuments.ownerCitizenshipPhoto
-      );
-    }
+    hotelDocuments.ownerCitizenshipPhoto =
+      hotelDocuments.ownerCitizenshipPhoto.map(async (photo) => {
+        if (!photo.startsWith("http")) {
+          //todo generate cloudinary link
+
+          return await generateLink(photo);
+        }
+        return photo;
+      });
 
     if (!hotelDocuments.hotelRegistrationPhoto.startsWith("http")) {
       hotelDocuments.hotelRegistrationPhoto = await generateLink(
@@ -188,19 +197,19 @@ exports.fetch_Single_Hotel_data = async (req, res) => {
   }
 };
 
-exports.fetchHotelByTourId = async (req, res) => {
-  const { tourID } = req.params;
-  try {
-    const hotels = await hotelRegistrationModel.find({ tour: tourID });
+// exports.fetchHotelByTourId = async (req, res) => {
+//   const { tourID } = req.params;
+//   try {
+//     const hotels = await hotelRegistrationModel.find({ tour: tourID });
 
-    res.status(200).json({ success: true, hotels });
-  } catch (error) {
-    console.log("Error while fetching hotels.", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error while fetching hotels." });
-  }
-};
+//     res.status(200).json({ success: true, hotels });
+//   } catch (error) {
+//     console.log("Error while fetching hotels.", error);
+//     res
+//       .status(500)
+//       .json({ success: false, message: "Error while fetching hotels." });
+//   }
+// };
 
 exports.deleteHotel = async (req, res) => {
   const { id } = req.params;

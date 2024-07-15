@@ -7,6 +7,14 @@ exports.vehicleSchema = {
       errorMessage: "Vehicle Name must be in string format.",
     },
   },
+  vehicleType: {
+    notEmpty: {
+      errorMessage: "Vehicle Type is required.",
+    },
+    isString: {
+      errorMessage: "Vehicle Type must be in string format.",
+    },
+  },
   vehicleNumberPlate: {
     notEmpty: {
       errorMessage: "Vehicle Number Plate is required.",

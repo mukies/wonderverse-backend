@@ -23,6 +23,7 @@ const blogRoute = require("./routes/blog.r");
 require("./config/passport-setup");
 const googleAuthRoute = require("./routes/googleAuth.r");
 const partnerRoute = require("./routes/partner.r");
+const { body } = require("express-validator");
 // const testModel = require("./test/test.m");
 // const {
 //   generateTokenAndSetCookie,

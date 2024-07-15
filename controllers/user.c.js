@@ -39,6 +39,11 @@ exports.registerUser = async (req, res) => {
     const OTPExpiryDate = new Date();
     OTPExpiryDate.setHours(OTPExpiryDate.getHours() + 1);
 
+    const isVerifiedEmail = await partnerModel.findOne({
+      isVerified: true,
+      email,
+    });
+
     let userID;
 
     if (isEmailExist && !isEmailExist.isVerified) {
@@ -49,7 +54,9 @@ exports.registerUser = async (req, res) => {
       isEmailExist.password = hashedPassword;
       isEmailExist.OTP = OTP;
       isEmailExist.OTPExpiryDate = OTPExpiryDate;
-
+      if (isVerifiedEmail) {
+        isEmailExist.isVerified = true;
+      }
       await isEmailExist.save();
       userID = isEmailExist._id;
     } else {
@@ -63,14 +70,13 @@ exports.registerUser = async (req, res) => {
         photo,
         country,
       });
+
+      if (isVerifiedEmail) {
+        newUser.isVerified = true;
+      }
       await newUser.save();
       userID = newUser._id;
     }
-
-    const isVerifiedEmail = await partnerModel.findOne({
-      isVerified: true,
-      email,
-    });
 
     if (!isVerifiedEmail) {
       //todo: send verification code into the email.

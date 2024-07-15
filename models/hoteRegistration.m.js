@@ -14,7 +14,7 @@ const hotelRegistrationSchema = new mongoose.Schema(
     },
     hotelDocuments: {
       ownerName: { type: String, required: true },
-      ownerCitizenshipPhoto: { type: String, required: true },
+      ownerCitizenshipPhoto: { type: [String], required: true },
       hotelRegistrationNumber: { type: String, required: true },
       hotelRegistrationPhoto: { type: String, required: true },
       hotelPanNumber: { type: String, required: true },

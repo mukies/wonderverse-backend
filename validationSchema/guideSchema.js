@@ -7,6 +7,7 @@ exports.guideSchema = {
       errorMessage: "Tour ID must be in string format.",
     },
   },
+
   guideName: {
     notEmpty: {
       errorMessage: "Guide name is required.",
@@ -19,6 +20,7 @@ exports.guideSchema = {
       errorMessage: "Guide name must be at least 2 characters long",
     },
   },
+
   price: {
     notEmpty: {
       errorMessage: "Price is required.",
@@ -37,7 +39,23 @@ exports.guideSchema = {
       errorMessage: "Description must be at least 50 characters long",
     },
   },
-  guideContactNumber: {
+
+  guidingDestinations: {
+    notEmpty: {
+      errorMessage: "Guiding Destinations is required.",
+    },
+    isArray: {
+      errorMessage: "Guiding Destinations must be an array",
+    },
+    custom: {
+      options: (value) => {
+        return value.every((item) => typeof item === "string");
+      },
+      errorMessage: "All items of Guiding destination array should be string",
+    },
+  },
+
+  contactNumber: {
     notEmpty: {
       errorMessage: "Contact Number is required.",
     },
@@ -45,16 +63,28 @@ exports.guideSchema = {
       errorMessage: "Contact Number must be in string format.",
     },
   },
-  guideEmail: {
+  citizenshipPhoto: {
     notEmpty: {
-      errorMessage: "Email is required.",
+      errorMessage: "Citizenship Photo is required.",
     },
-    isEmail: {
-      errorMessage: "Invalid email format.",
+    isArray: {
+      errorMessage: "Citizenship Photos must be an array",
+    },
+    isLength: {
+      options: { max: 2 },
+      errorMessage: "More than 2 Images is not allowed",
+    },
+    custom: {
+      options: (value) => {
+        return value.every((item) => typeof item === "string");
+      },
+      errorMessage: "Front and back side of citizenship Images must be strings",
     },
   },
   guidePhoto: {
-    optional: true,
+    notEmpty: {
+      errorMessage: "Guide Photo is required.",
+    },
     isString: {
       errorMessage: "From field must be in string format.",
     },

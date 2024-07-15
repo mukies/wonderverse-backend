@@ -1,3 +1,4 @@
+const { checkSchema } = require("express-validator");
 const {
   addHotel,
   editHotelDetails,
@@ -6,11 +7,22 @@ const {
   deleteHotel,
 } = require("../controllers/hotel.c");
 const { partnerProtection } = require("../middlewares/partnerProtection");
+const { hotelSchema } = require("../validationSchema/hotelSchema");
 
 const router = require("express").Router();
 
-router.post("/add-hotel", partnerProtection, addHotel);
-router.put("/update-hotel/:id", partnerProtection, editHotelDetails);
+router.post(
+  "/add-hotel",
+  partnerProtection,
+  checkSchema(hotelSchema),
+  addHotel
+);
+router.put(
+  "/update-hotel/:id",
+  partnerProtection,
+  checkSchema(hotelSchema),
+  editHotelDetails
+);
 router.get("/personal-hotels", partnerProtection, fetch_All_Personal_Hotels);
 router.get(
   "/single-hotel-data/:id",

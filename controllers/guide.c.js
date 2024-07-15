@@ -3,7 +3,7 @@ const guideRegistrationModel = require("../models/guideRegistration.m");
 
 exports.addGuide = async (req, res) => {
   const { contactNumber, guidingDestinations } = req.body;
-  let { citizenshipPhoto, nationalIdPhoto } = req.body;
+  let { citizenshipPhoto, guidePhoto, nationalIdPhoto } = req.body;
 
   //todo validation
 
@@ -13,18 +13,28 @@ exports.addGuide = async (req, res) => {
 
       nationalIdPhoto = await generateLink(nationalIdPhoto);
     }
-
-    if (!citizenshipPhoto.startsWith("http")) {
+    if (!guidePhoto.startsWith("http")) {
       //todo generate cloudinary link
 
-      citizenshipPhoto = await generateLink(citizenshipPhoto);
+      guidePhoto = await generateLink(guidePhoto);
     }
+
+    citizenshipPhoto = citizenshipPhoto.map(async (photo) => {
+      if (!photo.startsWith("http")) {
+        //todo generate cloudinary link
+
+        return await generateLink(photo);
+      }
+      return photo;
+    });
+
     const newGuide = new guideRegistrationModel({
       citizenshipPhoto,
       nationalIdPhoto,
       contactNumber,
       requestedBy: req.partner,
       guidingDestinations,
+      guidePhoto,
     });
 
     await newGuide.save();
@@ -44,7 +54,7 @@ exports.addGuide = async (req, res) => {
 
 exports.editGuideDetails = async (req, res) => {
   const { contactNumber, guidingDestinations } = req.body;
-  let { citizenshipPhoto, nationalIdPhoto } = req.body;
+  let { citizenshipPhoto, guidePhoto, nationalIdPhoto } = req.body;
   const { id } = req.params;
   //todo validation
 
@@ -55,11 +65,20 @@ exports.editGuideDetails = async (req, res) => {
       nationalIdPhoto = await generateLink(nationalIdPhoto);
     }
 
-    if (!citizenshipPhoto.startsWith("http")) {
+    if (!guidePhoto.startsWith("http")) {
       //todo generate cloudinary link
 
-      citizenshipPhoto = await generateLink(citizenshipPhoto);
+      guidePhoto = await generateLink(guidePhoto);
     }
+
+    citizenshipPhoto = citizenshipPhoto.map(async (photo) => {
+      if (!photo.startsWith("http")) {
+        //todo generate cloudinary link
+
+        return await generateLink(photo);
+      }
+      return photo;
+    });
 
     const updatedGuide = await guideRegistrationModel.findByIdAndUpdate(
       id,
@@ -69,6 +88,7 @@ exports.editGuideDetails = async (req, res) => {
         contactNumber,
         status: "pending",
         guidingDestinations,
+        guidePhoto,
       },
       { new: true }
     );
