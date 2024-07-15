@@ -1,13 +1,6 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
 
 require("dotenv").config();
 require("./config/database");
@@ -40,6 +33,14 @@ const { body } = require("express-validator");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 app.use(upload.none());
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
