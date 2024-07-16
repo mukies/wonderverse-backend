@@ -12,7 +12,7 @@ exports.addVehicle = async (req, res) => {
     vehicleType,
   } = req.body;
 
-  let { vehiclePhoto, blueBookPhoto } = req.body;
+  let { vehiclePhoto, featureImages, blueBookPhotos } = req.body;
   //todo: validation
 
   const errors = validationResult(req);
@@ -26,9 +26,19 @@ exports.addVehicle = async (req, res) => {
     vehiclePhoto = await generateLink(vehiclePhoto);
   }
 
-  if (!blueBookPhoto.startsWith("http")) {
-    blueBookPhoto = await generateLink(blueBookPhoto);
-  }
+  blueBookPhotos = blueBookPhotos.map(async (photo) => {
+    if (!photo.startsWith("http")) {
+      return await generateLink(photo);
+    }
+    return photo;
+  });
+
+  featureImages = featureImages.map(async (photo) => {
+    if (!photo.startsWith("http")) {
+      return await generateLink(photo);
+    }
+    return photo;
+  });
 
   if (!driverDetails.driverLicencePhoto.startsWith("http")) {
     driverDetails.driverLicencePhoto = await generateLink(
@@ -43,7 +53,7 @@ exports.addVehicle = async (req, res) => {
       vehicleCapacity,
       driverDetails,
       vehiclePhoto,
-      blueBookPhoto,
+      blueBookPhotos,
       requestedBy: req.partner,
       vehicleType,
     });
@@ -115,6 +125,7 @@ exports.fetchSingleVehicleData = async (req, res) => {
   }
 };
 exports.updateVehicleDetails = async (req, res) => {
+  const { vehicleID } = req.params;
   const {
     vehicleName,
     vehicleNumberPlate,
@@ -123,9 +134,7 @@ exports.updateVehicleDetails = async (req, res) => {
     vehicleType,
   } = req.body;
 
-  let { vehiclePhoto, blueBookPhoto } = req.body;
-
-  const { vehicleID } = req.params;
+  let { vehiclePhoto, featureImages, blueBookPhotos } = req.body;
   //todo: validation
 
   const errors = validationResult(req);
@@ -139,9 +148,19 @@ exports.updateVehicleDetails = async (req, res) => {
     vehiclePhoto = await generateLink(vehiclePhoto);
   }
 
-  if (!blueBookPhoto.startsWith("http")) {
-    blueBookPhoto = await generateLink(blueBookPhoto);
-  }
+  blueBookPhotos = blueBookPhotos.map(async (photo) => {
+    if (!photo.startsWith("http")) {
+      return await generateLink(photo);
+    }
+    return photo;
+  });
+
+  featureImages = featureImages.map(async (photo) => {
+    if (!photo.startsWith("http")) {
+      return await generateLink(photo);
+    }
+    return photo;
+  });
 
   if (!driverDetails.driverLicencePhoto.startsWith("http")) {
     driverDetails.driverLicencePhoto = await generateLink(
@@ -158,9 +177,10 @@ exports.updateVehicleDetails = async (req, res) => {
         vehicleCapacity,
         driverDetails,
         vehiclePhoto,
-        blueBookPhoto,
+        blueBookPhotos,
         vehicleType,
         status: "pending",
+        featureImages,
       },
       { new: true }
     );
@@ -206,6 +226,7 @@ exports.approveVehicle = async (req, res) => {
 };
 exports.rejectVehicle = async (req, res) => {
   const { id } = req.params;
+  const { rejectionMessage } = req.body;
 
   try {
     const vehicle = await vehicleRegistrationModel.findById(id);
@@ -216,6 +237,7 @@ exports.rejectVehicle = async (req, res) => {
         .json({ success: false, message: "Vehicle data not found." });
 
     vehicle.status = "rejected";
+    vehicle.rejectionMessage = rejectionMessage;
 
     await vehicle.save();
 

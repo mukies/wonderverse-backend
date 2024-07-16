@@ -39,12 +39,41 @@ exports.vehicleSchema = {
       errorMessage: "Vehicle Photo must be in string format.",
     },
   },
+  featureImages: {
+    notEmpty: {
+      errorMessage: "Feature Images is required.",
+    },
+    isArray: {
+      errorMessage: "Feature Images must be an array",
+    },
+    // isLength: {
+    //   options: { max: 2 },
+    //   errorMessage: "More than 2 Images is not allowed",
+    // },
+    custom: {
+      options: (value) => {
+        return value.every((item) => typeof item === "string");
+      },
+      errorMessage: "Feature Images must be in string format",
+    },
+  },
   blueBookPhoto: {
     notEmpty: {
-      errorMessage: " Bill-Book Photo is required.",
+      errorMessage: "Blue-Book Photos is required.",
     },
-    isString: {
-      errorMessage: "Bill-Book Photo must be in string format.",
+
+    isArray: {
+      errorMessage: "Blue-Book Photos must be an array",
+    },
+    // isLength: {
+    //   options: { max: 2 },
+    //   errorMessage: "More than 2 Images is not allowed",
+    // },
+    custom: {
+      options: (value) => {
+        return value.every((item) => typeof item === "string");
+      },
+      errorMessage: "Blue-Book Images must be in string format",
     },
   },
   driverDetails: {

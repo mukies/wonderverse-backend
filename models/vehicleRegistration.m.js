@@ -10,7 +10,8 @@ const vehicleRegistrationSchema = new mongoose.Schema(
 
     vehicleName: { type: String, required: true },
     vehiclePhoto: { type: String, required: true },
-    blueBookPhoto: { type: String, required: true },
+    featureImages: { type: [String], required: true },
+    blueBookPhotos: { type: [String], required: true },
     vehicleNumberPlate: { type: String, required: true },
     vehicleCapacity: { type: Number, required: true },
     vehicleType: {
