@@ -11,6 +11,11 @@ exports.vehicleSchema = {
     notEmpty: {
       errorMessage: "Vehicle Type is required.",
     },
+    isIn: {
+      options: [["taxi", "bus", "hiace", "scorpio"]],
+      errorMessage:
+        'Vehicle type must be one of these: "taxi", "bus", "hiace", "scorpio"',
+    },
     isString: {
       errorMessage: "Vehicle Type must be in string format.",
     },
@@ -57,7 +62,7 @@ exports.vehicleSchema = {
       errorMessage: "Feature Images must be in string format",
     },
   },
-  blueBookPhoto: {
+  blueBookPhotos: {
     notEmpty: {
       errorMessage: "Blue-Book Photos is required.",
     },

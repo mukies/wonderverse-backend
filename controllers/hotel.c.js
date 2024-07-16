@@ -16,7 +16,7 @@ exports.addHotel = async (req, res) => {
   try {
     //hotel documents
 
-    hotelDocuments.ownerCitizenshipPhoto =
+    hotelDocuments.ownerCitizenshipPhoto = await Promise.all(
       hotelDocuments.ownerCitizenshipPhoto.map(async (photo) => {
         if (!photo.startsWith("http")) {
           //todo generate cloudinary link
@@ -24,7 +24,8 @@ exports.addHotel = async (req, res) => {
           return await generateLink(photo);
         }
         return photo;
-      });
+      })
+    );
 
     if (!hotelDocuments.hotelRegistrationPhoto.startsWith("http")) {
       hotelDocuments.hotelRegistrationPhoto = await generateLink(
@@ -46,14 +47,14 @@ exports.addHotel = async (req, res) => {
       );
     }
 
-    hotelDetails.featureImages = hotelDetails.featureImages.map(
-      async (photo) => {
+    hotelDetails.featureImages = await Promise.all(
+      hotelDetails.featureImages.map(async (photo) => {
         if (!photo.startsWith("http")) {
           //todo generate cloudinary link
           return await generateLink(photo);
         }
         return photo;
-      }
+      })
     );
 
     const newHotel = new hotelRegistrationModel({
@@ -104,7 +105,8 @@ exports.editHotelDetails = async (req, res) => {
       });
 
     //hotel documents
-    hotelDocuments.ownerCitizenshipPhoto =
+
+    hotelDocuments.ownerCitizenshipPhoto = await Promise.all(
       hotelDocuments.ownerCitizenshipPhoto.map(async (photo) => {
         if (!photo.startsWith("http")) {
           //todo generate cloudinary link
@@ -112,7 +114,8 @@ exports.editHotelDetails = async (req, res) => {
           return await generateLink(photo);
         }
         return photo;
-      });
+      })
+    );
 
     if (!hotelDocuments.hotelRegistrationPhoto.startsWith("http")) {
       hotelDocuments.hotelRegistrationPhoto = await generateLink(
@@ -134,14 +137,14 @@ exports.editHotelDetails = async (req, res) => {
       );
     }
 
-    hotelDetails.featureImages = hotelDetails.featureImages.map(
-      async (photo) => {
+    hotelDetails.featureImages = await Promise.all(
+      hotelDetails.featureImages.map(async (photo) => {
         if (!photo.startsWith("http")) {
           //todo generate cloudinary link
           return await generateLink(photo);
         }
         return photo;
-      }
+      })
     );
 
     const updatedHotel = await hotelRegistrationModel.findByIdAndUpdate(

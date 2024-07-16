@@ -26,19 +26,25 @@ exports.addVehicle = async (req, res) => {
     vehiclePhoto = await generateLink(vehiclePhoto);
   }
 
-  blueBookPhotos = blueBookPhotos.map(async (photo) => {
-    if (!photo.startsWith("http")) {
-      return await generateLink(photo);
-    }
-    return photo;
-  });
+  blueBookPhotos = await Promise.all(
+    blueBookPhotos.map(async (photo) => {
+      // console.log("image", photo);
 
-  featureImages = featureImages.map(async (photo) => {
-    if (!photo.startsWith("http")) {
-      return await generateLink(photo);
-    }
-    return photo;
-  });
+      if (!photo.startsWith("http")) {
+        return await generateLink(photo);
+      }
+      return photo;
+    })
+  );
+
+  featureImages = await Promise.all(
+    featureImages.map(async (photo) => {
+      if (!photo.startsWith("http")) {
+        return await generateLink(photo);
+      }
+      return photo;
+    })
+  );
 
   if (!driverDetails.driverLicencePhoto.startsWith("http")) {
     driverDetails.driverLicencePhoto = await generateLink(
@@ -148,19 +154,23 @@ exports.updateVehicleDetails = async (req, res) => {
     vehiclePhoto = await generateLink(vehiclePhoto);
   }
 
-  blueBookPhotos = blueBookPhotos.map(async (photo) => {
-    if (!photo.startsWith("http")) {
-      return await generateLink(photo);
-    }
-    return photo;
-  });
+  blueBookPhotos = await Promise.all(
+    blueBookPhotos.map(async (photo) => {
+      if (!photo.startsWith("http")) {
+        return await generateLink(photo);
+      }
+      return photo;
+    })
+  );
 
-  featureImages = featureImages.map(async (photo) => {
-    if (!photo.startsWith("http")) {
-      return await generateLink(photo);
-    }
-    return photo;
-  });
+  featureImages = await Promise.all(
+    featureImages.map(async (photo) => {
+      if (!photo.startsWith("http")) {
+        return await generateLink(photo);
+      }
+      return photo;
+    })
+  );
 
   if (!driverDetails.driverLicencePhoto.startsWith("http")) {
     driverDetails.driverLicencePhoto = await generateLink(

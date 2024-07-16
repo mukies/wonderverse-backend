@@ -20,14 +20,16 @@ exports.addGuide = async (req, res) => {
       guidePhoto = await generateLink(guidePhoto);
     }
 
-    citizenshipPhoto = citizenshipPhoto.map(async (photo) => {
-      if (!photo.startsWith("http")) {
-        //todo generate cloudinary link
+    citizenshipPhoto = await Promise.all(
+      citizenshipPhoto.map(async (photo) => {
+        if (!photo.startsWith("http")) {
+          //todo generate cloudinary link
 
-        return await generateLink(photo);
-      }
-      return photo;
-    });
+          return await generateLink(photo);
+        }
+        return photo;
+      })
+    );
 
     const newGuide = new guideRegistrationModel({
       citizenshipPhoto,
@@ -72,14 +74,16 @@ exports.editGuideDetails = async (req, res) => {
       guidePhoto = await generateLink(guidePhoto);
     }
 
-    citizenshipPhoto = citizenshipPhoto.map(async (photo) => {
-      if (!photo.startsWith("http")) {
-        //todo generate cloudinary link
+    citizenshipPhoto = await Promise.all(
+      citizenshipPhoto.map(async (photo) => {
+        if (!photo.startsWith("http")) {
+          //todo generate cloudinary link
 
-        return await generateLink(photo);
-      }
-      return photo;
-    });
+          return await generateLink(photo);
+        }
+        return photo;
+      })
+    );
 
     const updatedGuide = await guideRegistrationModel.findByIdAndUpdate(
       id,

@@ -50,12 +50,14 @@ exports.createTour = async (req, res) => {
       mainImage = await generateLink(mainImage);
     }
 
-    featureImages = featureImages.map(async (img) => {
-      if (!img.startsWith("http")) {
-        return await generateLink(img);
-      }
-      return img;
-    });
+    featureImages = await Promise.all(
+      featureImages.map(async (img) => {
+        if (!img.startsWith("http")) {
+          return await generateLink(img);
+        }
+        return img;
+      })
+    );
 
     const newTour = new tourModel({
       placeName,
@@ -210,12 +212,14 @@ exports.editTour = async (req, res) => {
         .json({ success: false, message: "Tour name already exist." });
 
     //use cloudinary
-    featureImages = featureImages.map(async (item) => {
-      if (!item.startsWith("http")) {
-        return await generateLink(item);
-      }
-      return item;
-    });
+    featureImages = await Promise.all(
+      featureImages.map(async (item) => {
+        if (!item.startsWith("http")) {
+          return await generateLink(item);
+        }
+        return item;
+      })
+    );
 
     //convert main image links into cloudinary links
     if (!mainImage.startsWith("http")) {
