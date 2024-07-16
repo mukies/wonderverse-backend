@@ -75,4 +75,33 @@ exports.tourSchema = {
       errorMessage: "Description must be in string format",
     },
   },
+
+  type: {
+    isIn: {
+      options: [["normal", "package"]],
+      errorMessage: 'Type must be either "normal" or "package".',
+    },
+  },
+  places: {
+    custom: {
+      options: (value, { req }) => {
+        if (req.body.type === "package" && (!value || value.length === 0)) {
+          throw new Error('Places field is required when type is "package".');
+        }
+        return true;
+      },
+    },
+    isArray: {
+      options: true,
+      errorMessage: "Places must be an array.",
+    },
+    custom: {
+      options: (value, { req }) => {
+        if (req.body.type === "package" && !Array.isArray(value)) {
+          throw new Error("Places must be an array.");
+        }
+        return true;
+      },
+    },
+  },
 };

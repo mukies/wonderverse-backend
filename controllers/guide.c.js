@@ -1,5 +1,6 @@
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const guideRegistrationModel = require("../models/guideRegistration.m");
+const tourModel = require("../models/tour.m");
 
 exports.addGuide = async (req, res) => {
   const { contactNumber, guidingDestinations } = req.body;
@@ -143,6 +144,27 @@ exports.deleteGuide = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error while deleting guide." });
+  }
+};
+
+exports.fetch_all_guiding_destinations_tours = async (req, res) => {
+  const { guideID } = req.params;
+  try {
+    const guide = await guideRegistrationModel.findById(guideID);
+    if (!guide)
+      return res
+        .status(404)
+        .json({ success: false, message: "Guide not found" });
+
+    const tours = await tourModel.find({ _id: guide.guidingDestinations });
+
+    res.json({ success: true, tours });
+  } catch (error) {
+    console.log("Error while fetching guiding destination tours", error);
+    res.status(500).json({
+      success: false,
+      message: "Error while fetching guiding destination tours",
+    });
   }
 };
 

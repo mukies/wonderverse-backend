@@ -89,12 +89,12 @@ exports.fetch_Personal_Vehicles = async (req, res) => {
       requestedBy: req.partner,
     });
 
-    req.json({ success: true, vehicles });
+    res.json({ success: true, vehicles });
   } catch (error) {
-    console.log("Error while fetching all approved vehicles", error);
+    console.log("Error while fetching all vehicles", error);
     res.status(500).json({
       success: false,
-      message: "Error while fetching all approved vehicles",
+      message: "Error while fetching all vehicles",
     });
   }
 };
@@ -171,12 +171,10 @@ exports.updateVehicleDetails = async (req, res) => {
     });
   } catch (error) {
     console.log("Error while updating vehicle details", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error while updating vehicle details",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error while updating vehicle details",
+    });
   }
 };
 
