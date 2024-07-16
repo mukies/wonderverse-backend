@@ -12,7 +12,7 @@ exports.addVehicle = async (req, res) => {
     vehicleType,
   } = req.body;
 
-  let { vehiclePhoto, billBookPhoto } = req.body;
+  let { vehiclePhoto, blueBookPhoto } = req.body;
   //todo: validation
 
   const errors = validationResult(req);
@@ -26,8 +26,8 @@ exports.addVehicle = async (req, res) => {
     vehiclePhoto = await generateLink(vehiclePhoto);
   }
 
-  if (!billBookPhoto.startsWith("http")) {
-    billBookPhoto = await generateLink(billBookPhoto);
+  if (!blueBookPhoto.startsWith("http")) {
+    blueBookPhoto = await generateLink(blueBookPhoto);
   }
 
   if (!driverDetails.driverLicencePhoto.startsWith("http")) {
@@ -43,7 +43,7 @@ exports.addVehicle = async (req, res) => {
       vehicleCapacity,
       driverDetails,
       vehiclePhoto,
-      billBookPhoto,
+      blueBookPhoto,
       requestedBy: req.partner,
       vehicleType,
     });
@@ -123,7 +123,7 @@ exports.updateVehicleDetails = async (req, res) => {
     vehicleType,
   } = req.body;
 
-  let { vehiclePhoto, billBookPhoto } = req.body;
+  let { vehiclePhoto, blueBookPhoto } = req.body;
 
   const { vehicleID } = req.params;
   //todo: validation
@@ -139,8 +139,8 @@ exports.updateVehicleDetails = async (req, res) => {
     vehiclePhoto = await generateLink(vehiclePhoto);
   }
 
-  if (!billBookPhoto.startsWith("http")) {
-    billBookPhoto = await generateLink(billBookPhoto);
+  if (!blueBookPhoto.startsWith("http")) {
+    blueBookPhoto = await generateLink(blueBookPhoto);
   }
 
   if (!driverDetails.driverLicencePhoto.startsWith("http")) {
@@ -158,7 +158,7 @@ exports.updateVehicleDetails = async (req, res) => {
         vehicleCapacity,
         driverDetails,
         vehiclePhoto,
-        billBookPhoto,
+        blueBookPhoto,
         vehicleType,
         status: "pending",
       },

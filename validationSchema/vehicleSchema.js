@@ -39,7 +39,7 @@ exports.vehicleSchema = {
       errorMessage: "Vehicle Photo must be in string format.",
     },
   },
-  billBookPhoto: {
+  blueBookPhoto: {
     notEmpty: {
       errorMessage: " Bill-Book Photo is required.",
     },

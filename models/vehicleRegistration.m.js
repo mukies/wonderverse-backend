@@ -10,12 +10,12 @@ const vehicleRegistrationSchema = new mongoose.Schema(
 
     vehicleName: { type: String, required: true },
     vehiclePhoto: { type: String, required: true },
-    billBookPhoto: { type: String, required: true },
+    blueBookPhoto: { type: String, required: true },
     vehicleNumberPlate: { type: String, required: true },
     vehicleCapacity: { type: Number, required: true },
     vehicleType: {
       type: String,
-      enum: ["taxi", "bus", "hiace"],
+      enum: ["taxi", "bus", "hiace", "scorpio"],
       required: true,
     },
 
