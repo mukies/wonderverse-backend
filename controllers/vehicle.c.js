@@ -62,6 +62,7 @@ exports.addVehicle = async (req, res) => {
       blueBookPhotos,
       requestedBy: req.partner,
       vehicleType,
+      featureImages,
     });
 
     await newVehicle.save();
