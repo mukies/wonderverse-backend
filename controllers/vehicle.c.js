@@ -21,38 +21,37 @@ exports.addVehicle = async (req, res) => {
       .status(400)
       .json({ success: false, message: errors.array()[0].msg });
   }
-
-  if (!vehiclePhoto.startsWith("http")) {
-    vehiclePhoto = await generateLink(vehiclePhoto);
-  }
-
-  blueBookPhotos = await Promise.all(
-    blueBookPhotos.map(async (photo) => {
-      // console.log("image", photo);
-
-      if (!photo.startsWith("http")) {
-        return await generateLink(photo);
-      }
-      return photo;
-    })
-  );
-
-  featureImages = await Promise.all(
-    featureImages.map(async (photo) => {
-      if (!photo.startsWith("http")) {
-        return await generateLink(photo);
-      }
-      return photo;
-    })
-  );
-
-  if (!driverDetails.driverLicencePhoto.startsWith("http")) {
-    driverDetails.driverLicencePhoto = await generateLink(
-      driverDetails.driverLicencePhoto
-    );
-  }
-
   try {
+    if (!vehiclePhoto.startsWith("http")) {
+      vehiclePhoto = await generateLink(vehiclePhoto);
+    }
+
+    blueBookPhotos = await Promise.all(
+      blueBookPhotos.map(async (photo) => {
+        // console.log("image", photo);
+
+        if (!photo.startsWith("http")) {
+          return await generateLink(photo);
+        }
+        return photo;
+      })
+    );
+
+    featureImages = await Promise.all(
+      featureImages.map(async (photo) => {
+        if (!photo.startsWith("http")) {
+          return await generateLink(photo);
+        }
+        return photo;
+      })
+    );
+
+    if (!driverDetails.driverLicencePhoto.startsWith("http")) {
+      driverDetails.driverLicencePhoto = await generateLink(
+        driverDetails.driverLicencePhoto
+      );
+    }
+
     const newVehicle = new vehicleRegistrationModel({
       vehicleName,
       vehicleNumberPlate,
@@ -150,36 +149,35 @@ exports.updateVehicleDetails = async (req, res) => {
       .status(400)
       .json({ success: false, message: errors.array()[0].msg });
   }
-
-  if (!vehiclePhoto.startsWith("http")) {
-    vehiclePhoto = await generateLink(vehiclePhoto);
-  }
-
-  blueBookPhotos = await Promise.all(
-    blueBookPhotos.map(async (photo) => {
-      if (!photo.startsWith("http")) {
-        return await generateLink(photo);
-      }
-      return photo;
-    })
-  );
-
-  featureImages = await Promise.all(
-    featureImages.map(async (photo) => {
-      if (!photo.startsWith("http")) {
-        return await generateLink(photo);
-      }
-      return photo;
-    })
-  );
-
-  if (!driverDetails.driverLicencePhoto.startsWith("http")) {
-    driverDetails.driverLicencePhoto = await generateLink(
-      driverDetails.driverLicencePhoto
-    );
-  }
-
   try {
+    if (!vehiclePhoto.startsWith("http")) {
+      vehiclePhoto = await generateLink(vehiclePhoto);
+    }
+
+    blueBookPhotos = await Promise.all(
+      blueBookPhotos.map(async (photo) => {
+        if (!photo.startsWith("http")) {
+          return await generateLink(photo);
+        }
+        return photo;
+      })
+    );
+
+    featureImages = await Promise.all(
+      featureImages.map(async (photo) => {
+        if (!photo.startsWith("http")) {
+          return await generateLink(photo);
+        }
+        return photo;
+      })
+    );
+
+    if (!driverDetails.driverLicencePhoto.startsWith("http")) {
+      driverDetails.driverLicencePhoto = await generateLink(
+        driverDetails.driverLicencePhoto
+      );
+    }
+
     const updatedVehicle = await vehicleRegistrationModel.findByIdAndUpdate(
       vehicleID,
       {
