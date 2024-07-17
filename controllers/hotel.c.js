@@ -177,9 +177,11 @@ exports.editHotelDetails = async (req, res) => {
 
 exports.fetch_All_Personal_Hotels = async (req, res) => {
   try {
-    const hotels = await hotelRegistrationModel.find({
-      requestedBy: req.partner,
-    });
+    const hotels = await hotelRegistrationModel
+      .find({
+        requestedBy: req.partner,
+      })
+      .populate("tour", "placeName mainImage slug location");
 
     res.status(200).json({ success: true, hotels });
   } catch (error) {

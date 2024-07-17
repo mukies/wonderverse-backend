@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const guideRegistrationModel = require("../models/guideRegistration.m");
 const tourModel = require("../models/tour.m");
@@ -116,28 +117,33 @@ exports.editGuideDetails = async (req, res) => {
   }
 };
 
-exports.fetchGuideByTourId = async (req, res) => {
-  const { tourID } = req.params;
-  try {
-    const guides = await guideRegistrationModel
-      .find({
-        guidingDestinations: tourID,
-        status: "approved",
-      })
-      .populate("requestedBy", "photo firstName lastName email");
+// exports.fetchGuideByTourId = async (req, res) => {
+//   const { tourID } = req.params;
+//   try {
+//     const guides = await guideRegistrationModel
+//       .find({
+//         guidingDestinations: tourID,
+//         status: "approved",
+//       })
+//       .populate("requestedBy", "photo firstName lastName email");
 
-    res.status(200).json({ success: true, guides });
-  } catch (error) {
-    console.log("Error while fetching guide.", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error while fetching guide." });
-  }
-};
+//     res.status(200).json({ success: true, guides });
+//   } catch (error) {
+//     console.log("Error while fetching guide.", error);
+//     res
+//       .status(500)
+//       .json({ success: false, message: "Error while fetching guide." });
+//   }
+// };
 
 exports.deleteGuide = async (req, res) => {
   const { id } = req.params;
   try {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
     await guideRegistrationModel.findByIdAndDelete(id);
 
     res
@@ -172,10 +178,11 @@ exports.fetch_all_guiding_destinations_tours = async (req, res) => {
   }
 };
 
-//admin action
 exports.fetchAllGuide = async (req, res) => {
   try {
-    const guides = await guideRegistrationModel.find({ status: "approved" });
+    const guides = await guideRegistrationModel
+      .find()
+      .populate("guidingDestinations", "placeName mainImage slug location");
 
     res.status(200).json({ success: true, guides });
   } catch (error) {
