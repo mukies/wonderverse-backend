@@ -8,6 +8,7 @@ const {
   getToursByActivity,
   allTours,
   featuredTrips,
+  allToursNames,
 } = require("../controllers/tour.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const { tourSchema } = require("../validationSchema/tourSchema");
@@ -18,6 +19,7 @@ router.get("/destination/:slug", getToursByState);
 router.get("/activities/:slug", getToursByActivity);
 router.get("/tour-details/:tourID", singleTour);
 router.get("/featured-trips", featuredTrips);
+router.get("/all-tour-name", allToursNames);
 //admin routes
 
 router.get("/all", adminProtection, allTours);

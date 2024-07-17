@@ -12,16 +12,9 @@ const guideRegistrationModel = require("../models/guideRegistration.m");
 // const transportationModel = require("../models/transportation.m");
 
 exports.createTour = async (req, res) => {
-  const {
-    placeName, //todo string
-    state,
-    activity,
-    description,
-    location,
-    included,
-    excluded,
-  } = req.body;
-  const { featureImages, mainImage } = req.body;
+  const { placeName, state, activity, description, location, included } =
+    req.body;
+  let { featureImages, mainImage } = req.body;
   try {
     const result = validationResult(req);
     if (!result.isEmpty())
@@ -69,7 +62,6 @@ exports.createTour = async (req, res) => {
       location: location.toLowerCase(),
       featureImages,
       included,
-      excluded,
     });
     await newTour.save();
     res.status(201).json({ success: true, message: "tour created", newTour });
@@ -85,6 +77,20 @@ exports.allTours = async (req, res) => {
   const { page } = req.query;
   try {
     const tours = await tourModel.find().populate("state").populate("activity");
+
+    res.status(200).json({ success: true, tours });
+  } catch (error) {
+    console.log("Error while fetching all tour");
+    res
+      .status(500)
+      .json({ success: false, message: "Error while fetching all tour." });
+  }
+};
+
+exports.allToursNames = async (req, res) => {
+  // const { page } = req.query;
+  try {
+    const tours = await tourModel.find().select("placeName");
 
     res.status(200).json({ success: true, tours });
   } catch (error) {
@@ -180,15 +186,8 @@ exports.singleTour = async (req, res) => {
 };
 
 exports.editTour = async (req, res) => {
-  const {
-    placeName,
-    state,
-    activity,
-    description,
-    location,
-    included,
-    excluded,
-  } = req.body;
+  const { placeName, state, activity, description, location, included } =
+    req.body;
   let { featureImages, mainImage } = req.body;
 
   const { tourID } = req.params;
@@ -204,6 +203,7 @@ exports.editTour = async (req, res) => {
 
     const isNameExist = await tourModel.findOne({
       slug: slugify(placeName.toLowerCase(), "+"),
+      _id: { $ne: tourID },
     });
 
     if (isNameExist)
@@ -236,7 +236,6 @@ exports.editTour = async (req, res) => {
       location: location.toLowerCase(),
       featureImages,
       included,
-      excluded,
     });
     await tourUpdate.save();
     res

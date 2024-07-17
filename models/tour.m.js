@@ -6,22 +6,30 @@ const tourSchema = new mongoose.Schema(
     slug: { type: String, required: true },
     mainImage: { type: String, required: true },
     location: { type: String, required: true },
-    type: { type: String, enum: ["normal", "package"], default: "normal" },
-    places: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "PackagePlace",
-      sparse: true,
-    },
+    // type: { type: String, enum: ["normal", "package"], default: "normal" },
+    // places: {
+    //   type: [mongoose.Schema.Types.ObjectId],
+    //   ref: "PackagePlace",
+    //   sparse: true,
+    // },
     state: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "State",
+      type: String,
       required: true,
     },
+    // state: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "State",
+    //   required: true,
+    // },
     activity: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Activity",
+      type: String,
       required: true,
     },
+    // activity: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Activity",
+    //   required: true,
+    // },
     avgRating: { type: Number, default: 0 },
     reviews: [
       {
@@ -36,7 +44,7 @@ const tourSchema = new mongoose.Schema(
     ],
     description: { type: String, default: "" },
     included: { type: String, default: "" },
-    excluded: { type: String, default: "" },
+    // excluded: { type: String, default: "" },
     featureImages: { type: [String], required: true },
   },
   { timestamps: true }

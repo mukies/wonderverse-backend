@@ -63,12 +63,12 @@ exports.tourSchema = {
       errorMessage: "What's Included field must be in string format",
     },
   },
-  excluded: {
-    optional: true,
-    isString: {
-      errorMessage: "What's Excluded field must be in string format",
-    },
-  },
+  // excluded: {
+  //   optional: true,
+  //   isString: {
+  //     errorMessage: "What's Excluded field must be in string format",
+  //   },
+  // },
   description: {
     optional: true,
     isString: {
@@ -76,32 +76,32 @@ exports.tourSchema = {
     },
   },
 
-  type: {
-    isIn: {
-      options: [["normal", "package"]],
-      errorMessage: 'Type must be either "normal" or "package".',
-    },
-  },
-  places: {
-    custom: {
-      options: (value, { req }) => {
-        if (req.body.type === "package" && (!value || value.length === 0)) {
-          throw new Error('Places field is required when type is "package".');
-        }
-        return true;
-      },
-    },
-    isArray: {
-      options: true,
-      errorMessage: "Places must be an array.",
-    },
-    custom: {
-      options: (value, { req }) => {
-        if (req.body.type === "package" && !Array.isArray(value)) {
-          throw new Error("Places must be an array.");
-        }
-        return true;
-      },
-    },
-  },
+  // type: {
+  //   isIn: {
+  //     options: [["normal", "package"]],
+  //     errorMessage: 'Type must be either "normal" or "package".',
+  //   },
+  // },
+  // places: {
+  //   custom: {
+  //     options: (value, { req }) => {
+  //       if (req.body.type === "package" && (!value || value.length === 0)) {
+  //         throw new Error('Places field is required when type is "package".');
+  //       }
+  //       return true;
+  //     },
+  //   },
+  //   isArray: {
+  //     options: true,
+  //     errorMessage: "Places must be an array.",
+  //   },
+  //   custom: {
+  //     options: (value, { req }) => {
+  //       if (req.body.type === "package" && !Array.isArray(value)) {
+  //         throw new Error("Places must be an array.");
+  //       }
+  //       return true;
+  //     },
+  //   },
+  // },
 };
