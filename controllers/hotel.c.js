@@ -139,15 +139,17 @@ exports.editHotelDetails = async (req, res) => {
       );
     }
 
-    hotelDetails.featureImages = await Promise.all(
-      hotelDetails.featureImages.map(async (photo) => {
-        if (!photo.startsWith("http")) {
-          //todo generate cloudinary link
-          return await generateLink(photo);
-        }
-        return photo;
-      })
-    );
+    if (hotelDetails.featureImages) {
+      hotelDetails.featureImages = await Promise.all(
+        hotelDetails.featureImages.map(async (photo) => {
+          if (!photo.startsWith("http")) {
+            //todo generate cloudinary link
+            return await generateLink(photo);
+          }
+          return photo;
+        })
+      );
+    }
 
     const updatedHotel = await hotelRegistrationModel.findByIdAndUpdate(
       id,
@@ -226,7 +228,10 @@ exports.deleteHotel = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Hotel not found" });
 
-    if (hotel.requestedBy.toString() !== req.partner)
+    console.log("reqby", hotel.requestedBy);
+    console.log("req.partner", req.partner);
+
+    if (hotel.requestedBy.toString() !== req.partner.toString())
       return res.status(401).json({
         success: false,
         message: "Unable to delete other's hotel.",

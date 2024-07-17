@@ -28,7 +28,7 @@ exports.userProtection = async (req, res, next) => {
         .status(401)
         .json({ success: false, message: "User is not verified" });
 
-    req.user = user._id;
+    req.user = user._id.toString();
 
     next();
   } catch (error) {

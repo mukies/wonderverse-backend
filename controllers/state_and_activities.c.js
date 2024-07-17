@@ -5,7 +5,7 @@ const activityModel = require("../models/activity.m");
 exports.addState = async (req, res) => {
   const { name } = req.body;
 
-  if (!req.admin._id)
+  if (!req.admin)
     return res
       .status(401)
       .json({ success: false, message: "Unauthorized action." });
@@ -48,7 +48,7 @@ exports.updateState = async (req, res) => {
   const { name } = req.body;
   const { id } = req.params;
 
-  if (!req.admin._id)
+  if (!req.admin)
     return res
       .status(401)
       .json({ success: false, message: "Unauthorized action." });
@@ -94,7 +94,7 @@ exports.deleteState = async (req, res) => {
   const { id } = req.params;
 
   try {
-    if (!req.admin._id)
+    if (!req.admin)
       return res
         .status(401)
         .json({ success: false, message: "Unauthorized action." });
@@ -153,7 +153,7 @@ exports.getSingleState = async (req, res) => {
 
 exports.addActivity = async (req, res) => {
   const { title } = req.body;
-  if (!req.admin._id)
+  if (!req.admin)
     return res
       .status(401)
       .json({ success: false, message: "Unauthorized action." });
@@ -196,7 +196,7 @@ exports.addActivity = async (req, res) => {
 exports.updateActivity = async (req, res) => {
   const { title } = req.body;
   const { id } = req.params;
-  if (!req.admin._id)
+  if (!req.admin)
     return res
       .status(401)
       .json({ success: false, message: "Unauthorized action." });
@@ -243,7 +243,7 @@ exports.deleteActivity = async (req, res) => {
   const { id } = req.params;
 
   try {
-    if (!req.admin._id)
+    if (!req.admin)
       return res
         .status(401)
         .json({ success: false, message: "Unauthorized action." });

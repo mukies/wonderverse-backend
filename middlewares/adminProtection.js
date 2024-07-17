@@ -28,14 +28,7 @@ exports.adminProtection = async (req, res, next) => {
         message: "Admin account is not verified",
       });
 
-    const adminData = {
-      fullName: admin.fullName,
-      email: admin.email,
-      isVerified: admin.isVerified,
-      _id: admin._id,
-    };
-
-    req.admin = adminData;
+    req.admin = admin._id.toString();
     next();
   } catch (error) {
     console.log("Error in admin protection route.", error);

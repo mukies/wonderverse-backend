@@ -28,7 +28,7 @@ exports.partnerProtection = async (req, res, next) => {
         .status(401)
         .json({ success: false, message: "Partner account is not verified" });
 
-    req.partner = partner._id;
+    req.partner = partner._id.toString();
 
     next();
   } catch (error) {
