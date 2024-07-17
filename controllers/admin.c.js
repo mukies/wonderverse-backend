@@ -6,6 +6,7 @@ const tourModel = require("../models/tour.m");
 const { sendEmail } = require("../nodemailer/sendEmail");
 const adminModel = require("../models/admin.m");
 const { validationResult } = require("express-validator");
+const mongoose = require("mongoose");
 
 exports.registerAdmin = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -128,6 +129,11 @@ exports.verifyAdmin = async (req, res) => {
     return res
       .status(400)
       .json({ success: false, message: "OTP code required" });
+
+  if (!mongoose.Types.ObjectId.isValid(uid))
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid object id" });
 
   try {
     const admin = await adminModel.findById(uid);

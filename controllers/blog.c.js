@@ -1,10 +1,11 @@
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const blogModel = require("../models/blog.m");
+const mongoose = require("mongoose");
 
 exports.createPost = async (req, res) => {
   const { blogTitle, blogContent } = req.body;
   let { image } = req.body;
-  const postedBy = req.user._id;
+  const postedBy = req.user;
 
   if (!postedBy)
     return res.status(401).json({
@@ -42,10 +43,14 @@ exports.createPost = async (req, res) => {
 };
 
 exports.deletePost = async (req, res) => {
-  const userID = req.user._id;
+  const userID = req.user;
   const { postID } = req.params;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(postID))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
     const post = await blogModel.findById(postID);
 
     if (post.postedBy.toString() !== userID.toString())
@@ -69,7 +74,7 @@ exports.deletePost = async (req, res) => {
 
 exports.editPost = async (req, res) => {
   const { blogTitle, blogContent } = req.body;
-  const postedBy = req.user._id;
+  const postedBy = req.user;
   const { postID } = req.params;
 
   if (!postedBy)
@@ -82,6 +87,10 @@ exports.editPost = async (req, res) => {
       success: false,
       message: "Blog title and content required.",
     });
+  if (!mongoose.Types.ObjectId.isValid(postID))
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid object id" });
 
   try {
     const post = await blogModel.findById(postID);
@@ -127,7 +136,7 @@ exports.allBlogPost = async (req, res) => {
 exports.personalPost = async (req, res) => {
   try {
     const posts = await blogModel
-      .find({ postedBy: req.user._id })
+      .find({ postedBy: req.user })
       .populate("postedBy", "firstName lastName photo country");
 
     res.status(200).json({ success: true, posts });
@@ -142,6 +151,12 @@ exports.personalPost = async (req, res) => {
 
 exports.singlePost = async (req, res) => {
   const { postID } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(postID))
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid object id" });
+
   try {
     const post = await blogModel
       .findById(postID)
@@ -170,6 +185,11 @@ exports.adminDeletePost = async (req, res) => {
   const { postID } = req.params;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(postID))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
     const post = await blogModel.findById(postID);
     if (!post)
       return res

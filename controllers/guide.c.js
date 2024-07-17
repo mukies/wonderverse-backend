@@ -2,12 +2,19 @@ const mongoose = require("mongoose");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const guideRegistrationModel = require("../models/guideRegistration.m");
 const tourModel = require("../models/tour.m");
+const { validationResult } = require("express-validator");
 
 exports.addGuide = async (req, res) => {
-  const { contactNumber, guidingDestinations } = req.body;
+  const { contactNumber, guidingDestinations, guideName } = req.body;
   let { citizenshipPhoto, guidePhoto, nationalIdPhoto } = req.body;
 
   //todo validation
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
 
   try {
     if (nationalIdPhoto && !nationalIdPhoto.startsWith("http")) {
@@ -39,6 +46,7 @@ exports.addGuide = async (req, res) => {
       requestedBy: req.partner,
       guidingDestinations,
       guidePhoto,
+      guideName,
     });
 
     await newGuide.save();
@@ -57,10 +65,20 @@ exports.addGuide = async (req, res) => {
 };
 
 exports.editGuideDetails = async (req, res) => {
-  const { contactNumber, guidingDestinations } = req.body;
+  const { contactNumber, guidingDestinations, guideName } = req.body;
   let { citizenshipPhoto, guidePhoto, nationalIdPhoto } = req.body;
   const { id } = req.params;
-  //todo validation
+  const result = validationResult(req);
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid object id" });
+
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
 
   try {
     if (nationalIdPhoto && !nationalIdPhoto.startsWith("http")) {
@@ -95,6 +113,7 @@ exports.editGuideDetails = async (req, res) => {
         status: "pending",
         guidingDestinations,
         guidePhoto,
+        guideName,
       },
       { new: true }
     );
@@ -160,6 +179,11 @@ exports.deleteGuide = async (req, res) => {
 exports.fetch_all_guiding_destinations_tours = async (req, res) => {
   const { guideID } = req.params;
   try {
+    if (!mongoose.Types.ObjectId.isValid(guideID))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
     const guide = await guideRegistrationModel.findById(guideID);
     if (!guide)
       return res

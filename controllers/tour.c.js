@@ -20,7 +20,7 @@ exports.createTour = async (req, res) => {
     if (!result.isEmpty())
       return res.status(400).json({
         success: false,
-        message: result.array(),
+        message: result.array()[0].msg,
       });
 
     const isNameExist = await tourModel.findOne({
