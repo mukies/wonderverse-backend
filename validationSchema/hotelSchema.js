@@ -3,8 +3,8 @@ exports.hotelSchema = {
     notEmpty: {
       errorMessage: "Tour ID is required.",
     },
-    isString: {
-      errorMessage: "Tour ID must be in string format.",
+    isArray: {
+      errorMessage: "Tour ID must be in array format.",
     },
   },
   hotelDocuments: {
@@ -109,10 +109,7 @@ exports.hotelSchema = {
     isArray: {
       errorMessage: "Owner Citizenship Photo must be an array",
     },
-    isLength: {
-      options: { max: 2 },
-      errorMessage: "More than 2 Images is not allowed",
-    },
+
     custom: {
       options: (value) => {
         return value.every((item) => typeof item === "string");

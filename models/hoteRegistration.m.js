@@ -8,7 +8,7 @@ const hotelRegistrationSchema = new mongoose.Schema(
       required: true,
     },
     tour: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: [mongoose.Schema.Types.ObjectId],
       ref: "Tour",
       required: true,
     },

@@ -47,15 +47,17 @@ exports.addHotel = async (req, res) => {
       );
     }
 
-    hotelDetails.featureImages = await Promise.all(
-      hotelDetails.featureImages.map(async (photo) => {
-        if (!photo.startsWith("http")) {
-          //todo generate cloudinary link
-          return await generateLink(photo);
-        }
-        return photo;
-      })
-    );
+    if (hotelDetails.featureImages) {
+      hotelDetails.featureImages = await Promise.all(
+        hotelDetails.featureImages.map(async (photo) => {
+          if (!photo.startsWith("http")) {
+            //todo generate cloudinary link
+            return await generateLink(photo);
+          }
+          return photo;
+        })
+      );
+    }
 
     const newHotel = new hotelRegistrationModel({
       hotelDocuments,
