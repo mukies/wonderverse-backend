@@ -1,7 +1,7 @@
 const {
   addGuide,
   editGuideDetails,
-  fetchGuideByTourId,
+  // fetchGuideByTourId,
   fetchAllGuide,
   deleteGuide,
 } = require("../controllers/guide.c");
