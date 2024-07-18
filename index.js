@@ -32,7 +32,8 @@ app.use(upload.none());
 
 app.use(
   cors({
-    origin: "*",
+    origin:
+      "https://rnmsx-2405-acc0-1100-37a1-855d-df42-c99d-1b8.a.free.pinggy.link",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
