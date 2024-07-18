@@ -24,12 +24,6 @@ const blogRoute = require("./routes/blog.r");
 require("./config/passport-setup");
 const googleAuthRoute = require("./routes/googleAuth.r");
 const partnerRoute = require("./routes/partner.r");
-// const { body, checkSchema, validationResult } = require("express-validator");
-// const { test } = require("./test/testSchema");
-// const testModel = require("./test/test.m");
-// const {
-//   generateTokenAndSetCookie,
-// } = require("./helper/generateTokenAndSendCookie");
 
 //multer
 const storage = multer.memoryStorage();
@@ -38,7 +32,7 @@ app.use(upload.none());
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -76,16 +70,6 @@ app.use("/api/category", state_and_activities_route);
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "server is ok." });
 });
-
-// app.post("/epay", async (req, res) => {
-//   const errors = validationResult(req);
-
-//   const { amount, success_url, failure_url } = req.body;
-
-//   res
-//     .status(200)
-//     .json({ success: true, type, places, message: "server is ok." });
-// });
 
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Invalid API endpoint." });
