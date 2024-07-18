@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const planModel = require("../models/guidePlan.m");
+const mongoose = require("mongoose");
 
 exports.addPlan = async (req, res) => {
   const { tour, plans } = req.body;
@@ -71,5 +72,30 @@ exports.editPlan = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error while updating guide plan" });
+  }
+};
+
+exports.fetchPlanDetails = async (req, res) => {
+  const { guideID } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(guideID))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid guide id." });
+
+    const planData = await planModel.findById(guideID);
+
+    if (!planData)
+      return res
+        .status(404)
+        .json({ success: false, message: "Guide Plan not found" });
+  } catch (error) {
+    console.log("Error while fetching single plan details", error);
+    res.status(500),
+      json({
+        success: false,
+        message: "Error while fetching single plan details",
+      });
   }
 };

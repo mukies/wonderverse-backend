@@ -11,6 +11,14 @@ exports.guideSchema = {
       errorMessage: "Guide name must be at least 2 characters long",
     },
   },
+  guideEmail: {
+    notEmpty: {
+      errorMessage: "Guide email is required.",
+    },
+    isEmail: {
+      errorMessage: "Invalid email format.",
+    },
+  },
 
   // price: {
   //   notEmpty: {

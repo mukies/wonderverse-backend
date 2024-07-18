@@ -5,7 +5,8 @@ const tourModel = require("../models/tour.m");
 const { validationResult } = require("express-validator");
 
 exports.addGuide = async (req, res) => {
-  const { contactNumber, guidingDestinations, guideName } = req.body;
+  const { contactNumber, guidingDestinations, guideName, guideEmail } =
+    req.body;
   let { citizenshipPhoto, guidePhoto, nationalIdPhoto } = req.body;
 
   //todo validation
@@ -47,6 +48,7 @@ exports.addGuide = async (req, res) => {
       guidingDestinations,
       guidePhoto,
       guideName,
+      guideEmail,
     });
 
     await newGuide.save();
@@ -65,7 +67,8 @@ exports.addGuide = async (req, res) => {
 };
 
 exports.editGuideDetails = async (req, res) => {
-  const { contactNumber, guidingDestinations, guideName } = req.body;
+  const { contactNumber, guidingDestinations, guideName, guideEmail } =
+    req.body;
   let { citizenshipPhoto, guidePhoto, nationalIdPhoto } = req.body;
   const { id } = req.params;
   const result = validationResult(req);
@@ -114,6 +117,7 @@ exports.editGuideDetails = async (req, res) => {
         guidingDestinations,
         guidePhoto,
         guideName,
+        guideEmail,
       },
       { new: true }
     );
