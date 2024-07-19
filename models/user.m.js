@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema(
     photo: { type: String, default: "" },
     firstName: { type: String, required: true },
     lastName: { type: String },
+    gender: { type: String, enum: ["male", "female", "other"], required: true },
     country: String,
     email: { type: String, unique: true, required: true },
     favourite: {

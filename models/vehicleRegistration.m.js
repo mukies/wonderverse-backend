@@ -22,6 +22,11 @@ const vehicleRegistrationSchema = new mongoose.Schema(
 
     driverDetails: {
       driverName: { type: String, required: true },
+      gender: {
+        type: String,
+        enum: ["male", "female", "other"],
+        required: true,
+      },
       driverLicencePhoto: { type: String, required: true },
       driverContactNumber: { type: String, required: true },
       conducterName: { type: String, sparse: true },

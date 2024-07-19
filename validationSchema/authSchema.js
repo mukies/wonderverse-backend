@@ -25,6 +25,18 @@ exports.userRegisterSchema = {
       errorMessage: "First Name must be at least 2 characters long",
     },
   },
+  gender: {
+    notEmpty: {
+      errorMessage: "Gender is required.",
+    },
+    isString: {
+      errorMessage: "Gender must be in string format",
+    },
+    isIn: {
+      options: [["male", "female", "other"]],
+      errorMessage: 'Only "male", "female" or "other" are valid gender.',
+    },
+  },
   lastName: {
     notEmpty: {
       errorMessage: "Last Name is required.",
@@ -137,6 +149,18 @@ exports.partnerRegisterSchema = {
     isLength: {
       options: { min: 2 },
       errorMessage: "First Name must be at least 2 characters long",
+    },
+  },
+  gender: {
+    notEmpty: {
+      errorMessage: "Gender is required.",
+    },
+    isString: {
+      errorMessage: "Gender must be in string format",
+    },
+    isIn: {
+      options: [["male", "female", "other"]],
+      errorMessage: 'Only "male", "female" or "other" are valid gender.',
     },
   },
   lastName: {

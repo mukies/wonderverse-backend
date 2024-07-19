@@ -139,9 +139,11 @@ exports.deleteRoute = async (req, res) => {
 
 exports.fetchPersonalRoutes = async (req, res) => {
   try {
-    const routes = await routeModel.find({
-      createdBy: req.partner,
-    });
+    const routes = await routeModel
+      .find({
+        createdBy: req.partner,
+      })
+      .populate("destination", "placeName mainImage slug location");
 
     res.json({ success: true, routes });
   } catch (error) {

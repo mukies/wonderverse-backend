@@ -7,11 +7,6 @@ exports.createPost = async (req, res) => {
   let { image } = req.body;
   const postedBy = req.user;
 
-  if (!postedBy)
-    return res.status(401).json({
-      success: false,
-      message: "Login to post a blog.",
-    });
   if (!blogContent && !blogTitle)
     return res.status(400).json({
       success: false,

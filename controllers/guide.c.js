@@ -5,7 +5,7 @@ const tourModel = require("../models/tour.m");
 const { validationResult } = require("express-validator");
 
 exports.addGuide = async (req, res) => {
-  const { contactNumber, guidingDestinations, guideName, guideEmail } =
+  const { contactNumber, guidingDestinations, guideName, guideEmail, gender } =
     req.body;
   let { citizenshipPhoto, guidePhoto, nationalIdPhoto } = req.body;
 
@@ -49,6 +49,7 @@ exports.addGuide = async (req, res) => {
       guidePhoto,
       guideName,
       guideEmail,
+      gender,
     });
 
     await newGuide.save();
@@ -67,7 +68,7 @@ exports.addGuide = async (req, res) => {
 };
 
 exports.editGuideDetails = async (req, res) => {
-  const { contactNumber, guidingDestinations, guideName, guideEmail } =
+  const { contactNumber, guidingDestinations, guideName, guideEmail, gender } =
     req.body;
   let { citizenshipPhoto, guidePhoto, nationalIdPhoto } = req.body;
   const { id } = req.params;
@@ -118,6 +119,7 @@ exports.editGuideDetails = async (req, res) => {
         guidePhoto,
         guideName,
         guideEmail,
+        gender,
       },
       { new: true }
     );
@@ -167,6 +169,12 @@ exports.deleteGuide = async (req, res) => {
         .status(401)
         .json({ success: false, message: "Invalid object id" });
 
+    const guide = await guideRegistrationModel.findById(id);
+    if (!guide)
+      return res
+        .status(404)
+        .json({ success: false, message: "Guide not found" });
+
     await guideRegistrationModel.findByIdAndDelete(id);
 
     res
@@ -209,7 +217,7 @@ exports.fetch_all_guiding_destinations_tours = async (req, res) => {
 exports.fetchAllGuide = async (req, res) => {
   try {
     const guides = await guideRegistrationModel
-      .find()
+      .find({ requestedBy: req.partner })
       .populate("guidingDestinations", "placeName mainImage slug location");
 
     res.status(200).json({ success: true, guides });
@@ -218,5 +226,27 @@ exports.fetchAllGuide = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error while fetching all guide." });
+  }
+};
+exports.singleGuideData = async (req, res) => {
+  const { guideID } = req.params;
+  try {
+    if (!mongoose.Types.ObjectId.isValid(guideID))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
+    const guide = await guideRegistrationModel.findById(guideID);
+    if (!guide)
+      return res
+        .status(404)
+        .json({ success: true, message: "Guide not found" });
+
+    res.json({ success: true, guide });
+  } catch (error) {
+    console.log("Error while fetching guide data", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while fetching guide data" });
   }
 };

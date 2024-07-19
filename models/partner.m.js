@@ -5,6 +5,7 @@ const partnerSchema = new mongoose.Schema(
     photo: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
+    gender: { type: String, enum: ["male", "female", "other"], required: true },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     OTP: { type: String }, // for registration

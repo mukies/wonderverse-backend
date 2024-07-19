@@ -70,15 +70,20 @@ exports.vehicleSchema = {
     isArray: {
       errorMessage: "Blue-Book Photos must be an array",
     },
-    // isLength: {
-    //   options: { max: 2 },
-    //   errorMessage: "More than 2 Images is not allowed",
-    // },
+
     custom: {
       options: (value) => {
-        return value.every((item) => typeof item === "string");
+        if (value.length > 2)
+          throw new Error("More than 2 photos are not allowed.");
+        if (value.length < 2)
+          throw new Error("You have to submit 2 photos of your blue-book.");
+        value.every((item) => {
+          if (typeof item !== "string")
+            throw new Error("Image url must be in string format.");
+          else return true;
+        });
+        return true;
       },
-      errorMessage: "Blue-Book Images must be in string format",
     },
   },
   driverDetails: {
@@ -111,6 +116,18 @@ exports.vehicleSchema = {
     },
     isString: {
       errorMessage: "Driver Contact Number must be in string format.",
+    },
+  },
+  "driverDetails.gender": {
+    notEmpty: {
+      errorMessage: "Driver Gender is required.",
+    },
+    isIn: {
+      options: [["male", "female", "other"]],
+      errorMessage: 'Only "male", "female" or "other" are valid gender.',
+    },
+    isString: {
+      errorMessage: "Driver Gender must be in string format.",
     },
   },
   "driverDetails.conducterName": {

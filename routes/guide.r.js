@@ -6,6 +6,7 @@ const {
   fetchAllGuide,
   deleteGuide,
   fetch_all_guiding_destinations_tours,
+  singleGuideData,
 } = require("../controllers/guide.c");
 const { partnerProtection } = require("../middlewares/partnerProtection");
 const { guideSchema } = require("../validationSchema/guideSchema");
@@ -31,6 +32,7 @@ router.get(
   partnerProtection,
   fetch_all_guiding_destinations_tours
 );
+router.get("/single-guide-data/:guideID", partnerProtection, singleGuideData);
 router.get("/all-guide", partnerProtection, fetchAllGuide);
 router.delete("/delete-guide/:id", partnerProtection, deleteGuide);
 

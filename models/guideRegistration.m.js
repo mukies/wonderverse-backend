@@ -10,6 +10,7 @@ const guideRegistrationSchema = new mongoose.Schema(
 
     guidePhoto: { type: String, required: true },
     guideName: { type: String, required: true },
+    gender: { type: String, enum: ["male", "female", "other"], required: true },
     guideEmail: { type: String, required: true },
     citizenshipPhoto: { type: [String], required: true },
     nationalIdPhoto: { type: String, sparse: true },

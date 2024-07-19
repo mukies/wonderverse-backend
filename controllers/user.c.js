@@ -10,7 +10,7 @@ const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const partnerModel = require("../models/partner.m");
 
 exports.registerUser = async (req, res) => {
-  const { firstName, lastName, email, password, country } = req.body;
+  const { firstName, lastName, email, password, country, gender } = req.body;
   let { photo } = req.body;
 
   const errors = validationResult(req);
@@ -53,6 +53,7 @@ exports.registerUser = async (req, res) => {
       isEmailExist.photo = photo;
       isEmailExist.password = hashedPassword;
       isEmailExist.OTP = OTP;
+      isEmailExist.gender = gender;
       isEmailExist.OTPExpiryDate = OTPExpiryDate;
       if (isVerifiedEmail) {
         isEmailExist.isVerified = true;
@@ -69,6 +70,7 @@ exports.registerUser = async (req, res) => {
         OTPExpiryDate,
         photo,
         country,
+        gender,
       });
 
       if (isVerifiedEmail) {

@@ -112,9 +112,19 @@ exports.hotelSchema = {
 
     custom: {
       options: (value) => {
-        return value.every((item) => typeof item === "string");
+        if (value.length > 2)
+          throw new Error("More than 2 photos are not allowed.");
+        if (value.length < 2)
+          throw new Error(
+            "You have to submit front and back side of the photo."
+          );
+        value.every((item) => {
+          if (typeof item !== "string")
+            throw new Error("Image url must be in string format.");
+          else return true;
+        });
+        return true;
       },
-      errorMessage: "Front and back side of citizenship Images must be strings",
     },
   },
   "hotelDocuments.hotelRegistrationNumber": {
