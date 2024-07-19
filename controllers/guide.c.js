@@ -239,7 +239,12 @@ exports.singleGuideData = async (req, res) => {
         .status(401)
         .json({ success: false, message: "Invalid object id" });
 
-    const guide = await guideRegistrationModel.findById(guideID);
+    const guide = await guideRegistrationModel
+      .findById(guideID)
+      .populate(
+        "guidingDestinations",
+        "placeName mainImage slug location avgRating"
+      );
     if (!guide)
       return res
         .status(404)

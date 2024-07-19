@@ -156,3 +156,34 @@ exports.busPark = [
   { name: "Madhyapur Thimi Bus Park", value: "madhyapur-thimi-bus-park" },
   { name: "Tikapur Bus Park", value: "tikapur-bus-park" },
 ];
+
+exports.states = [
+  {
+    name: "Province No. 1",
+    value: "province_no_1",
+  },
+  {
+    name: "Province No. 2",
+    value: "province_no_2",
+  },
+  {
+    name: "Bagmati Province",
+    value: "bagmati_province",
+  },
+  {
+    name: "Gandaki Province",
+    value: "gandaki_province",
+  },
+  {
+    name: "Lumbini Province",
+    value: "lumbini_province",
+  },
+  {
+    name: "Karnali Province",
+    value: "karnali_province",
+  },
+  {
+    name: "Sudurpashchim Province",
+    value: "sudurpashchim_province",
+  },
+];

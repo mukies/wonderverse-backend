@@ -143,7 +143,8 @@ exports.fetchPersonalRoutes = async (req, res) => {
       .find({
         createdBy: req.partner,
       })
-      .populate("destination", "placeName mainImage slug location");
+      .populate("destination", "placeName mainImage slug location")
+      .populate("vehicle");
 
     res.json({ success: true, routes });
   } catch (error) {

@@ -48,11 +48,6 @@ exports.updateState = async (req, res) => {
   const { name } = req.body;
   const { id } = req.params;
 
-  if (!req.admin)
-    return res
-      .status(401)
-      .json({ success: false, message: "Unauthorized action." });
-
   if (!name)
     return res
       .status(400)

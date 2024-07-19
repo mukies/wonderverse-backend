@@ -181,7 +181,7 @@ exports.fetch_All_Personal_Hotels = async (req, res) => {
       .find({
         requestedBy: req.partner,
       })
-      .populate("tour", "placeName mainImage slug location");
+      .populate("tour", "placeName mainImage slug location avgRating");
 
     res.status(200).json({ success: true, hotels });
   } catch (error) {
@@ -195,7 +195,9 @@ exports.fetch_All_Personal_Hotels = async (req, res) => {
 exports.fetch_Single_Hotel_data = async (req, res) => {
   const { id } = req.params;
   try {
-    const hotel = await hotelRegistrationModel.findById(id).populate("tour");
+    const hotel = await hotelRegistrationModel
+      .findById(id)
+      .populate("tour", "placeName mainImage slug location avgRating");
 
     res.status(200).json({ success: true, hotel });
   } catch (error) {
