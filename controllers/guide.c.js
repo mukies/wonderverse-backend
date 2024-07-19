@@ -218,7 +218,10 @@ exports.fetchAllGuide = async (req, res) => {
   try {
     const guides = await guideRegistrationModel
       .find({ requestedBy: req.partner })
-      .populate("guidingDestinations", "placeName mainImage slug location");
+      .populate(
+        "guidingDestinations",
+        "placeName mainImage slug location avgRating"
+      );
 
     res.status(200).json({ success: true, guides });
   } catch (error) {

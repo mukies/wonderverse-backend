@@ -158,7 +158,10 @@ exports.fetchPersonalRoutes = async (req, res) => {
 exports.fetchSingleRouteData = async (req, res) => {
   const { id } = req.params;
   try {
-    const route = await routeModel.findById(id).populate("vehicle");
+    const route = await routeModel
+      .findById(id)
+      .populate("vehicle")
+      .populate("destination", "placeName mainImage slug location avgRating");
 
     res.json({ success: true, route });
   } catch (error) {
