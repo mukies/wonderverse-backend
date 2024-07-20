@@ -48,6 +48,11 @@ exports.deletePost = async (req, res) => {
         .json({ success: false, message: "Invalid object id" });
     const post = await blogModel.findById(postID);
 
+    if (!post)
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+
     if (post.postedBy.toString() !== userID.toString())
       return res.status(401).json({
         success: false,
@@ -156,7 +161,7 @@ exports.singlePost = async (req, res) => {
     const post = await blogModel
       .findById(postID)
       .populate("postedBy", "firstName lastName photo country")
-      .populate("likes", "firstName lastName")
+      .populate("likes", "firstName lastName photo")
       .populate("comments.commentedBy", "firstName lastName");
 
     if (!post)
@@ -171,6 +176,174 @@ exports.singlePost = async (req, res) => {
       success: false,
       message: "Error while fetching blog post details.",
     });
+  }
+};
+
+exports.like_toggle = async (req, res) => {
+  const { postID } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(postID))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid post id" });
+
+    const post = await blogModel.findById(postID);
+
+    if (!post)
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    const isLiked = post.likes.includes(req.user);
+    if (isLiked) {
+      post.likes = post.likes.filter((id) => id.toString() !== req.user);
+      await post.save();
+    } else {
+      post.likes.push(req.user);
+      await post.save();
+    }
+
+    res.json({
+      success: true,
+      message: isLiked ? "Like removed" : "post liked",
+    });
+  } catch (error) {
+    console.log("Error while liking the post", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while liking the post" });
+  }
+};
+
+exports.addComment = async (req, res) => {
+  const { content } = req.body;
+  const { postID } = req.params;
+  try {
+    if (!mongoose.Types.ObjectId.isValid(postID))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid post id" });
+
+    const post = await blogModel.findById(postID);
+
+    if (!post)
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+
+    const comment = {
+      commentedBy: req.user,
+      content,
+    };
+
+    post.comments.push(comment);
+    await post.save();
+
+    res.json({
+      success: true,
+      message: "Comment has been added",
+    });
+  } catch (error) {
+    console.log("Error while commenting in the post", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while commenting in the post" });
+  }
+};
+
+exports.deleteComment = async (req, res) => {
+  const { postID, commentID } = req.params;
+  try {
+    if (
+      !mongoose.Types.ObjectId.isValid(postID) ||
+      !mongoose.Types.ObjectId.isValid(commentID)
+    )
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
+    const post = await blogModel.findById(postID);
+
+    if (!post)
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+
+    const index = post.comments.findIndex(
+      (comment) => comment._id.toString() == commentID
+    );
+
+    if (index == -1)
+      return res
+        .status(404)
+        .json({ success: false, message: "Comment not found." });
+
+    const isYourComment =
+      post.comments[index].commentedBy.toString() == req.user;
+
+    if (!isYourComment)
+      return res
+        .status(401)
+        .json({ success: false, message: "Unable to delete other's comment" });
+
+    post.comments.splice(index, 1);
+
+    await post.save();
+
+    res.json({
+      success: true,
+      message: "Comment has been deleted",
+    });
+  } catch (error) {
+    console.log("Error while deleting comment", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while deleting comment" });
+  }
+};
+
+exports.delete_Comment_By_Owner = async (req, res) => {
+  const { postID, commentID } = req.params;
+  try {
+    if (
+      !mongoose.Types.ObjectId.isValid(postID) ||
+      !mongoose.Types.ObjectId.isValid(commentID)
+    )
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
+    const post = await blogModel.findById(postID);
+
+    if (!post)
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+
+    if (post.postedBy.toString() !== req.user)
+      return res.status(401).json({
+        success: false,
+        message: "Unable to delete other people post's comment",
+      });
+
+    const index = post.comments.findIndex(
+      (comment) => comment._id.toString() == commentID
+    );
+
+    if (index == -1)
+      return res
+        .status(404)
+        .json({ success: false, message: "Comment not found" });
+
+    post.comments.splice(index, 1);
+    await post.save();
+
+    res.json({ success: true, message: "Comment has been deleted" });
+  } catch (error) {
+    console.log("Error while deleting comment", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while deleting comment" });
   }
 };
 
