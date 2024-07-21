@@ -99,3 +99,50 @@ exports.fetchPlanDetails = async (req, res) => {
       });
   }
 };
+
+exports.deletePlan = async (req, res) => {
+  const { planID } = req.params;
+  try {
+    if (!mongoose.Types.ObjectId.isValid(planID))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
+    const plan = await planModel.findById(planID);
+
+    if (!plan)
+      return res
+        .status(404)
+        .json({ success: false, message: "Plan not found" });
+
+    if (plan.createdBy.toString() !== req.partner)
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized! Unable to delete." });
+
+    await planModel.findByIdAndDelete(planID);
+
+    res.json({ success: true, message: "Guide plan has been deleted" });
+  } catch (error) {
+    console.log("Error while deleting guide plan.", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while deleting guide plan" });
+  }
+};
+
+exports.fetchAllPlan = async (req, res) => {
+  try {
+    const plans = await planModel
+      .find({ createdBy: req.partner })
+      .populate("tour", "placeName slug mainImage")
+      .populate("guide", "guideName guidePhoto");
+
+    res.json({ success: true, plans });
+  } catch (error) {
+    console.log("Error while fetching all plans", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while fetching all plans" });
+  }
+};
