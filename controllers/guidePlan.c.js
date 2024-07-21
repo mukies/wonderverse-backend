@@ -11,6 +11,14 @@ exports.addPlan = async (req, res) => {
     res.status(400).json({ success: false, message: result.array()[0].msg });
 
   try {
+    if (
+      !mongoose.Types.ObjectId.isValid(tour) ||
+      !mongoose.Types.ObjectId.isValid(guideID)
+    )
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
     const isExist = await planModel.findOne({ tour, guideID });
 
     if (isExist)
