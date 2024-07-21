@@ -8,7 +8,9 @@ exports.addPlan = async (req, res) => {
 
   const result = validationResult(req);
   if (!result.isEmpty())
-    res.status(400).json({ success: false, message: result.array()[0].msg });
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
 
   try {
     if (
@@ -28,7 +30,7 @@ exports.addPlan = async (req, res) => {
 
     const newPlan = new planModel({
       createdBy: req.partner,
-      guideID,
+      guide: guideID,
       plans,
       tour,
     });
@@ -50,7 +52,9 @@ exports.editPlan = async (req, res) => {
 
   const result = validationResult(req);
   if (!result.isEmpty())
-    res.status(400).json({ success: false, message: result.array()[0].msg });
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
 
   try {
     const isExist = await planModel.findOne({
@@ -67,7 +71,7 @@ exports.editPlan = async (req, res) => {
     const updatedPlan = await planModel.findByIdAndUpdate(
       planID,
       {
-        guideID,
+        guide: guideID,
         plans,
         tour,
       },
