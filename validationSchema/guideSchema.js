@@ -163,3 +163,63 @@ exports.planSchema = {
     },
   },
 };
+
+exports.planUpdateSchema = {
+  tour: {
+    notEmpty: {
+      errorMessage: "Tour ID is required.",
+    },
+    isString: {
+      errorMessage: "Tour ID must be in string format.",
+    },
+  },
+  plans: {
+    notEmpty: {
+      errorMessage: "Plans is required.",
+    },
+    isArray: {
+      errorMessage: "Plans must be in array format.",
+    },
+    custom: {
+      options: (value) => {
+        if (value.length == 0) throw new Error("Plans is required.");
+
+        return value.every((obj) => {
+          const keys = Object.keys(obj);
+          if (
+            keys.length === 3 &&
+            keys.includes("title") &&
+            keys.includes("description") &&
+            keys.includes("_id")
+          ) {
+            return true;
+          } else if (keys.length !== 3) {
+            throw new Error(
+              "Each object must and only have title and description in the plans array"
+            );
+          } else {
+            throw new Error("Plan must be array of object");
+          }
+        });
+      },
+    },
+  },
+
+  "plans.*.title": {
+    notEmpty: {
+      errorMessage: "Plan title is required.",
+    },
+    isString: {
+      errorMessage: "Plan title must be in string format.",
+    },
+  },
+
+  "plans.*.description": {
+    notEmpty: {
+      errorMessage: "Plan description is required.",
+    },
+    isString: {
+      errorMessage: "Plan description must be in string format.",
+    },
+  },
+};

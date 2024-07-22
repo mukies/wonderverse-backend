@@ -171,10 +171,16 @@ exports.singleTour = async (req, res) => {
       .find({ tour: tourID })
       .select("-hotelDocuments");
 
+    const suggestedTour = await tourModel
+      .find({ activity: tour.activity, _id: { $ne: tour._id } })
+      .select("placeName")
+      .limit(5);
+
     const tourDetails = {
       tour,
       guides,
       hotels,
+      suggestedTour,
     };
     res.status(200).json({ success: true, tourDetails });
   } catch (error) {

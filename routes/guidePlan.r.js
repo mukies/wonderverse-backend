@@ -7,7 +7,10 @@ const {
   fetchPlanDetails,
 } = require("../controllers/guidePlan.c");
 const { partnerProtection } = require("../middlewares/partnerProtection");
-const { planSchema } = require("../validationSchema/guideSchema");
+const {
+  planSchema,
+  planUpdateSchema,
+} = require("../validationSchema/guideSchema");
 
 const router = require("express").Router();
 
@@ -21,7 +24,7 @@ router.get("/guide-plan-data/:planID", partnerProtection, fetchPlanDetails);
 router.put(
   "/:guideID/update-plan/:planID",
   partnerProtection,
-  checkSchema(planSchema),
+  checkSchema(planUpdateSchema),
   editPlan
 );
 router.delete("/delete-plan/:planID", partnerProtection, deletePlan);
