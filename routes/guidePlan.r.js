@@ -17,7 +17,7 @@ router.post(
   checkSchema(planSchema),
   addPlan
 );
-router.get("/guide-plan-data/:guideID", partnerProtection, fetchPlanDetails);
+router.get("/guide-plan-data/:planID", partnerProtection, fetchPlanDetails);
 router.put(
   "/:guideID/update-plan/:planID",
   partnerProtection,

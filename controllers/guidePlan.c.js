@@ -88,20 +88,22 @@ exports.editPlan = async (req, res) => {
 };
 
 exports.fetchPlanDetails = async (req, res) => {
-  const { guideID } = req.params;
+  const { planID } = req.params;
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(guideID))
+    if (!mongoose.Types.ObjectId.isValid(planID))
       return res
         .status(401)
-        .json({ success: false, message: "Invalid guide id." });
+        .json({ success: false, message: "Invalid plan id." });
 
-    const planData = await planModel.findById(guideID);
+    const planData = await planModel.findById(planID);
 
     if (!planData)
       return res
         .status(404)
         .json({ success: false, message: "Guide Plan not found" });
+
+    res.json({ success: true, planData });
   } catch (error) {
     console.log("Error while fetching single plan details", error);
     res.status(500),
