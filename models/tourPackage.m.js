@@ -38,12 +38,19 @@ const packageSchema = new mongoose.Schema(
         message: { type: String, required: true },
       },
     ],
+    places: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "PackagePlace",
+      required: true,
+      default: [],
+    },
     description: { type: String, default: "" },
     included: { type: String, default: "" },
-    // excluded: { type: String, default: "" },
     featureImages: { type: [String], required: true },
   },
   { timestamps: true }
 );
 
 const packageModel = mongoose.model("Package", packageSchema);
+
+module.exports = packageModel;

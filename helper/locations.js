@@ -16,6 +16,7 @@ exports.cities = [
   { name: "Tulsipur", value: "tulsipur" },
   { name: "Kalaiya", value: "kalaiya" },
   { name: "Dhangadhi", value: "dhangadhi" },
+  { name: "Dhanusha", value: "dhanusha" },
   { name: "Dhankuta", value: "dhankuta" },
   { name: "Putalibazar", value: "putalibazar" },
   { name: "Mechinagar", value: "mechinagar" },
@@ -160,30 +161,30 @@ exports.busPark = [
 exports.states = [
   {
     name: "Province No. 1",
-    value: "province_no_1",
+    value: "province-no-1",
   },
   {
-    name: "Province No. 2",
-    value: "province_no_2",
+    name: "Madhesh",
+    value: "madhesh",
   },
   {
-    name: "Bagmati Province",
-    value: "bagmati_province",
+    name: "Bagmati",
+    value: "bagmati",
   },
   {
-    name: "Gandaki Province",
-    value: "gandaki_province",
+    name: "Gandaki",
+    value: "gandaki",
   },
   {
-    name: "Lumbini Province",
-    value: "lumbini_province",
+    name: "Lumbini",
+    value: "lumbini",
   },
   {
-    name: "Karnali Province",
-    value: "karnali_province",
+    name: "Karnali",
+    value: "karnali",
   },
   {
-    name: "Sudurpashchim Province",
-    value: "sudurpashchim_province",
+    name: "Sudurpashchim",
+    value: "sudurpashchim",
   },
 ];

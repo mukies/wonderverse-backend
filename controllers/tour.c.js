@@ -1,10 +1,6 @@
 const tourModel = require("../models/tour.m");
 const slugify = require("slugify");
-const categoryModel = require("../models/state.m");
-// const guideModel = require("../models/guide.m");
-const hotelModel = require("../models/hoteRegistration.m");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
-const stateModel = require("../models/state.m");
 const activityModel = require("../models/activity.m");
 const { validationResult } = require("express-validator");
 const hotelRegistrationModel = require("../models/hoteRegistration.m");
@@ -76,7 +72,7 @@ exports.createTour = async (req, res) => {
 exports.allTours = async (req, res) => {
   const { page } = req.query;
   try {
-    const tours = await tourModel.find().populate("state").populate("activity");
+    const tours = await tourModel.find().populate("activity");
 
     res.status(200).json({ success: true, tours });
   } catch (error) {
@@ -102,20 +98,10 @@ exports.allToursNames = async (req, res) => {
 };
 
 exports.getToursByState = async (req, res) => {
-  const { slug } = req.params;
+  const { state } = req.params;
   const { page } = req.query;
   try {
-    const state = await stateModel.findOne({ slug });
-
-    if (!state)
-      return res
-        .status(403)
-        .json({ success: false, message: "State not found." });
-
-    const tours = await tourModel
-      .find({ state: state._id })
-      .populate("state")
-      .populate("activity");
+    const tours = await tourModel.find({ state }).populate("activity");
     res.status(200).json({ success: true, tours });
   } catch (error) {
     console.log("Error while fetching tours data.", error);
@@ -137,7 +123,6 @@ exports.getToursByActivity = async (req, res) => {
 
     const tours = await tourModel
       .find({ activity: activity._id })
-      .populate("state")
       .populate("activity");
     res.status(200).json({ success: true, tours });
   } catch (error) {
@@ -156,7 +141,6 @@ exports.singleTour = async (req, res) => {
 
     const tour = await tourModel
       .findById(tourID)
-      .populate("state")
       .populate("activity")
       .populate("reviews.userID", "firstName lastName photo country");
 
@@ -232,18 +216,22 @@ exports.editTour = async (req, res) => {
       mainImage = await generateLink(mainImage);
     }
 
-    const tourUpdate = await tourModel.findByIdAndUpdate(tourID, {
-      placeName,
-      slug: slugify(placeName.toLowerCase(), "+"),
-      mainImage,
-      state,
-      activity,
-      description,
-      location: location.toLowerCase(),
-      featureImages,
-      included,
-    });
-    await tourUpdate.save();
+    const tourUpdate = await tourModel.findByIdAndUpdate(
+      tourID,
+      {
+        placeName,
+        slug: slugify(placeName.toLowerCase(), "+"),
+        mainImage,
+        state,
+        activity,
+        description,
+        location: location.toLowerCase(),
+        featureImages,
+        included,
+      },
+      { new: true }
+    );
+
     res
       .status(200)
       .json({ success: true, message: "Tour has been updated", tourUpdate });
@@ -282,8 +270,22 @@ exports.featuredTrips = async (req, res) => {
     const trips = await tourModel
       .find()
       .sort({ avgRating: -1 })
+      .populate("activity");
+
+    res.status(200).json({ success: true, trips });
+  } catch (error) {
+    console.log("Error while fetching featured trip");
+    res
+      .status(500)
+      .json({ success: false, message: "Error while fetching featured trip." });
+  }
+};
+exports.homePageFeaturedTrips = async (req, res) => {
+  try {
+    const trips = await tourModel
+      .find()
+      .sort({ avgRating: -1 })
       .limit(8)
-      .populate("state")
       .populate("activity");
 
     res.status(200).json({ success: true, trips });

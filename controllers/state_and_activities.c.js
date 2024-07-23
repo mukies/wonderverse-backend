@@ -148,10 +148,6 @@ exports.getSingleState = async (req, res) => {
 
 exports.addActivity = async (req, res) => {
   const { title } = req.body;
-  if (!req.admin)
-    return res
-      .status(401)
-      .json({ success: false, message: "Unauthorized action." });
 
   if (!title)
     return res
@@ -159,11 +155,12 @@ exports.addActivity = async (req, res) => {
       .json({ success: false, message: "Activity title is required." });
 
   try {
-    const isTitleExist = await stateModel.findOne({
+    const isTitleExist = await activityModel.findOne({
       $or: [{ title }, { slug: title.toLowerCase() }],
     });
+
     if (isTitleExist)
-      return res.status(403).json({
+      return res.status(409).json({
         success: false,
         message: "Activity title already exist.",
       });

@@ -21,15 +21,15 @@ const tourSchema = new mongoose.Schema(
     //   ref: "State",
     //   required: true,
     // },
-    activity: {
-      type: String,
-      required: true,
-    },
     // activity: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Activity",
+    //   type: String,
     //   required: true,
     // },
+    activity: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Activity",
+      required: true,
+    },
     avgRating: { type: Number, default: 0 },
     reviews: [
       {

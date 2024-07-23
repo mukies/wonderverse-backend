@@ -15,11 +15,11 @@ const { adminProtection } = require("../middlewares/adminProtection");
 const router = require("express").Router();
 
 //state CRUD
-router.get("/states", getAllStates);
-router.get("/single-state/:id", adminProtection, getSingleState);
-router.post("/add-state", adminProtection, addState);
-router.put("/update-state/:id", adminProtection, updateState);
-router.delete("/delete-state/:id", adminProtection, deleteState);
+// router.get("/states", getAllStates);
+// router.get("/single-state/:id", adminProtection, getSingleState);
+// router.post("/add-state", adminProtection, addState);
+// router.put("/update-state/:id", adminProtection, updateState);
+// router.delete("/delete-state/:id", adminProtection, deleteState);
 
 //activities CRUD
 router.get("/activities", getActivities);
