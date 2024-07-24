@@ -1,4 +1,5 @@
 const topDestinationModel = require("../models/top_destination.m");
+const mongoose = require("mongoose");
 
 exports.add_in_top_destination = async (req, res) => {
   const { tour } = req.body;
@@ -10,6 +11,11 @@ exports.add_in_top_destination = async (req, res) => {
     });
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(tour))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
     const topdestinations = await topDestinationModel.find();
     if (topdestinations.length == 8)
       return res.status(400).json({
@@ -52,7 +58,18 @@ exports.update_top_destinations_items = async (req, res) => {
     });
 
   try {
-    const isAreadyExist = await topDestinationModel.findOne({ tour });
+    if (
+      !mongoose.Types.ObjectId.isValid(id) ||
+      !mongoose.Types.ObjectId.isValid(tour)
+    )
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
+    const isAreadyExist = await topDestinationModel.findOne({
+      tour,
+      _id: { $ne: id },
+    });
 
     if (isAreadyExist)
       return res.status(403).json({
@@ -60,15 +77,17 @@ exports.update_top_destinations_items = async (req, res) => {
         message: "Tour already exist in top destination section.",
       });
 
-    const updated_Top_destination_Item =
-      await topDestinationModel.findByIdAndUpdate(id, {
+    const updatedItem = await topDestinationModel.findByIdAndUpdate(
+      id,
+      {
         tour,
-      });
-    await updated_Top_destination_Item.save();
+      },
+      { new: true }
+    );
     res.status(200).json({
       success: true,
       message: "Top destination's tour item has been updated.",
-      updated_Top_destination_Item,
+      updatedItem,
     });
   } catch (error) {
     console.log("Error while updating tour in top destinations section.");
@@ -83,6 +102,17 @@ exports.delete_tour_from_top_destination = async (req, res) => {
   const { id } = req.params;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid object id" });
+
+    const destination = await topDestinationModel.findById(id);
+    if (!destination)
+      return res
+        .status(404)
+        .json({ success: false, message: "Tour Destination not found" });
+
     await topDestinationModel.findByIdAndDelete(id);
     res.status(200).json({
       success: true,
@@ -99,12 +129,10 @@ exports.delete_tour_from_top_destination = async (req, res) => {
 
 exports.get_top_destinations_tours = async (req, res) => {
   try {
-    const top_destinations_tours = await topDestinationModel
-      .find()
-      .populate("tour");
+    const tours = await topDestinationModel.find().populate("tour");
     res.status(200).json({
       success: true,
-      top_destinations_tours,
+      tours,
     });
   } catch (error) {
     console.log("Error while fetching tour of top destinations section.");

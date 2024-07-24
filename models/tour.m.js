@@ -50,6 +50,8 @@ const tourSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+tourSchema.index({ placeName: "text", location: "text" });
+
 const tourModel = mongoose.model("Tour", tourSchema);
 
 module.exports = tourModel;

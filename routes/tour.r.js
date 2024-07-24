@@ -10,6 +10,7 @@ const {
   featuredTrips,
   allToursNames,
   homePageFeaturedTrips,
+  searchTour,
 } = require("../controllers/tour.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const { tourSchema } = require("../validationSchema/tourSchema");
@@ -22,6 +23,8 @@ router.get("/tour-details/:tourID", singleTour);
 // router.get("/featured-trips", featuredTrips);
 router.get("/homepage-featured-trips", homePageFeaturedTrips);
 router.get("/all-tour-name", allToursNames);
+router.get("/search", searchTour);
+
 //admin routes
 
 router.get("/all", adminProtection, allTours);

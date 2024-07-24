@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const routeModel = require("../models/route.m");
+const vehicleRegistrationModel = require("../models/vehicleRegistration.m");
 
 exports.createRoute = async (req, res) => {
   const { destination, from, costPerPerson } = req.body;
@@ -145,6 +146,46 @@ exports.fetchPersonalRoutes = async (req, res) => {
       })
       .populate("destination", "placeName mainImage slug location")
       .populate("vehicle");
+
+    res.json({ success: true, routes });
+  } catch (error) {
+    console.log("Error while fetching available routes", error);
+    res.status(500).json({
+      success: false,
+      message: "Error while fetching available routes",
+    });
+  }
+};
+
+exports.fetchRoutesInTour = async (req, res) => {
+  const { tourID, placeName } = req.params;
+  const { type = "all" } = req.query;
+
+  if (
+    type !== "all" &&
+    type !== "taxi" &&
+    type !== "bus" &&
+    type !== "hiace" &&
+    type !== "scorpio"
+  )
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid filter type" });
+  try {
+    let routes = await routeModel
+      .find({
+        from: placeName,
+        destination: tourID,
+        isAvailable: true,
+      })
+      .populate("destination", "placeName mainImage slug location")
+      .populate("vehicle");
+
+    routes = routes.filter((route) => route.vehicle.status == "approved");
+
+    if (type !== "all") {
+      routes = routes.filter((route) => route.vehicle.vehicleType == type);
+    }
 
     res.json({ success: true, routes });
   } catch (error) {

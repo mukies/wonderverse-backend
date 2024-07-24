@@ -296,3 +296,23 @@ exports.homePageFeaturedTrips = async (req, res) => {
       .json({ success: false, message: "Error while fetching featured trip." });
   }
 };
+
+exports.searchTour = async (req, res) => {
+  const { query } = req.query;
+  try {
+    if (!query)
+      return res
+        .status(400)
+        .json({ success: false, message: "Empty search query" });
+
+    const result = await tourModel.find({
+      $text: { $search: query },
+    });
+    res.json({ result });
+  } catch (error) {
+    console.log("Error while searching the tour", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error while searching the tour" });
+  }
+};
