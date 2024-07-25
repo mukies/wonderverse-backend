@@ -1,7 +1,7 @@
 const slugify = require("slugify");
 const stateModel = require("../models/state.m");
 const activityModel = require("../models/activity.m");
-const { get } = require("../config/cache_setup");
+const { get, set } = require("../config/cache_setup");
 
 exports.addState = async (req, res) => {
   const { name } = req.body;
