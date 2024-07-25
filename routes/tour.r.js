@@ -19,7 +19,7 @@ const router = require("express").Router();
 
 router.get("/destination/:state", getToursByState);
 router.get("/activities/:slug", getToursByActivity);
-router.get("/tour-details/:tourID", singleTour);
+router.get("/tour-details/:slug", singleTour);
 // router.get("/featured-trips", featuredTrips);
 router.get("/homepage-featured-trips", homePageFeaturedTrips);
 router.get("/all-tour-name", allToursNames);

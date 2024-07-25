@@ -5,6 +5,7 @@ const activityModel = require("../models/activity.m");
 const { validationResult } = require("express-validator");
 const hotelRegistrationModel = require("../models/hoteRegistration.m");
 const guideRegistrationModel = require("../models/guideRegistration.m");
+const { get, set } = require("../config/cache_setup");
 // const transportationModel = require("../models/transportation.m");
 
 exports.createTour = async (req, res) => {
@@ -72,8 +73,12 @@ exports.createTour = async (req, res) => {
 exports.allTours = async (req, res) => {
   const { page } = req.query;
   try {
-    const tours = await tourModel.find().populate("activity");
-
+    let tours = await get("tours");
+    if (tours) {
+      return res.json({ success: true, tours });
+    }
+    tours = await tourModel.find().populate("activity");
+    await set("tours", tours, 3600);
     res.status(200).json({ success: true, tours });
   } catch (error) {
     console.log("Error while fetching all tour");
@@ -118,12 +123,18 @@ exports.getToursByActivity = async (req, res) => {
 
     if (!activity)
       return res
-        .status(403)
+        .status(404)
         .json({ success: false, message: "Activity not found." });
 
-    const tours = await tourModel
-      .find({ activity: activity._id })
-      .populate("activity");
+    let tours = await get("tours_activity");
+
+    if (!tours) {
+      tours = await tourModel
+        .find({ activity: activity._id })
+        .populate("activity");
+
+      await set("tours_activity", tours, 3600);
+    }
     res.status(200).json({ success: true, tours });
   } catch (error) {
     console.log("Error while fetching tours data.", error);
@@ -135,24 +146,29 @@ exports.getToursByActivity = async (req, res) => {
 
 exports.singleTour = async (req, res) => {
   try {
-    const { tourID } = req.params;
+    const { slug } = req.params;
 
     // const availableTransportations = await transportationModel.find({ tourID });
 
     const tour = await tourModel
-      .findById(tourID)
+      .findOne({ slug })
       .populate("activity")
       .populate("reviews.userID", "firstName lastName photo country");
 
+    if (!tour)
+      return res
+        .status(404)
+        .json({ success: false, message: "Tour not found" });
+
     const guides = await guideRegistrationModel
       .find({
-        guidingDestinations: tourID,
+        guidingDestinations: tour._id,
         status: "approved",
       })
       .populate("requestedBy", "photo firstName lastName email");
 
     const hotels = await hotelRegistrationModel
-      .find({ tour: tourID })
+      .find({ tour: tour._id })
       .select("-hotelDocuments");
 
     const suggestedTour = await tourModel

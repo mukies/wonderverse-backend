@@ -1,6 +1,7 @@
 const slugify = require("slugify");
 const stateModel = require("../models/state.m");
 const activityModel = require("../models/activity.m");
+const { get } = require("../config/cache_setup");
 
 exports.addState = async (req, res) => {
   const { name } = req.body;
@@ -256,8 +257,16 @@ exports.deleteActivity = async (req, res) => {
 
 exports.getActivities = async (req, res) => {
   try {
-    const activities = await activityModel.find();
+    let activities = await get("activities");
 
+    if (activities)
+      return res.status(200).json({
+        success: true,
+        activities,
+      });
+
+    activities = await activityModel.find();
+    await set("activities", activities, 3600);
     res.status(200).json({
       success: true,
       activities,

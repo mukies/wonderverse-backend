@@ -41,7 +41,6 @@ const packageSchema = new mongoose.Schema(
     places: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "PackagePlace",
-      required: true,
       default: [],
     },
     description: { type: String, default: "" },
