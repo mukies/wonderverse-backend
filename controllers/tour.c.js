@@ -126,14 +126,14 @@ exports.getToursByActivity = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Activity not found." });
 
-    let tours = await get("tours_activity");
+    let tours = await get(`tours_activity_${activity._id}`);
 
     if (!tours) {
       tours = await tourModel
         .find({ activity: activity._id })
         .populate("activity");
 
-      await set("tours_activity", tours, 3600);
+      await set(`tours_activity_${activity._id}`, tours, 3600);
     }
     res.status(200).json({ success: true, tours });
   } catch (error) {
