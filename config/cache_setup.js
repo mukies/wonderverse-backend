@@ -15,4 +15,7 @@ module.exports = {
   async del(key) {
     return cache.del(key);
   },
+  async keys() {
+    return cache.keys();
+  },
 };

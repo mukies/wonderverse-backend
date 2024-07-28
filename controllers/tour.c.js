@@ -5,7 +5,12 @@ const activityModel = require("../models/activity.m");
 const { validationResult } = require("express-validator");
 const hotelRegistrationModel = require("../models/hoteRegistration.m");
 const guideRegistrationModel = require("../models/guideRegistration.m");
-const { get, set } = require("../config/cache_setup");
+const { get, set, del } = require("../config/cache_setup");
+const { tryCatchWrapper } = require("../helper/tryCatchHandler");
+const packageModel = require("../models/tourPackage.m");
+const { default: mongoose } = require("mongoose");
+const { invalidObj } = require("../helper/objectIdHendler");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 // const transportationModel = require("../models/transportation.m");
 
 exports.createTour = async (req, res) => {
@@ -49,7 +54,7 @@ exports.createTour = async (req, res) => {
       })
     );
 
-    const newTour = new tourModel({
+    let newTour = new tourModel({
       placeName,
       slug: slugify(placeName.toLowerCase(), "+"),
       mainImage,
@@ -61,6 +66,11 @@ exports.createTour = async (req, res) => {
       included,
     });
     await newTour.save();
+
+    newTour = await newTour.populate("activity", "title");
+
+    await clearCacheByPrefix("tour");
+
     res.status(201).json({ success: true, message: "tour created", newTour });
   } catch (error) {
     console.log("Error while creating the tour.", error);
@@ -71,15 +81,32 @@ exports.createTour = async (req, res) => {
 };
 
 exports.allTours = async (req, res) => {
-  const { page } = req.query;
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+
   try {
-    let tours = await get("tours");
+    let tours = await get(`tours:page${page}`);
     if (tours) {
-      return res.json({ success: true, tours });
+      return res.json({
+        success: true,
+        tours: tours.tours,
+        totlePages: tours.totlePages,
+      });
     }
-    tours = await tourModel.find().populate("activity");
-    await set("tours", tours, 3600);
-    res.status(200).json({ success: true, tours });
+    const totleItem = await tourModel.countDocuments();
+    tours = await tourModel.find().populate("activity").skip(skip).limit(limit);
+    const tourData = {
+      totlePages: Math.ceil(totleItem / limit),
+      tours,
+    };
+    await set(`tours:page${page}`, tourData, 3600);
+
+    res.status(200).json({
+      success: true,
+      tours: tourData.tours,
+      totlePages: tourData.totlePages,
+    });
   } catch (error) {
     console.log("Error while fetching all tour");
     res
@@ -104,9 +131,12 @@ exports.allToursNames = async (req, res) => {
 
 exports.getToursByState = async (req, res) => {
   const { state } = req.params;
-  const { page } = req.query;
+
   try {
-    const tours = await tourModel.find({ state }).populate("activity");
+    const tours = await tourModel
+      .find({ state })
+      .populate("activity")
+      .limit(10);
     res.status(200).json({ success: true, tours });
   } catch (error) {
     console.log("Error while fetching tours data.", error);
@@ -117,7 +147,7 @@ exports.getToursByState = async (req, res) => {
 };
 exports.getToursByActivity = async (req, res) => {
   const { slug } = req.params;
-  const { page } = req.query;
+
   try {
     const activity = await activityModel.findOne({ slug });
 
@@ -131,7 +161,8 @@ exports.getToursByActivity = async (req, res) => {
     if (!tours) {
       tours = await tourModel
         .find({ activity: activity._id })
-        .populate("activity");
+        .populate("activity")
+        .limit(10);
 
       await set(`tours_activity_${activity._id}`, tours, 3600);
     }
@@ -149,6 +180,8 @@ exports.singleTour = async (req, res) => {
     const { slug } = req.params;
 
     // const availableTransportations = await transportationModel.find({ tourID });
+    let tourDetails = await get(`tour:${slug}`);
+    if (tourDetails) return res.json({ success: true, tourDetails });
 
     const tour = await tourModel
       .findOne({ slug })
@@ -160,31 +193,45 @@ exports.singleTour = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Tour not found" });
 
-    const guides = await guideRegistrationModel
+    let guides = await guideRegistrationModel
       .find({
         guidingDestinations: tour._id,
         status: "approved",
       })
-      .populate("requestedBy", "photo firstName lastName email");
+      .select("guideName guidePhoto gender guideEmail contactNumber plans")
+      .populate("plans");
+
+    guides = guides.map(
+      (guide) =>
+        (guide.plans = guide.plans.filter(
+          (plan) => plan.tour.toString() == tour._id.toString()
+        ))
+    );
 
     const hotels = await hotelRegistrationModel
       .find({ tour: tour._id })
       .select("-hotelDocuments");
 
     const suggestedTour = await tourModel
-      .find({ activity: tour.activity, _id: { $ne: tour._id } })
-      .select("placeName")
+      .find({ activity: tour.activity._id, _id: { $ne: tour._id } })
+      .select("placeName slug mainImage")
+      .limit(5);
+    const suggestedPackage = await packageModel
+      .find({ activity: tour.activity._id })
+      .select("placeName slug mainImage")
       .limit(5);
 
-    const tourDetails = {
+    tourDetails = {
       tour,
       guides,
       hotels,
       suggestedTour,
+      suggestedPackage,
     };
+    await set(`tour:${slug}`, tourDetails, 3600);
     res.status(200).json({ success: true, tourDetails });
   } catch (error) {
-    console.log("Error while getting tour details.");
+    console.log("Error while getting tour details.", error);
     res
       .status(500)
       .json({ message: "Error while getting tour details.", success: false });
@@ -247,7 +294,7 @@ exports.editTour = async (req, res) => {
       },
       { new: true }
     );
-
+    await clearCacheByPrefix("tour");
     res
       .status(200)
       .json({ success: true, message: "Tour has been updated", tourUpdate });
@@ -259,27 +306,22 @@ exports.editTour = async (req, res) => {
   }
 };
 
-exports.deleteTour = async (req, res) => {
+exports.deleteTour = tryCatchWrapper(async (req, res) => {
   const { tourID } = req.params;
 
-  if (!req.admin)
-    return res.status(401).json({
-      success: false,
-      message: "Deletation failed. Unauthorize permission.",
-    });
+  if (!mongoose.Types.ObjectId.isValid(tourID)) return invalidObj(res);
+  const tour = await tourModel.findById(tourID);
+  if (!tour)
+    return res.status(404).json({ success: false, message: "Tour not found" });
 
-  try {
-    await tourModel.findByIdAndDelete(tourID);
-    res
-      .status(200)
-      .json({ success: true, message: "Tour deleted successfully." });
-  } catch (error) {
-    console.log("Error while deleting tour");
-    res
-      .status(500)
-      .json({ success: false, message: "Error while deleting tour." });
-  }
-};
+  await tourModel.findByIdAndDelete(tourID);
+
+  await clearCacheByPrefix("tour");
+
+  res
+    .status(200)
+    .json({ success: true, message: "Tour deleted successfully." });
+});
 
 exports.featuredTrips = async (req, res) => {
   try {

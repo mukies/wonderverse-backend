@@ -1,6 +1,9 @@
 const { validationResult } = require("express-validator");
 const planModel = require("../models/guidePlan.m");
 const mongoose = require("mongoose");
+const guideRegistrationModel = require("../models/guideRegistration.m");
+const { clearCacheByPrefix } = require("../helper/clearCache");
+const { invalidObj } = require("../helper/objectIdHendler");
 
 exports.addPlan = async (req, res) => {
   const { tour, plans } = req.body;
@@ -17,11 +20,15 @@ exports.addPlan = async (req, res) => {
       !mongoose.Types.ObjectId.isValid(tour) ||
       !mongoose.Types.ObjectId.isValid(guideID)
     )
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid object id" });
+      return invalidObj(res);
 
     const isExist = await planModel.findOne({ tour, guideID });
+    const guide = await guideRegistrationModel.findById(guideID);
+
+    if (!guide)
+      return res
+        .status(404)
+        .json({ success: false, message: "Guide not found" });
 
     if (isExist)
       return res
@@ -35,8 +42,11 @@ exports.addPlan = async (req, res) => {
       tour,
     });
 
-    await newPlan.save();
+    guide.plans.push(newPlan);
 
+    await newPlan.save();
+    await guide.save();
+    await clearCacheByPrefix("tour");
     res.json({ success: true, message: "Plan has been added.", newPlan });
   } catch (error) {
     console.log("Error while adding guide plan", error);

@@ -16,15 +16,7 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // state: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "State",
-    //   required: true,
-    // },
-    // activity: {
-    //   type: String,
-    //   required: true,
-    // },
+
     activity: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Activity",

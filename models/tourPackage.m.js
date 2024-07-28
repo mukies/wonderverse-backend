@@ -17,15 +17,15 @@ const packageSchema = new mongoose.Schema(
       required: true,
     },
 
-    activity: {
-      type: String,
-      required: true,
-    },
     // activity: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Activity",
+    //   type: String,
     //   required: true,
     // },
+    activity: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Activity",
+      required: true,
+    },
     avgRating: { type: Number, default: 0 },
     reviews: [
       {
@@ -43,6 +43,8 @@ const packageSchema = new mongoose.Schema(
       ref: "PackagePlace",
       default: [],
     },
+    price: { type: Number, default: 0 },
+    discountPercent: { type: Number, default: 0 },
     description: { type: String, default: "" },
     included: { type: String, default: "" },
     featureImages: { type: [String], required: true },
