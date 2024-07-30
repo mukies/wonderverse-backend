@@ -6,6 +6,10 @@ const {
   verifyUser,
   logoutUser,
   fetchUser,
+  changeUserDetails,
+  changePassword,
+  changeProfilePhoto,
+  changePassportDetails,
 } = require("../controllers/user.c");
 
 const { userProtection } = require("../middlewares/userProtection");
@@ -28,5 +32,10 @@ router.post(
   checkSchema(ratingSchema),
   tourRating
 ); //payload = rating, comment
+
+router.put("/change-user-details", userProtection, changeUserDetails);
+router.put("/change-photo", userProtection, changeProfilePhoto);
+router.put("/change-passport-details", userProtection, changePassportDetails);
+router.put("/change-password", userProtection, changePassword);
 
 module.exports = router;

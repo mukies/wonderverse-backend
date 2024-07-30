@@ -6,6 +6,8 @@ const { get, set } = require("../config/cache_setup");
 const mongoose = require("mongoose");
 const tourModel = require("../models/tour.m");
 const { clearCacheByPrefix } = require("../helper/clearCache");
+const placeModel = require("../models/packagePlace.m");
+const slugify = require("slugify");
 
 exports.addPackage = tryCatchWrapper(async (req, res) => {
   const {
@@ -172,18 +174,47 @@ exports.getSinglePackage = tryCatchWrapper(async (req, res) => {
 
   const suggestedTour = await tourModel
     .find({ activity: package.activity._id })
-    .select("placeName slug")
+    .select("placeName slug mainImage")
     .limit(5);
   const suggestedPackage = await packageModel
     .find({ activity: tour.activity._id, _id: { $ne: package._id } })
-    .select("placeName slug")
+    .select("placeName slug mainImage")
     .limit(5);
 
   packageDetails = {
-    tour,
-    guides,
-    hotels,
+    package,
     suggestedTour,
     suggestedPackage,
   };
+
+  await set(`package:${package.slug}`, packageDetails, 3600);
+  res.json({ success: true, packageDetails });
+});
+
+//package places
+
+exports.addPackagePlaces = tryCatchWrapper(async (req, res) => {
+  const { price, name } = req.body;
+  let { image } = req.body;
+
+  const result = validationResult(req);
+  if (!result.array())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  if (!image.startsWith("http")) {
+    image = await generateLink(image);
+  }
+
+  const newPlace = new placeModel({
+    price,
+    name,
+    image,
+  });
+
+  await newPlace.save();
+  await clearCacheByPrefix("package");
+
+  res.json({ success: true, message: "Package place created", newPlace });
 });

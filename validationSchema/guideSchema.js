@@ -31,6 +31,14 @@ exports.guideSchema = {
       errorMessage: "Invalid email format.",
     },
   },
+  price: {
+    notEmpty: {
+      errorMessage: "Guide price is required.",
+    },
+    isNumeric: {
+      errorMessage: "Guide price must be in numeric format.",
+    },
+  },
 
   // price: {
   //   notEmpty: {

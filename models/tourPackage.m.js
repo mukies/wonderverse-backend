@@ -6,21 +6,12 @@ const packageSchema = new mongoose.Schema(
     slug: { type: String, required: true },
     mainImage: { type: String, required: true },
     location: { type: String, required: true },
-    // type: { type: String, enum: ["normal", "package"], default: "normal" },
-    // places: {
-    //   type: [mongoose.Schema.Types.ObjectId],
-    //   ref: "PackagePlace",
-    //   sparse: true,
-    // },
+
     state: {
       type: String,
       required: true,
     },
 
-    // activity: {
-    //   type: String,
-    //   required: true,
-    // },
     activity: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Activity",

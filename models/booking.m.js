@@ -33,6 +33,7 @@ const bookingschema = new mongoose.Schema(
         ref: "Transportation",
         required: true,
       },
+
       journeyStartingDate: { type: Date, required: true },
       numberOfPeople: { type: Number, required: true },
       totalCost: { type: Number, required: true },

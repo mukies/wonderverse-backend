@@ -8,6 +8,7 @@ const multer = require("multer");
 const cookie = require("cookie-parser");
 const { v2 } = require("cloudinary");
 const tourRoute = require("./routes/tour.r");
+const packageRoute = require("./routes/tourPackage.r");
 const vehicle_Route = require("./routes/vehicleRoute.r");
 const vehicle = require("./routes/vehicle.r");
 const guideRoute = require("./routes/guide.r");
@@ -55,6 +56,7 @@ v2.config({
 //routes
 app.use("/auth", googleAuthRoute);
 app.use("/api/tour", tourRoute);
+app.use("/api/package", packageRoute);
 app.use("/api/location", locationRoute);
 app.use("/api/vehicle-route", vehicle_Route);
 app.use("/api/vehicle", vehicle);

@@ -15,6 +15,7 @@ const guideRegistrationSchema = new mongoose.Schema(
     citizenshipPhoto: { type: [String], required: true },
     nationalIdPhoto: { type: String, sparse: true },
     contactNumber: { type: String, required: true },
+    price: { type: Number, required: true },
     guidingDestinations: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "Tour",

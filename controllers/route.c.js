@@ -3,7 +3,7 @@ const routeModel = require("../models/route.m");
 const vehicleRegistrationModel = require("../models/vehicleRegistration.m");
 
 exports.createRoute = async (req, res) => {
-  const { destination, from, costPerPerson } = req.body;
+  const { destination, from, costPerPerson, isAvailable } = req.body;
   const { vehicleID: vehicle } = req.params; //vehicle id
 
   const errors = validationResult(req);
@@ -32,6 +32,7 @@ exports.createRoute = async (req, res) => {
       destination,
       from,
       costPerPerson,
+      isAvailable,
     });
 
     await newRoute.save();
@@ -47,7 +48,7 @@ exports.createRoute = async (req, res) => {
   }
 };
 exports.editRoute = async (req, res) => {
-  const { destination, from, costPerPerson } = req.body;
+  const { destination, from, costPerPerson, isAvailable } = req.body;
   const { vehicleID, routeID } = req.params;
 
   try {
@@ -69,6 +70,7 @@ exports.editRoute = async (req, res) => {
         destination,
         from,
         costPerPerson,
+        isAvailable,
       },
       { new: true }
     );

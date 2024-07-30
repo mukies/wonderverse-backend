@@ -363,9 +363,13 @@ exports.searchTour = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Empty search query" });
 
-    const result = await tourModel.find({
+    let result = await get(query);
+    if (result) return res.json({ success: true, result });
+
+    result = await tourModel.find({
       $text: { $search: query },
     });
+    await set(query, result, 3600);
     res.json({ result });
   } catch (error) {
     console.log("Error while searching the tour", error);

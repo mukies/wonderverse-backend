@@ -42,7 +42,7 @@ exports.addPlan = async (req, res) => {
       tour,
     });
 
-    guide.plans.push(newPlan);
+    guide.plans.push(newPlan._id);
 
     await newPlan.save();
     await guide.save();

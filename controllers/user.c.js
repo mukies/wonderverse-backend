@@ -8,6 +8,7 @@ const { sendEmail } = require("../nodemailer/sendEmail");
 const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const partnerModel = require("../models/partner.m");
+const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 
 exports.registerUser = async (req, res) => {
   const { firstName, lastName, email, password, country, gender } = req.body;
@@ -137,6 +138,12 @@ exports.loginUser = async (req, res) => {
       email: isRegister.email,
       firstName: isRegister.firstName,
       lastName: isRegister.lastName,
+      passportNumber: isRegister.passportNumber,
+      country: isRegister.country,
+      gender: isRegister.gender,
+      passportExpiryDate: isRegister.passportExpiryDate,
+      arrivalDate: isRegister.arrivalDate,
+      departureDate: isRegister.departureDate,
     };
 
     await generateTokenAndSetCookie(isRegister._id, res);
@@ -281,9 +288,14 @@ exports.fetchUser = async (req, res) => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      isVerified: user.isVerified,
       photo: user.photo,
       _id: user._id,
+      passportNumber: user.passportNumber,
+      country: user.country,
+      gender: user.gender,
+      passportExpiryDate: user.passportExpiryDate,
+      arrivalDate: user.arrivalDate,
+      departureDate: user.departureDate,
     };
 
     res.status(200).json({ success: true, message: "User found", userData });
@@ -294,3 +306,116 @@ exports.fetchUser = async (req, res) => {
       .json({ success: false, message: "Error while fetching user data." });
   }
 };
+
+exports.changeUserDetails = tryCatchWrapper(async (req, res) => {
+  const { firstName, lastName, gender, country } = req.body;
+
+  const user = await userModel.findById(req.user);
+
+  if (!user)
+    return res.status(404).json({ success: false, message: "User not found" });
+
+  const updatedProfile = await userModel.findByIdAndUpdate(
+    req.user,
+    {
+      firstName,
+      lastName,
+      gender,
+      country,
+    },
+    { new: true }
+  );
+
+  res.json({
+    success: true,
+    message: "Profile details updated",
+    updatedProfile,
+  });
+});
+
+exports.changePassword = tryCatchWrapper(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  const user = await userModel.findById(req.user);
+
+  if (!user)
+    return res.status(404).json({ success: false, message: "User not found" });
+
+  //check old password is matched or not
+
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isMatch)
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid password" });
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  const updatedProfile = await userModel.findByIdAndUpdate(
+    req.user,
+    {
+      password: hashedPassword,
+    },
+    { new: true }
+  );
+
+  res.json({
+    success: true,
+    message: "Password has been changed",
+    updatedProfile,
+  });
+});
+
+exports.changeProfilePhoto = tryCatchWrapper(async (req, res) => {
+  let { photo } = req.body;
+
+  if (!photo.startsWith("http")) {
+    photo = await generateLink(photo);
+  }
+  const user = await userModel.findById(req.user);
+
+  if (!user)
+    return res.status(404).json({ success: false, message: "User not found" });
+
+  const updatedProfile = await userModel.findByIdAndUpdate(
+    req.user,
+    {
+      photo,
+    },
+    { new: true }
+  );
+
+  res.json({
+    success: true,
+    message: "Profile Picture changed",
+    updatedProfile,
+  });
+});
+
+exports.changePassportDetails = tryCatchWrapper(async (req, res) => {
+  const { passportNumber, passportExpiryDate, arrivalDate, departureDate } =
+    req.body;
+
+  const user = await userModel.findById(req.user);
+
+  if (!user)
+    return res.status(404).json({ success: false, message: "User not found" });
+
+  const updatedProfile = await userModel.findByIdAndUpdate(
+    req.user,
+    {
+      passportNumber,
+      passportExpiryDate,
+      arrivalDate,
+      departureDate,
+    },
+    { new: true }
+  );
+
+  res.json({
+    success: true,
+    message: "Passport details updated",
+    updatedProfile,
+  });
+});
