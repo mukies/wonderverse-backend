@@ -9,6 +9,8 @@ const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const partnerModel = require("../models/partner.m");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
+const { default: mongoose } = require("mongoose");
+const { invalidObj } = require("../helper/objectIdHendler");
 
 exports.registerUser = async (req, res) => {
   const { firstName, lastName, email, password, country, gender } = req.body;
@@ -21,11 +23,10 @@ exports.registerUser = async (req, res) => {
       .json({ success: false, message: errors.array()[0].msg });
   }
 
-  if (photo && !photo.startsWith("http")) {
-    photo = await generateLink(photo);
-  }
-
   try {
+    if (photo && !photo.startsWith("http")) {
+      photo = await generateLink(photo);
+    }
     const isEmailExist = await userModel.findOne({ email });
 
     if (isEmailExist && isEmailExist.isVerified) {
@@ -310,6 +311,12 @@ exports.fetchUser = async (req, res) => {
 exports.changeUserDetails = tryCatchWrapper(async (req, res) => {
   const { firstName, lastName, gender, country } = req.body;
 
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
   const user = await userModel.findById(req.user);
 
   if (!user)
@@ -329,12 +336,23 @@ exports.changeUserDetails = tryCatchWrapper(async (req, res) => {
   res.json({
     success: true,
     message: "Profile details updated",
-    updatedProfile,
+    updatedProfile: {
+      firstName: updatedProfile.firstName,
+      lastName: updatedProfile.lastName,
+      gender: updatedProfile.gender,
+      country: updatedProfile.country,
+    },
   });
 });
 
 exports.changePassword = tryCatchWrapper(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
 
   const user = await userModel.findById(req.user);
 
@@ -363,12 +381,16 @@ exports.changePassword = tryCatchWrapper(async (req, res) => {
   res.json({
     success: true,
     message: "Password has been changed",
-    updatedProfile,
   });
 });
 
 exports.changeProfilePhoto = tryCatchWrapper(async (req, res) => {
   let { photo } = req.body;
+
+  if (!photo)
+    return res
+      .status(400)
+      .json({ success: false, message: "Photo is required." });
 
   if (!photo.startsWith("http")) {
     photo = await generateLink(photo);
@@ -389,13 +411,19 @@ exports.changeProfilePhoto = tryCatchWrapper(async (req, res) => {
   res.json({
     success: true,
     message: "Profile Picture changed",
-    updatedProfile,
+    updatedProfile: { photo: updatedProfile.photo },
   });
 });
 
 exports.changePassportDetails = tryCatchWrapper(async (req, res) => {
   const { passportNumber, passportExpiryDate, arrivalDate, departureDate } =
     req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
 
   const user = await userModel.findById(req.user);
 
@@ -418,4 +446,93 @@ exports.changePassportDetails = tryCatchWrapper(async (req, res) => {
     message: "Passport details updated",
     updatedProfile,
   });
+});
+
+exports.requestForgetPassCode = tryCatchWrapper(async (req, res) => {
+  const { email } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  const user = await userModel.findOne({ email });
+
+  if (!user)
+    return res
+      .status(404)
+      .json({ success: false, message: "Email does not exist." });
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiryDate = new Date();
+  expiryDate.setMinutes(expiryDate.getMinutes() + 5);
+  user.isRecoveryCodeUsed = false;
+  user.passwordRecoveryCode = code;
+  user.passwordRecoveryCodeExpiryDate = expiryDate;
+
+  await user.save();
+  console.log(code);
+
+  res.json({ success: true, data: user._id });
+});
+
+exports.verifyResetCode = tryCatchWrapper(async (req, res) => {
+  const { code } = req.query;
+  const { id } = req.params;
+  console.log(id);
+  if (!code)
+    return res
+      .status(400)
+      .json({ success: false, message: "Recovery code is required" });
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const user = await userModel.findById(id);
+  if (!user)
+    return res.status(404).json({ success: false, message: "User not found" });
+
+  if (user.isRecoveryCodeUsed)
+    return res
+      .status(400)
+      .json({ success: false, message: "Recovery code is already used." });
+
+  if (user.passwordRecoveryCode !== code)
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid recovery code." });
+
+  if (user.passwordRecoveryCodeExpiryDate < new Date())
+    return res.status(400).json({
+      success: false,
+      message: "Recovery code expired.",
+    });
+
+  res.json({ success: true, data: user._id });
+});
+
+exports.resetPassword = tryCatchWrapper(async (req, res) => {
+  const { newPassword } = req.body;
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  const user = await userModel.findById(id);
+
+  if (!user)
+    return res.status(404).json({ success: false, message: "User not found" });
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+  user.isRecoveryCodeUsed = true;
+
+  await user.save();
+  res.json({ success: true, message: "Password has been reset." });
 });

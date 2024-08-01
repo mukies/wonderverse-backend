@@ -11,6 +11,7 @@ const packageModel = require("../models/tourPackage.m");
 const { default: mongoose } = require("mongoose");
 const { invalidObj } = require("../helper/objectIdHendler");
 const { clearCacheByPrefix } = require("../helper/clearCache");
+const userModel = require("../models/user.m");
 // const transportationModel = require("../models/transportation.m");
 
 exports.createTour = async (req, res) => {
@@ -378,3 +379,22 @@ exports.searchTour = async (req, res) => {
       .json({ success: false, message: "Error while searching the tour" });
   }
 };
+
+exports.addToFavourite = tryCatchWrapper(async (req, res) => {
+  const { tourID } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(tourID)) return invalidObj(res);
+  const user = await userModel.findById(req.user);
+
+  if (!user)
+    return res.status(404).json({ success: false, message: "User not found" });
+
+  const tour = await tourModel.findById(tourID);
+
+  if (!tour)
+    return res.status.json({ success: false, message: "Tour not found" });
+
+  user.favourite.push(tourID);
+  await user.save();
+  res.json({ success: true, message: "Tour added to favourite", data: tour });
+});

@@ -191,6 +191,15 @@ exports.getSinglePackage = tryCatchWrapper(async (req, res) => {
   res.json({ success: true, packageDetails });
 });
 
+exports.getAllPackage = tryCatchWrapper(async (req, res) => {
+  let packages = await get("packages");
+  if (packages) return res.json({ success: true, data: packages });
+
+  packages = await packageModel.find().populate("activity");
+  await set("packages", packages, 3600);
+  res.json({ success: true, data: packages });
+});
+
 //package places
 
 exports.addPackagePlaces = tryCatchWrapper(async (req, res) => {

@@ -1,4 +1,4 @@
-const { checkSchema } = require("express-validator");
+const { checkSchema, body } = require("express-validator");
 const {
   loginUser,
   registerUser,
@@ -10,6 +10,9 @@ const {
   changePassword,
   changeProfilePhoto,
   changePassportDetails,
+  requestForgetPassCode,
+  verifyResetCode,
+  resetPassword,
 } = require("../controllers/user.c");
 
 const { userProtection } = require("../middlewares/userProtection");
@@ -18,6 +21,12 @@ const {
   userRegisterSchema,
 } = require("../validationSchema/authSchema");
 const { ratingSchema } = require("../validationSchema/ratingSchema");
+const {
+  passportSchema,
+  passwordSchema,
+  userDetailSchema,
+  resetPasswordSchema,
+} = require("../validationSchema/userSchema");
 
 const router = require("express").Router();
 
@@ -33,9 +42,40 @@ router.post(
   tourRating
 ); //payload = rating, comment
 
-router.put("/change-user-details", userProtection, changeUserDetails);
+router.put(
+  "/change-user-details",
+  userProtection,
+  checkSchema(userDetailSchema),
+  changeUserDetails
+);
 router.put("/change-photo", userProtection, changeProfilePhoto);
-router.put("/change-passport-details", userProtection, changePassportDetails);
-router.put("/change-password", userProtection, changePassword);
+router.put(
+  "/change-passport-details",
+  userProtection,
+  checkSchema(passportSchema),
+  changePassportDetails
+);
+router.put(
+  "/change-password",
+  userProtection,
+  checkSchema(passwordSchema),
+  changePassword
+);
+
+router.put(
+  "/request-reset-code",
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Invalid email format"),
+  requestForgetPassCode
+);
+router.get("/verify-reset-code/:id", verifyResetCode);
+router.put(
+  "/reset-password/:id",
+  checkSchema(resetPasswordSchema),
+  resetPassword
+);
 
 module.exports = router;

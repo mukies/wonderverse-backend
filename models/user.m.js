@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
     passportExpiryDate: { type: Date, default: "" },
     arrivalDate: { type: Date, default: "" },
     departureDate: { type: Date, default: "" },
-    firstName: { type: String, required: true },
+    firstName: { type: String, required: true, default: "" },
     lastName: { type: String, default: "" },
     gender: {
       type: String,
@@ -28,7 +28,9 @@ const userSchema = new mongoose.Schema(
     OTP: { type: String }, // for registration
     OTPExpiryDate: { type: Date }, // for registration
     isVerified: { type: Boolean, default: false },
-    passwordRecoveryCode: { type: String, default: "" },
+    passwordRecoveryCode: { type: String, default: null },
+    passwordRecoveryCodeExpiryDate: { type: Date, default: Date.now() },
+    isRecoveryCodeUsed: { type: Boolean, default: true },
     isTravelAgent: { type: Boolean, default: false },
     isGuideAgent: { type: Boolean, default: false },
   },

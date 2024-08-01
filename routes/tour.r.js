@@ -11,9 +11,11 @@ const {
   allToursNames,
   homePageFeaturedTrips,
   searchTour,
+  addToFavourite,
 } = require("../controllers/tour.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const { tourSchema } = require("../validationSchema/tourSchema");
+const { userProtection } = require("../middlewares/userProtection");
 
 const router = require("express").Router();
 
@@ -24,6 +26,7 @@ router.get("/tour-details/:slug", singleTour);
 router.get("/homepage-featured-trips", homePageFeaturedTrips);
 router.get("/all-tour-name", allToursNames);
 router.get("/search", searchTour);
+router.patch("/add-to-fav/:tourID", userProtection, addToFavourite);
 
 //admin routes
 
