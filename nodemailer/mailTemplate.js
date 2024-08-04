@@ -58,3 +58,86 @@ exports.contactMessageTemplate = () => {};
 exports.bookingTemplateForHotel = () => {};
 exports.bookingTemplateForTransportation = () => {};
 exports.bookingTemplateForGuide = () => {};
+exports.resetPasswordTemplate = (otp) => {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Reset OTP</title>
+  </head>
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-collapse: collapse;
+      "
+    >
+      <tr>
+        <td
+          style="padding: 20px; text-align: center; background-color: #13a74c"
+        >
+          <h1 style="color: #ffffff; margin: 0">Wanderverse Nepal</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 20px">
+          <h2 style="color: #333333">Password Reset code</h2>
+          <p style="color: #666666">
+            You have requested to reset your password. Please use the following
+            code to complete the process:
+          </p>
+          <div
+            style="
+              background-color: #f0f0f0;
+              padding: 10px;
+              text-align: center;
+              font-size: 24px;
+              font-weight: bold;
+              color: #119945;
+              margin: 20px 0;
+            "
+          >
+            ${otp}
+          </div>
+          <p style="color: #666666">
+            This code is only valid for 5 minutes. If you didn't request a
+            password reset, please ignore this email.
+          </p>
+          <p style="color: #666666">
+            For security reasons, please do not share this code with anyone.
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td
+          style="
+            padding: 20px;
+            text-align: center;
+            background-color: #f4f4f4;
+            color: #888888;
+          "
+        >
+          <p>&copy; 2024 Wanderverse Nepal. All rights reserved.</p>
+          <p>If you have any questions, please contact our support team.</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+`;
+};

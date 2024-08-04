@@ -177,7 +177,7 @@ exports.getSinglePackage = tryCatchWrapper(async (req, res) => {
     .select("placeName slug mainImage")
     .limit(5);
   const suggestedPackage = await packageModel
-    .find({ activity: tour.activity._id, _id: { $ne: package._id } })
+    .find({ activity: package.activity._id, _id: { $ne: package._id } })
     .select("placeName slug mainImage")
     .limit(5);
 

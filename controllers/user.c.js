@@ -4,7 +4,10 @@ const {
   generateTokenAndSetCookie,
 } = require("../helper/generateTokenAndSendCookie");
 const tourModel = require("../models/tour.m");
-const { sendEmail } = require("../nodemailer/sendEmail");
+const {
+  sendEmail,
+  sendResetPasswordEmail,
+} = require("../nodemailer/sendEmail");
 const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const partnerModel = require("../models/partner.m");
@@ -472,7 +475,7 @@ exports.requestForgetPassCode = tryCatchWrapper(async (req, res) => {
   user.passwordRecoveryCodeExpiryDate = expiryDate;
 
   await user.save();
-  console.log(code);
+  await sendResetPasswordEmail(code, email);
 
   res.json({ success: true, data: user._id });
 });
