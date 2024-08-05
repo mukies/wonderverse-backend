@@ -20,6 +20,7 @@ exports.addPackage = tryCatchWrapper(async (req, res) => {
     places,
     discountPercent,
     price,
+    packageDuration,
   } = req.body;
   let { featureImages, mainImage } = req.body;
 
@@ -72,6 +73,7 @@ exports.addPackage = tryCatchWrapper(async (req, res) => {
     places,
     discountPercent,
     price,
+    packageDuration,
   });
 
   await newPackage.save();
@@ -92,6 +94,7 @@ exports.updatePackage = tryCatchWrapper(async (req, res) => {
     places,
     discountPercent,
     price,
+    packageDuration,
   } = req.body;
   let { featureImages, mainImage } = req.body;
   const { packageID } = req.params;
@@ -146,6 +149,7 @@ exports.updatePackage = tryCatchWrapper(async (req, res) => {
       places,
       discountPercent,
       price,
+      packageDuration,
     },
     { new: true }
   );

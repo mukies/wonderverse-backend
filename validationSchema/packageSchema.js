@@ -11,6 +11,14 @@ exports.tourPackageSchema = {
       errorMessage: "Place Name must be at least 3 characters long",
     },
   },
+  packageDuration: {
+    notEmpty: {
+      errorMessage: "Package duration is required.",
+    },
+    isString: {
+      errorMessage: "Package duration must be in string format",
+    },
+  },
   state: {
     notEmpty: {
       errorMessage: "State object id is required.",
