@@ -357,21 +357,81 @@ exports.homePageFeaturedTrips = async (req, res) => {
 };
 
 exports.searchTour = async (req, res) => {
-  const { query } = req.query;
+  const { query, activity = "none", state = "none" } = req.query;
   try {
     if (!query)
       return res
         .status(400)
         .json({ success: false, message: "Empty search query" });
 
-    let result = await get(query);
+    let result = await get(`tour:search:${query}:${activity}:${state}`);
     if (result) return res.json({ success: true, result });
 
-    result = await tourModel.find({
-      $text: { $search: query },
-    });
-    await set(query, result, 3600);
-    res.json({ result });
+    result = await tourModel.aggregate([
+      {
+        $search: {
+          index: "Tour_Index",
+          compound: {
+            should: [
+              {
+                autocomplete: {
+                  query: query,
+                  path: "placeName",
+                  fuzzy: {
+                    maxEdits: 1,
+                    prefixLength: 1,
+                  },
+                },
+              },
+              {
+                autocomplete: {
+                  query: query,
+                  path: "location",
+                  fuzzy: {
+                    maxEdits: 1,
+                    prefixLength: 1,
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          score: { $meta: "searchScore" },
+        },
+      },
+      {
+        $sort: { score: -1, avgRating: -1 },
+      },
+      {
+        $lookup: {
+          from: "activities",
+          localField: "activity",
+          foreignField: "_id",
+          as: "activity",
+        },
+      },
+      {
+        $unwind: {
+          path: "$activity",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]);
+
+    if (activity !== "none") {
+      result = result.filter((tour) => tour.activity._id == activity);
+    }
+
+    if (state !== "none") {
+      result = result.filter((tour) => tour.state == slugify(state, "+"));
+    }
+
+    // .populate("activity");
+    await set(`tour:search:${query}:${activity}:${state}`, result, 3600);
+    res.json({ success: true, result });
   } catch (error) {
     console.log("Error while searching the tour", error);
     res
