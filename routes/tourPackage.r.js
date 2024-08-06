@@ -5,6 +5,7 @@ const {
   getSinglePackage,
   addPackagePlaces,
   getAllPackage,
+  searchPackage,
 } = require("../controllers/tourPackage.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const {
@@ -28,6 +29,7 @@ router.put(
 );
 router.get("/single-package/:slug", getSinglePackage);
 router.get("/all-package", getAllPackage);
+router.get("/search-package", searchPackage);
 
 //package place
 router.post(

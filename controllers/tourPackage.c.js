@@ -204,6 +204,104 @@ exports.getAllPackage = tryCatchWrapper(async (req, res) => {
   res.json({ success: true, data: packages });
 });
 
+exports.searchPackage = tryCatchWrapper(async (req, res) => {
+  const {
+    query,
+    activity = "none",
+    state = "none",
+    pricing = "none",
+  } = req.query;
+
+  if (!query)
+    return res
+      .status(400)
+      .json({ success: false, message: "Empty search query" });
+
+  let result = await get(
+    `package:search:${query}:${activity}:${state}:${pricing}`
+  );
+  if (result) return res.json({ success: true, result });
+
+  result = await packageModel.aggregate([
+    {
+      $search: {
+        index: "package_index",
+        compound: {
+          should: [
+            {
+              autocomplete: {
+                query: query,
+                path: "placeName",
+                fuzzy: {
+                  maxEdits: 1,
+                  prefixLength: 1,
+                },
+              },
+            },
+            {
+              autocomplete: {
+                query: query,
+                path: "location",
+                fuzzy: {
+                  maxEdits: 1,
+                  prefixLength: 1,
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      $addFields: {
+        score: { $meta: "searchScore" },
+      },
+    },
+    {
+      $sort: { score: -1, avgRating: -1 },
+    },
+    {
+      $lookup: {
+        from: "activities",
+        localField: "activity",
+        foreignField: "_id",
+        as: "activity",
+      },
+    },
+    {
+      $unwind: {
+        path: "$activity",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+  ]);
+
+  if (activity !== "none") {
+    result = result.filter((package) => package.activity._id == activity);
+  }
+
+  if (state !== "none") {
+    result = result.filter((package) => package.state == slugify(state, "+"));
+  }
+
+  if (pricing !== "none") {
+    if (pricing == "high-to-low") {
+      result = result.sort((x, y) => y.price - x.price);
+    }
+    if (pricing == "low-to-high") {
+      result = result.sort((x, y) => x.price - y.price);
+    }
+  }
+
+  // .populate("activity");
+  await set(
+    `package:search:${query}:${activity}:${state}:${pricing}`,
+    result,
+    3600
+  );
+  res.json({ success: true, result });
+});
+
 //package places
 
 exports.addPackagePlaces = tryCatchWrapper(async (req, res) => {
