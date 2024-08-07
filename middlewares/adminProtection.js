@@ -10,7 +10,6 @@ exports.adminProtection = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Token not found" });
 
-    console.log("first", process.env.JWT_KEY);
     const decode = jwt.verify(token, process.env.JWT_KEY);
     if (!decode)
       return res.status(401).json({ success: false, message: "Invalid token" });
