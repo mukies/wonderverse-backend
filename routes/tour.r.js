@@ -12,6 +12,8 @@ const {
   homePageFeaturedTrips,
   searchTour,
   addToFavourite,
+  getAllToursByActivity,
+  getAllToursByState,
 } = require("../controllers/tour.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const { tourSchema } = require("../validationSchema/tourSchema");
@@ -20,7 +22,9 @@ const { userProtection } = require("../middlewares/userProtection");
 const router = require("express").Router();
 
 router.get("/destination/:state", getToursByState);
+router.get("/all-destination/:state", getAllToursByState);
 router.get("/activities/:slug", getToursByActivity);
+router.get("/all-activities/:slug", getAllToursByActivity);
 router.get("/tour-details/:slug", singleTour);
 // router.get("/featured-trips", featuredTrips);
 router.get("/homepage-featured-trips", homePageFeaturedTrips);

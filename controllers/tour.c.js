@@ -176,6 +176,37 @@ exports.getToursByActivity = async (req, res) => {
   }
 };
 
+//all
+exports.getAllToursByState = tryCatchWrapper(async (req, res) => {
+  const { state } = req.params;
+
+  const tours = await tourModel.find({ state }).populate("activity");
+
+  res.status(200).json({ success: true, tours });
+});
+
+exports.getAllToursByActivity = tryCatchWrapper(async (req, res) => {
+  const { slug } = req.params;
+
+  const activity = await activityModel.findOne({ slug });
+
+  if (!activity)
+    return res
+      .status(404)
+      .json({ success: false, message: "Activity not found." });
+
+  let tours = await get(`tours_activity_${activity._id}`);
+
+  if (!tours) {
+    tours = await tourModel
+      .find({ activity: activity._id })
+      .populate("activity");
+
+    await set(`tours_activity_${activity._id}`, tours, 3600);
+  }
+  res.json({ success: true, tours });
+});
+
 exports.singleTour = async (req, res) => {
   try {
     const { slug } = req.params;
