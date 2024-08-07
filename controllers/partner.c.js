@@ -4,11 +4,15 @@ const {
   generateTokenAndSetCookie,
 } = require("../helper/generateTokenAndSendCookie");
 
-const { sendEmail } = require("../nodemailer/sendEmail");
+const {
+  sendEmail,
+  sendResetPasswordEmail,
+} = require("../nodemailer/sendEmail");
 const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const partnerModel = require("../models/partner.m");
 const userModel = require("../models/user.m");
+const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 
 exports.registerPartner = async (req, res) => {
   const { firstName, lastName, email, password, gender } = req.body;
@@ -249,3 +253,96 @@ exports.loggedInPartner = async (req, res) => {
       .json({ success: false, message: "Error while fetching partner data" });
   }
 };
+
+exports.requestForgetPassCodePartner = tryCatchWrapper(async (req, res) => {
+  const { email } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  const partner = await partnerModel.findOne({ email });
+
+  if (!partner)
+    return res
+      .status(404)
+      .json({ success: false, message: "Email does not exist." });
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiryDate = new Date();
+  expiryDate.setMinutes(expiryDate.getMinutes() + 5);
+  partner.isRecoveryCodeUsed = false;
+  partner.passwordRecoveryCode = code;
+  partner.passwordRecoveryCodeExpiryDate = expiryDate;
+
+  await partner.save();
+  await sendResetPasswordEmail(code, email);
+
+  res.json({ success: true, data: partner._id });
+});
+
+exports.verifyResetCodePartner = tryCatchWrapper(async (req, res) => {
+  const { code } = req.query;
+  const { id } = req.params;
+
+  if (!code)
+    return res
+      .status(400)
+      .json({ success: false, message: "Recovery code is required" });
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const partner = await partnerModel.findById(id);
+  if (!partner)
+    return res
+      .status(404)
+      .json({ success: false, message: "Partner not found" });
+
+  if (partner.isRecoveryCodeUsed)
+    return res
+      .status(400)
+      .json({ success: false, message: "Recovery code is already used." });
+
+  if (partner.passwordRecoveryCode !== code)
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid recovery code." });
+
+  if (partner.passwordRecoveryCodeExpiryDate < new Date())
+    return res.status(400).json({
+      success: false,
+      message: "Recovery code expired.",
+    });
+
+  res.json({ success: true, data: partner._id });
+});
+
+exports.resetPasswordPartner = tryCatchWrapper(async (req, res) => {
+  const { newPassword } = req.body;
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  const partner = await partnerModel.findById(id);
+
+  if (!partner)
+    return res
+      .status(404)
+      .json({ success: false, message: "Partner not found" });
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  partner.password = hashedPassword;
+  partner.isRecoveryCodeUsed = true;
+
+  await partner.save();
+  res.json({ success: true, message: "Password has been reset." });
+});

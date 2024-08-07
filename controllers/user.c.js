@@ -483,7 +483,7 @@ exports.requestForgetPassCode = tryCatchWrapper(async (req, res) => {
 exports.verifyResetCode = tryCatchWrapper(async (req, res) => {
   const { code } = req.query;
   const { id } = req.params;
-  console.log(id);
+
   if (!code)
     return res
       .status(400)

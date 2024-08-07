@@ -60,3 +60,22 @@ exports.updateCharges = tryCatchWrapper(async (req, res) => {
     data: updatedCharges,
   });
 });
+
+exports.allCharges = tryCatchWrapper(async (req, res) => {
+  const charges = await chargesModel.find();
+  res.json({ success: true, data: charges });
+});
+exports.singleCharges = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const charge = await chargesModel.findById(id);
+
+  if (!charge)
+    return res
+      .status(404)
+      .json({ success: false, message: "Charges list didnot found" });
+
+  res.json({ success: true, data: charge });
+});

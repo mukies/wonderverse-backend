@@ -248,6 +248,26 @@ exports.searchPackage = tryCatchWrapper(async (req, res) => {
                 },
               },
             },
+            {
+              autocomplete: {
+                query: query,
+                path: "state",
+                fuzzy: {
+                  maxEdits: 1,
+                  prefixLength: 1,
+                },
+              },
+            },
+            {
+              autocomplete: {
+                query: query,
+                path: "slug",
+                fuzzy: {
+                  maxEdits: 1,
+                  prefixLength: 1,
+                },
+              },
+            },
           ],
         },
       },

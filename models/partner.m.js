@@ -11,7 +11,8 @@ const partnerSchema = new mongoose.Schema(
     OTP: { type: String }, // for registration
     OTPExpiryDate: { type: Date }, // for registration
     isVerified: { type: Boolean, default: false },
-    passwordRecoveryCode: { type: String, sparse: true },
+    passwordRecoveryCode: { type: String, default: null },
+    passwordRecoveryCodeExpiryDate: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

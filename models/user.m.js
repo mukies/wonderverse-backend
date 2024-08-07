@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
     OTPExpiryDate: { type: Date }, // for registration
     isVerified: { type: Boolean, default: false },
     passwordRecoveryCode: { type: String, default: null },
-    passwordRecoveryCodeExpiryDate: { type: Date, default: Date.now() },
+    passwordRecoveryCodeExpiryDate: { type: Date, default: Date.now },
     isRecoveryCodeUsed: { type: Boolean, default: true },
     isTravelAgent: { type: Boolean, default: false },
     isGuideAgent: { type: Boolean, default: false },
