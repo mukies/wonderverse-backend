@@ -7,6 +7,7 @@ const { sendEmail } = require("../nodemailer/sendEmail");
 const adminModel = require("../models/admin.m");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
+const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 
 exports.registerAdmin = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -190,3 +191,20 @@ exports.logoutAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: "Error while logout." });
   }
 };
+
+exports.loggedInData = tryCatchWrapper(async (req, res) => {
+  const userData = await adminModel.findById(req.admin).select("-password");
+
+  if (!userData)
+    return res
+      .status(404)
+      .json({ success: false, message: "Admin account not found" });
+
+  const responseData = {
+    name: userData.fullName,
+    email: userData.email,
+    photo: userData.photo,
+  };
+
+  res.json({ success: true, data: responseData });
+});
