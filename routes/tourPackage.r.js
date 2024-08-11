@@ -6,6 +6,11 @@ const {
   addPackagePlaces,
   getAllPackage,
   searchPackage,
+  deletePackage,
+  updatePackagePlace,
+  deletePlace,
+  getAllPlace,
+  getOnePlace,
 } = require("../controllers/tourPackage.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const {
@@ -27,6 +32,7 @@ router.put(
   checkSchema(tourPackageSchema),
   updatePackage
 );
+router.delete("/delete-package/:id", adminProtection, deletePackage);
 router.get("/single-package/:slug", getSinglePackage);
 router.get("/all-package", getAllPackage);
 router.get("/search-package", searchPackage);
@@ -38,5 +44,14 @@ router.post(
   checkSchema(packagePlaceSchema),
   addPackagePlaces
 );
+router.put(
+  "/update-package-place/:id",
+  adminProtection,
+  checkSchema(packagePlaceSchema),
+  updatePackagePlace
+);
+router.delete("/delete-package-place/:id", adminProtection, deletePlace);
+router.get("/all-package-place", adminProtection, getAllPlace);
+router.get("/single-package-place/:id", adminProtection, getOnePlace);
 
 module.exports = router;

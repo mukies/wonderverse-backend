@@ -8,6 +8,7 @@ const tourModel = require("../models/tour.m");
 const { clearCacheByPrefix } = require("../helper/clearCache");
 const placeModel = require("../models/packagePlace.m");
 const slugify = require("slugify");
+const { invalidObj } = require("../helper/objectIdHendler");
 
 exports.addPackage = tryCatchWrapper(async (req, res) => {
   const {
@@ -322,6 +323,19 @@ exports.searchPackage = tryCatchWrapper(async (req, res) => {
   res.json({ success: true, result });
 });
 
+exports.deletePackage = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const package = await packageModel.findById(id);
+  if (!package)
+    return res
+      .status(404)
+      .json({ success: false, message: "Package not found" });
+  await clearCacheByPrefix("package");
+  await packageModel.findByIdAndDelete(id);
+  res.json({ success: true, message: "Package has been deleted." });
+});
 //package places
 
 exports.addPackagePlaces = tryCatchWrapper(async (req, res) => {
@@ -345,7 +359,76 @@ exports.addPackagePlaces = tryCatchWrapper(async (req, res) => {
   });
 
   await newPlace.save();
-  await clearCacheByPrefix("package");
+  await clearCacheByPrefix("place");
 
   res.json({ success: true, message: "Package place created", newPlace });
+});
+exports.updatePackagePlace = tryCatchWrapper(async (req, res) => {
+  const { price, name } = req.body;
+  let { image } = req.body;
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const result = validationResult(req);
+  if (!result.array())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  if (!image.startsWith("http")) {
+    image = await generateLink(image);
+  }
+
+  const updated = await placeModel.findByIdAndUpdate(
+    id,
+    {
+      price,
+      name,
+      image,
+    },
+    { new: true }
+  );
+  await clearCacheByPrefix("place");
+  res.json({ success: true, message: "place has been updated", data: updated });
+});
+exports.getAllPlace = tryCatchWrapper(async (req, res) => {
+  let data = await get("place");
+  if (data) return res.json({ success: true, data });
+
+  data = await placeModel.find();
+
+  await set("place", data, 3600);
+  res.json({ success: true, data });
+});
+exports.getOnePlace = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  let data = await get(`place:${id}`);
+  if (data) return res.json({ success: true, data });
+
+  data = await placeModel.findById(id);
+  if (!data)
+    return res
+      .status(404)
+      .json({ success: false, message: "Package place not found" });
+
+  await set(`place:${id}`, data, 3600);
+
+  res.json({ success: true, data });
+});
+
+exports.deletePlace = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const place = await placeModel.findById(id);
+  if (!place)
+    return res
+      .status(404)
+      .json({ success: false, message: "Package place not found" });
+  await placeModel.findByIdAndDelete(id);
+  await clearCacheByPrefix("place");
+  res.json({ success: true, message: "Package place has been deleted." });
 });
