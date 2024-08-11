@@ -38,6 +38,11 @@ const tourSchema = new mongoose.Schema(
     included: { type: String, default: "" },
     // excluded: { type: String, default: "" },
     featureImages: { type: [String], required: true },
+    status: {
+      type: String,
+      enum: ["active", "deactive"],
+      default: "active",
+    },
   },
   { timestamps: true }
 );

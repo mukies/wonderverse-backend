@@ -336,6 +336,57 @@ exports.deletePackage = tryCatchWrapper(async (req, res) => {
   await packageModel.findByIdAndDelete(id);
   res.json({ success: true, message: "Package has been deleted." });
 });
+
+exports.deleteMultiplePackage = tryCatchWrapper(async (req, res) => {
+  const { idArray } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  idArray.forEach(async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+    const package = await packageModel.findById(id);
+    if (!package)
+      return res
+        .status(404)
+        .json({ success: false, message: "Package place not found" });
+    await packageModel.findByIdAndDelete(id);
+  });
+  await clearCacheByPrefix("package");
+  res.json({ success: true, message: "Data deleted successfully." });
+});
+
+exports.packageToggleStatus = tryCatchWrapper(async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  if (status !== "active" && status !== "deactive")
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid status type" });
+
+  const package = await packageModel.findById(id);
+
+  if (!package)
+    return res
+      .status(404)
+      .json({ success: false, message: "Package not found" });
+
+  if (package.status == "active") {
+    package.status = "deactive";
+  } else {
+    package.status = "active";
+  }
+  await package.save();
+  res.json({ success: true, message: "Package status changed." });
+});
+
 //package places
 
 exports.addPackagePlaces = tryCatchWrapper(async (req, res) => {
@@ -431,4 +482,52 @@ exports.deletePlace = tryCatchWrapper(async (req, res) => {
   await placeModel.findByIdAndDelete(id);
   await clearCacheByPrefix("place");
   res.json({ success: true, message: "Package place has been deleted." });
+});
+
+exports.deleteMultiplePlace = tryCatchWrapper(async (req, res) => {
+  const { idArray } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  idArray.forEach(async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+    const place = await placeModel.findById(id);
+    if (!place)
+      return res
+        .status(404)
+        .json({ success: false, message: "Package place not found" });
+    await placeModel.findByIdAndDelete(id);
+  });
+  await clearCacheByPrefix("place");
+  res.json({ success: true, message: "Data deleted successfully." });
+});
+
+exports.placeToggleStatus = tryCatchWrapper(async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  if (status !== "active" && status !== "deactive")
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid status type" });
+
+  const place = await placeModel.findById(id);
+
+  if (!place)
+    return res.status(404).json({ success: false, message: "Place not found" });
+
+  if (place.status == "active") {
+    place.status = "deactive";
+  } else {
+    place.status = "active";
+  }
+  await place.save();
+  res.json({ success: true, message: "Place status changed." });
 });

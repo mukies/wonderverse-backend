@@ -1,4 +1,4 @@
-const { checkSchema } = require("express-validator");
+const { checkSchema, body } = require("express-validator");
 const {
   addPackage,
   updatePackage,
@@ -11,6 +11,10 @@ const {
   deletePlace,
   getAllPlace,
   getOnePlace,
+  deleteMultiplePackage,
+  deleteMultiplePlace,
+  packageToggleStatus,
+  placeToggleStatus,
 } = require("../controllers/tourPackage.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const {
@@ -33,9 +37,24 @@ router.put(
   updatePackage
 );
 router.delete("/delete-package/:id", adminProtection, deletePackage);
+router.delete(
+  "/delete-multi-package",
+  adminProtection,
+  body("idArray")
+    .notEmpty()
+    .withMessage("Id array is required")
+    .isArray()
+    .withMessage("id array must be an array"),
+  deleteMultiplePackage
+);
 router.get("/single-package/:slug", getSinglePackage);
 router.get("/all-package", getAllPackage);
 router.get("/search-package", searchPackage);
+router.patch(
+  "/toggle-package-status/:id",
+  adminProtection,
+  packageToggleStatus
+);
 
 //package place
 router.post(
@@ -50,8 +69,19 @@ router.put(
   checkSchema(packagePlaceSchema),
   updatePackagePlace
 );
+router.delete(
+  "/delete-multi-place",
+  adminProtection,
+  body("idArray")
+    .notEmpty()
+    .withMessage("Id array is required")
+    .isArray()
+    .withMessage("id array must be an array"),
+  deleteMultiplePlace
+);
 router.delete("/delete-package-place/:id", adminProtection, deletePlace);
 router.get("/all-package-place", adminProtection, getAllPlace);
 router.get("/single-package-place/:id", adminProtection, getOnePlace);
+router.patch("/toggle-place-status/:id", adminProtection, placeToggleStatus);
 
 module.exports = router;

@@ -40,6 +40,11 @@ const packageSchema = new mongoose.Schema(
     description: { type: String, default: "" },
     included: { type: String, default: "" },
     featureImages: { type: [String], required: true },
+    status: {
+      type: String,
+      enum: ["active", "deactive"],
+      default: "active",
+    },
   },
   { timestamps: true }
 );
