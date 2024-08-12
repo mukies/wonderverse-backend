@@ -9,6 +9,7 @@ const { clearCacheByPrefix } = require("../helper/clearCache");
 const placeModel = require("../models/packagePlace.m");
 const slugify = require("slugify");
 const { invalidObj } = require("../helper/objectIdHendler");
+const { paginate } = require("../helper/pagination");
 
 exports.addPackage = tryCatchWrapper(async (req, res) => {
   const {
@@ -197,12 +198,30 @@ exports.getSinglePackage = tryCatchWrapper(async (req, res) => {
 });
 
 exports.getAllPackage = tryCatchWrapper(async (req, res) => {
-  let packages = await get("packages");
+  const { limit, page, skip } = paginate(req);
+
+  let packages = await get(`packages:${page}`);
   if (packages) return res.json({ success: true, data: packages });
 
-  packages = await packageModel.find().populate("activity");
-  await set("packages", packages, 3600);
-  res.json({ success: true, data: packages });
+  packages = await packageModel
+    .find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })
+    .populate("activity")
+    .populate("places");
+
+  const totalItems = await packageModel.countDocuments();
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const data = {
+    page,
+    packages,
+    totalPages,
+  };
+
+  await set(`packages:${page}`, packages, 3600);
+  res.json({ success: true, data });
 });
 
 exports.searchPackage = tryCatchWrapper(async (req, res) => {
