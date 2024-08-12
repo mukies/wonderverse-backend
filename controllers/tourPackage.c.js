@@ -522,15 +522,9 @@ exports.deleteMultiplePlace = tryCatchWrapper(async (req, res) => {
 });
 
 exports.placeToggleStatus = tryCatchWrapper(async (req, res) => {
-  const { status } = req.body;
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
-
-  if (status !== "active" && status !== "inactive")
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid status type" });
 
   const place = await placeModel.findById(id);
 
