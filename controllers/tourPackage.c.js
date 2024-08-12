@@ -218,6 +218,7 @@ exports.getAllPackage = tryCatchWrapper(async (req, res) => {
     page,
     packages,
     totalPages,
+totalItems
   };
 
   await set(`packages:${page}`, data, 3600);
