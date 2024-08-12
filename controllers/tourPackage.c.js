@@ -218,7 +218,7 @@ exports.getAllPackage = tryCatchWrapper(async (req, res) => {
     page,
     packages,
     totalPages,
-totalItems
+    totalItems,
   };
 
   await set(`packages:${page}`, data, 3600);
@@ -381,15 +381,9 @@ exports.deleteMultiplePackage = tryCatchWrapper(async (req, res) => {
 });
 
 exports.packageToggleStatus = tryCatchWrapper(async (req, res) => {
-  const { status } = req.body;
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
-
-  if (status !== "active" && status !== "deactive")
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid status type" });
 
   const package = await packageModel.findById(id);
 
@@ -399,7 +393,7 @@ exports.packageToggleStatus = tryCatchWrapper(async (req, res) => {
       .json({ success: false, message: "Package not found" });
 
   if (package.status == "active") {
-    package.status = "deactive";
+    package.status = "inactive";
   } else {
     package.status = "active";
   }
@@ -533,7 +527,7 @@ exports.placeToggleStatus = tryCatchWrapper(async (req, res) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
 
-  if (status !== "active" && status !== "deactive")
+  if (status !== "active" && status !== "inactive")
     return res
       .status(400)
       .json({ success: false, message: "Invalid status type" });
@@ -544,7 +538,7 @@ exports.placeToggleStatus = tryCatchWrapper(async (req, res) => {
     return res.status(404).json({ success: false, message: "Place not found" });
 
   if (place.status == "active") {
-    place.status = "deactive";
+    place.status = "inactive";
   } else {
     place.status = "active";
   }

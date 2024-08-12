@@ -42,7 +42,7 @@ const packageSchema = new mongoose.Schema(
     featureImages: { type: [String], required: true },
     status: {
       type: String,
-      enum: ["active", "deactive"],
+      enum: ["active", "inactive"],
       default: "active",
     },
   },
