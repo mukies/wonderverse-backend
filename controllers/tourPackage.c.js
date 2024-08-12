@@ -220,7 +220,7 @@ exports.getAllPackage = tryCatchWrapper(async (req, res) => {
     totalPages,
   };
 
-  await set(`packages:${page}`, packages, 3600);
+  await set(`packages:${page}`, data, 3600);
   res.json({ success: true, data });
 });
 
