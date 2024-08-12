@@ -397,6 +397,7 @@ exports.packageToggleStatus = tryCatchWrapper(async (req, res) => {
   } else {
     package.status = "active";
   }
+  await clearCacheByPrefix("package");
   await package.save();
   res.json({ success: true, message: "Package status changed." });
 });
@@ -536,6 +537,7 @@ exports.placeToggleStatus = tryCatchWrapper(async (req, res) => {
   } else {
     place.status = "active";
   }
+  await clearCacheByPrefix("place");
   await place.save();
   res.json({ success: true, message: "Place status changed." });
 });
