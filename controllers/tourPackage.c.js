@@ -459,12 +459,29 @@ exports.updatePackagePlace = tryCatchWrapper(async (req, res) => {
   res.json({ success: true, message: "place has been updated", data: updated });
 });
 exports.getAllPlace = tryCatchWrapper(async (req, res) => {
-  let data = await get("place");
-  if (data) return res.json({ success: true, data });
+  const { limit, page, skip } = paginate(req);
 
-  data = await placeModel.find();
+  let places = await get(`place:${page}`);
 
-  await set("place", data, 3600);
+  if (places) return res.json({ success: true, data: places });
+
+  places = await placeModel
+    .find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const totalItems = await placeModel.countDocuments();
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const data = {
+    page,
+    places,
+    totalPages,
+    totalItems,
+  };
+
+  await set(`place:${page}`, data, 3600);
   res.json({ success: true, data });
 });
 exports.getOnePlace = tryCatchWrapper(async (req, res) => {

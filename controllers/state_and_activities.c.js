@@ -2,6 +2,8 @@ const slugify = require("slugify");
 const stateModel = require("../models/state.m");
 const activityModel = require("../models/activity.m");
 const { get, set } = require("../config/cache_setup");
+const { tryCatchWrapper } = require("../helper/tryCatchHandler");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.addState = async (req, res) => {
   const { name } = req.body;
@@ -111,7 +113,16 @@ exports.deleteState = async (req, res) => {
 
 exports.getAllStates = async (req, res) => {
   try {
-    const states = await stateModel.find();
+    const { limit, page, skip } = paginate(req);
+
+    let states = await get(`states:${page}`);
+    if (states) return res.json({ success: true, data: states });
+
+    states = await stateModel
+      .find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     res.status(200).json({
       success: true,
@@ -172,6 +183,7 @@ exports.addActivity = async (req, res) => {
     });
 
     await newActivity.save();
+    await clearCacheByPrefix("activity");
 
     res.status(201).json({
       success: true,
@@ -218,6 +230,7 @@ exports.updateActivity = async (req, res) => {
       },
       { new: true }
     );
+    await clearCacheByPrefix("activity");
 
     res.status(200).json({
       success: true,
@@ -242,6 +255,7 @@ exports.deleteActivity = async (req, res) => {
         .json({ success: false, message: "Unauthorized action." });
 
     await activityModel.findByIdAndDelete(id);
+    await clearCacheByPrefix("activity");
 
     res.status(200).json({
       success: true,
@@ -300,3 +314,29 @@ exports.getSingleActivity = async (req, res) => {
       .json({ success: false, message: "Error while fetching activities." });
   }
 };
+
+exports.getAllActivity = tryCatchWrapper(async (req, res) => {
+  const { limit, page, skip } = paginate(req);
+
+  let activity = await get(`activity:${page}`);
+  if (activity) return res.json({ success: true, data: activity });
+
+  activity = await activityModel
+    .find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const totalItems = await activityModel.countDocuments();
+  const totalPages = Math.ceil(totalItems / limit);
+  const data = {
+    activity,
+    page,
+    totalItems,
+    totalPages,
+  };
+
+  await set(`activity:${page}`, data, 3600);
+
+  res.json({ success: true, data });
+});

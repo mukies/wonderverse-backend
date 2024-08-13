@@ -9,6 +9,7 @@ const {
   getAllStates,
   getSingleState,
   getSingleActivity,
+  getAllActivity,
 } = require("../controllers/state_and_activities.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 
@@ -24,6 +25,9 @@ const router = require("express").Router();
 //activities CRUD
 router.get("/activities", getActivities);
 router.get("/single-activity/:id", adminProtection, getSingleActivity);
+
+router.get("/get-all-activity", adminProtection, getAllActivity);
+
 router.post("/add-activities", adminProtection, addActivity);
 router.put("/update-activities/:id", adminProtection, updateActivity);
 router.delete("/delete-activities/:id", adminProtection, deleteActivity);

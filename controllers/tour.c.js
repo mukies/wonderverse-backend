@@ -12,6 +12,7 @@ const { default: mongoose } = require("mongoose");
 const { invalidObj } = require("../helper/objectIdHendler");
 const { clearCacheByPrefix } = require("../helper/clearCache");
 const userModel = require("../models/user.m");
+const { paginate } = require("../helper/pagination");
 // const transportationModel = require("../models/transportation.m");
 
 exports.createTour = async (req, res) => {
@@ -82,31 +83,37 @@ exports.createTour = async (req, res) => {
 };
 
 exports.allTours = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = 10;
-  const skip = (page - 1) * limit;
+  const { limit, page, skip } = paginate(req);
 
   try {
     let tours = await get(`tours:page${page}`);
     if (tours) {
       return res.json({
         success: true,
-        tours: tours.tours,
-        totlePages: tours.totlePages,
+        data: tours,
       });
     }
-    const totleItem = await tourModel.countDocuments();
-    tours = await tourModel.find().populate("activity").skip(skip).limit(limit);
+    tours = await tourModel
+      .find()
+      .populate("activity")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalItems = await tourModel.countDocuments();
+    const totalPages = Math.ceil(totalItems / limit);
+
     const tourData = {
-      totlePages: Math.ceil(totleItem / limit),
+      totalPages,
       tours,
+      totalItems,
+      page,
     };
     await set(`tours:page${page}`, tourData, 3600);
 
     res.status(200).json({
       success: true,
-      tours: tourData.tours,
-      totlePages: tourData.totlePages,
+      data: tourData,
     });
   } catch (error) {
     console.log("Error while fetching all tour");
