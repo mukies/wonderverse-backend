@@ -108,7 +108,7 @@ exports.updatePackage = tryCatchWrapper(async (req, res) => {
       message: result.array()[0].msg,
     });
 
-  if (!mongoose.Types.ObjectId.isValid())
+  if (!mongoose.Types.ObjectId.isValid(packageID))
     return res
       .status(401)
       .json({ success: false, message: "Invalid package id" });
