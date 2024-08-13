@@ -82,7 +82,11 @@ exports.addPackage = tryCatchWrapper(async (req, res) => {
 
   await clearCacheByPrefix("package");
 
-  res.json({ success: true, data: newPackage });
+  res.json({
+    success: true,
+    data: newPackage,
+    message: "New package created.",
+  });
 });
 
 exports.updatePackage = tryCatchWrapper(async (req, res) => {
@@ -158,7 +162,11 @@ exports.updatePackage = tryCatchWrapper(async (req, res) => {
 
   await clearCacheByPrefix("package");
 
-  res.json({ success: true, data: updatedPackage });
+  res.json({
+    success: true,
+    data: updatedPackage,
+    message: "Package has been updated",
+  });
 });
 
 exports.getSinglePackage = tryCatchWrapper(async (req, res) => {
