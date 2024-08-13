@@ -1,4 +1,4 @@
-const { checkSchema } = require("express-validator");
+const { checkSchema, body } = require("express-validator");
 const {
   createTour,
   singleTour,
@@ -14,6 +14,8 @@ const {
   addToFavourite,
   getAllToursByActivity,
   getAllToursByState,
+  deleteMultiTour,
+  tourToggleStatus,
 } = require("../controllers/tour.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const { tourSchema } = require("../validationSchema/tourSchema");
@@ -47,6 +49,19 @@ router.put(
   checkSchema(tourSchema),
   editTour
 );
+
+router.patch("/toggle-tour-status/:id", adminProtection, tourToggleStatus);
+
 router.delete("/delete-tour/:tourID", adminProtection, deleteTour);
+router.delete(
+  "/delete-multi-tour",
+  adminProtection,
+  body("idArray")
+    .notEmpty()
+    .withMessage("Id array is required")
+    .isArray()
+    .withMessage("id array must be an array"),
+  deleteMultiTour
+);
 
 module.exports = router;

@@ -516,3 +516,46 @@ exports.addToFavourite = tryCatchWrapper(async (req, res) => {
   await user.save();
   res.json({ success: true, message: "Tour added to favourite", data: tour });
 });
+
+exports.deleteMultiTour = tryCatchWrapper(async (req, res) => {
+  const { idArray } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  idArray.forEach(async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+    const tour = await tourModel.findById(id);
+    if (!tour)
+      return res
+        .status(404)
+        .json({ success: false, message: "Tour not found" });
+    await tourModel.findByIdAndDelete(id);
+  });
+  await clearCacheByPrefix("tour");
+  res.json({ success: true, message: "Tours deleted successfully." });
+});
+
+exports.tourToggleStatus = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const tour = await tourModel.findById(id);
+
+  if (!tour)
+    return res.status(404).json({ success: false, message: "Tour not found" });
+
+  if (tour.status == "active") {
+    tour.status = "inactive";
+  } else {
+    tour.status = "active";
+  }
+  await clearCacheByPrefix("tour");
+  await tour.save();
+  res.json({ success: true, message: "Tour status changed." });
+});

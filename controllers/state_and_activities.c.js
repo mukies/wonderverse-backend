@@ -4,6 +4,9 @@ const activityModel = require("../models/activity.m");
 const { get, set } = require("../config/cache_setup");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const { clearCacheByPrefix } = require("../helper/clearCache");
+const { validationResult } = require("express-validator");
+const { default: mongoose } = require("mongoose");
+const { invalidObj } = require("../helper/objectIdHendler");
 
 exports.addState = async (req, res) => {
   const { name } = req.body;
@@ -268,6 +271,29 @@ exports.deleteActivity = async (req, res) => {
       .json({ success: false, message: "Error while deleting state." });
   }
 };
+
+exports.deleteMultiActivity = tryCatchWrapper(async (req, res) => {
+  const { idArray } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  idArray.forEach(async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+    const activity = await activityModel.findById(id);
+    if (!activity)
+      return res
+        .status(404)
+        .json({ success: false, message: "Activity not found" });
+    await activityModel.findByIdAndDelete(id);
+  });
+  await clearCacheByPrefix("activity");
+  res.json({ success: true, message: "Activity deleted successfully." });
+});
 
 exports.getActivities = async (req, res) => {
   try {
