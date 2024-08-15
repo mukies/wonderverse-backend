@@ -4,6 +4,7 @@ const cors = require("cors");
 
 require("dotenv").config();
 require("./config/database");
+require("./config/passport-setup");
 const multer = require("multer");
 const cookie = require("cookie-parser");
 const { v2 } = require("cloudinary");
@@ -23,9 +24,9 @@ const passport = require("passport");
 const topDestinationRoute = require("./routes/top_Destination.r");
 const contactUsRoute = require("./routes/contact_us.r");
 const blogRoute = require("./routes/blog.r");
-require("./config/passport-setup");
 const googleAuthRoute = require("./routes/googleAuth.r");
 const partnerRoute = require("./routes/partner.r");
+const partnerRequestRoute = require("./routes/partnerRequests.r");
 
 //multer
 const storage = multer.memoryStorage();
@@ -64,6 +65,7 @@ app.use("/api/vehicle", vehicle);
 app.use("/api/user", userRoute);
 app.use("/api/charges", chargesRoute);
 app.use("/api/partner", partnerRoute);
+app.use("/api/partner-request", partnerRequestRoute);
 app.use("/api/hotel", hotelRoute);
 app.use("/api/guide", guideRoute);
 app.use("/api/guide-plan", planRoute);
