@@ -46,6 +46,10 @@ router.delete(
   deleteMultiActivity
 );
 
-router.patch("/toggle-activity-status", adminProtection, toggleActivityStatus);
+router.patch(
+  "/toggle-activity-status/:id",
+  adminProtection,
+  toggleActivityStatus
+);
 
 module.exports = router;
