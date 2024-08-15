@@ -566,3 +566,14 @@ exports.placeToggleStatus = tryCatchWrapper(async (req, res) => {
   await place.save();
   res.json({ success: true, message: "Place status changed." });
 });
+
+exports.getAllPlaceWithoutPagination = tryCatchWrapper(async (req, res) => {
+  let places = await get(`place`);
+
+  if (places) return res.json({ success: true, data: places });
+
+  places = await placeModel.find().sort({ createdAt: -1 });
+
+  await set(`place`, places, 3600);
+  res.json({ success: true, data: places });
+});

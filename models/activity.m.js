@@ -4,6 +4,11 @@ const activitySchema = new mongoose.Schema(
   {
     title: { type: String, required: true, unique: true },
     slug: { type: String, required: true },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
   },
   { timestamps: true }
 );

@@ -7,6 +7,7 @@ const { clearCacheByPrefix } = require("../helper/clearCache");
 const { validationResult } = require("express-validator");
 const { default: mongoose } = require("mongoose");
 const { invalidObj } = require("../helper/objectIdHendler");
+const { paginate } = require("../helper/pagination");
 
 exports.addState = async (req, res) => {
   const { name } = req.body;
@@ -365,4 +366,24 @@ exports.getAllActivity = tryCatchWrapper(async (req, res) => {
   await set(`activity:${page}`, data, 3600);
 
   res.json({ success: true, data });
+});
+
+exports.toggleActivityStatus = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const activity = await activityModel.findById(id);
+  if (!activity)
+    return res
+      .status(404)
+      .json({ success: false, message: "Activity not found" });
+
+  if (activity.status == "active") {
+    activity.status = "inactive";
+  } else {
+    activity.status = "active";
+  }
+  await activity.save();
+  await clearCacheByPrefix("activit");
+  res.json({ success: true, message: "Status changed" });
 });

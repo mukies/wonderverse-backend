@@ -14,6 +14,8 @@ const partnerModel = require("../models/partner.m");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const { default: mongoose } = require("mongoose");
 const { invalidObj } = require("../helper/objectIdHendler");
+const { paginate } = require("../helper/pagination");
+const { set, get } = require("../config/cache_setup");
 
 exports.registerUser = async (req, res) => {
   const { firstName, lastName, email, password, country, gender } = req.body;
@@ -538,4 +540,26 @@ exports.resetPassword = tryCatchWrapper(async (req, res) => {
 
   await user.save();
   res.json({ success: true, message: "Password has been reset." });
+});
+
+exports.allUsers = tryCatchWrapper(async (req, res) => {
+  const { limit, page, skip } = paginate(req);
+
+  let user = await get(`user:${page}`);
+  if (user) return res.json({ success: true, data: user });
+
+  user = await userModel.find().skip(skip).limit(limit).sort({ createdAt: -1 });
+
+  const totalItems = await userModel.countDocuments();
+  const totalPages = Math.ceil(totalItems / limit);
+  const data = {
+    user,
+    page,
+    totalItems,
+    totalPages,
+  };
+
+  await set(`user:${page}`, data, 3600);
+
+  res.json({ success: true, data });
 });

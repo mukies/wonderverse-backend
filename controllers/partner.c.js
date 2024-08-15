@@ -13,6 +13,7 @@ const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const partnerModel = require("../models/partner.m");
 const userModel = require("../models/user.m");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
+const { paginate } = require("../helper/pagination");
 
 exports.registerPartner = async (req, res) => {
   const { firstName, lastName, email, password, gender } = req.body;
@@ -345,4 +346,30 @@ exports.resetPasswordPartner = tryCatchWrapper(async (req, res) => {
 
   await partner.save();
   res.json({ success: true, message: "Password has been reset." });
+});
+
+exports.allPartners = tryCatchWrapper(async (req, res) => {
+  const { limit, page, skip } = paginate(req);
+
+  let partner = await get(`partner:${page}`);
+  if (partner) return res.json({ success: true, data: partner });
+
+  partner = await partnerModel
+    .find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const totalItems = await partnerModel.countDocuments();
+  const totalPages = Math.ceil(totalItems / limit);
+  const data = {
+    partner,
+    page,
+    totalItems,
+    totalPages,
+  };
+
+  await set(`partner:${page}`, data, 3600);
+
+  res.json({ success: true, data });
 });

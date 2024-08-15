@@ -15,6 +15,7 @@ const {
   deleteMultiplePlace,
   packageToggleStatus,
   placeToggleStatus,
+  getAllPlaceWithoutPagination,
 } = require("../controllers/tourPackage.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 const {
@@ -80,7 +81,8 @@ router.delete(
   deleteMultiplePlace
 );
 router.delete("/delete-package-place/:id", adminProtection, deletePlace);
-router.get("/all-package-place", adminProtection, getAllPlace);
+router.get("/all-package-place-paginate", adminProtection, getAllPlace);
+router.get("/all-package-place", adminProtection, getAllPlaceWithoutPagination);
 router.get("/single-package-place/:id", adminProtection, getOnePlace);
 router.patch("/toggle-place-status/:id", adminProtection, placeToggleStatus);
 

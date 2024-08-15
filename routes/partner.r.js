@@ -8,6 +8,7 @@ const {
   resetPasswordPartner,
   verifyResetCodePartner,
   requestForgetPassCodePartner,
+  allPartners,
 } = require("../controllers/partner.c");
 const { partnerProtection } = require("../middlewares/partnerProtection");
 const {
@@ -15,6 +16,7 @@ const {
   loginSchema,
 } = require("../validationSchema/authSchema");
 const { resetPasswordSchema } = require("../validationSchema/userSchema");
+const { adminProtection } = require("../middlewares/adminProtection");
 
 const router = require("express").Router();
 
@@ -39,4 +41,6 @@ router.put(
   resetPasswordPartner
 );
 
+//admin routes
+router.get("/all-partners", adminProtection, allPartners);
 module.exports = router;

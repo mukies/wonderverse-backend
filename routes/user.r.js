@@ -13,6 +13,7 @@ const {
   requestForgetPassCode,
   verifyResetCode,
   resetPassword,
+  allUsers,
 } = require("../controllers/user.c");
 
 const { userProtection } = require("../middlewares/userProtection");
@@ -27,6 +28,7 @@ const {
   userDetailSchema,
   resetPasswordSchema,
 } = require("../validationSchema/userSchema");
+const { adminProtection } = require("../middlewares/adminProtection");
 
 const router = require("express").Router();
 
@@ -77,5 +79,8 @@ router.put(
   checkSchema(resetPasswordSchema),
   resetPassword
 );
+
+//admin routes
+router.get("/all-users", adminProtection, allUsers);
 
 module.exports = router;

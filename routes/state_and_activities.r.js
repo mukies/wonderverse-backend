@@ -12,6 +12,8 @@ const {
   getSingleActivity,
   getAllActivity,
   deleteMultiActivity,
+  getAllActivityWithoutPagination,
+  toggleActivityStatus,
 } = require("../controllers/state_and_activities.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 
@@ -43,5 +45,7 @@ router.delete(
     .withMessage("id array must be an array"),
   deleteMultiActivity
 );
+
+router.patch("/toggle-activity-status", adminProtection, toggleActivityStatus);
 
 module.exports = router;
