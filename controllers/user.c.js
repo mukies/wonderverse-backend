@@ -16,6 +16,7 @@ const { default: mongoose } = require("mongoose");
 const { invalidObj } = require("../helper/objectIdHendler");
 const { paginate } = require("../helper/pagination");
 const { set, get } = require("../config/cache_setup");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.registerUser = async (req, res) => {
   const { firstName, lastName, email, password, country, gender } = req.body;
@@ -544,14 +545,36 @@ exports.resetPassword = tryCatchWrapper(async (req, res) => {
 
 exports.allUsers = tryCatchWrapper(async (req, res) => {
   const { limit, page, skip } = paginate(req);
+  const { status = "verified" } = req.query;
 
-  let user = await get(`user:${page}`);
+  if (status !== "verified" && status !== "not-verified")
+    return res.status(400).json({ success: false, message: "Invalid status" });
+
+  let user = await get(`user:${page}:${status}`);
   if (user) return res.json({ success: true, data: user });
 
-  user = await userModel.find().skip(skip).limit(limit).sort({ createdAt: -1 });
+  user = await userModel
+    .find({ isVerified: status == "verified" })
+    .select(
+      "firstName lastName email photo isVerified gender departureDate arrivalDate passportExpiryDate passportNumber country createdAt"
+    )
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
 
-  const totalItems = await userModel.countDocuments();
-  const totalPages = Math.ceil(totalItems / limit);
+  let totalItems = await userModel.countDocuments();
+  let totalPages = Math.ceil(totalItems / limit);
+
+  if (status == "verified") {
+    totalItems = await userModel.countDocuments({ isVerified: true });
+    totalPages = Math.ceil(totalItems / limit);
+  }
+
+  if (status == "not-verified") {
+    totalItems = await userModel.countDocuments({ isVerified: false });
+    totalPages = Math.ceil(totalItems / limit);
+  }
+
   const data = {
     user,
     page,
@@ -559,7 +582,42 @@ exports.allUsers = tryCatchWrapper(async (req, res) => {
     totalPages,
   };
 
-  await set(`user:${page}`, data, 3600);
+  await set(`user:${page}:${status}`, data, 3600);
 
   res.json({ success: true, data });
+});
+
+exports.deleteUser = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const user = await userModel.findById(id);
+  if (!user)
+    return res.status(404).json({ success: false, message: "User not found" });
+  await userModel.findByIdAndDelete(id);
+  await clearCacheByPrefix("user");
+  res.json({ success: true, message: "User has been deleted." });
+});
+
+exports.deleteMultipleUser = tryCatchWrapper(async (req, res) => {
+  const { idArray } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  idArray.forEach(async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+    const user = await userModel.findById(id);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    await userModel.findByIdAndDelete(id);
+  });
+  await clearCacheByPrefix("user");
+  res.json({ success: true, message: "User deleted successfully." });
 });

@@ -14,6 +14,8 @@ const {
   verifyResetCode,
   resetPassword,
   allUsers,
+  deleteUser,
+  deleteMultipleUser,
 } = require("../controllers/user.c");
 
 const { userProtection } = require("../middlewares/userProtection");
@@ -82,5 +84,18 @@ router.put(
 
 //admin routes
 router.get("/all-users", adminProtection, allUsers);
+
+router.delete(
+  "/delete-multi-users",
+  adminProtection,
+  body("idArray")
+    .notEmpty()
+    .withMessage("Id array is required")
+    .isArray()
+    .withMessage("id array must be an array"),
+  deleteMultipleUser
+);
+
+router.delete("/delete-user/:id", adminProtection, deleteUser);
 
 module.exports = router;

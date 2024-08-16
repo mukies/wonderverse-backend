@@ -14,6 +14,10 @@ const partnerModel = require("../models/partner.m");
 const userModel = require("../models/user.m");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const { paginate } = require("../helper/pagination");
+const { get, set } = require("../config/cache_setup");
+const { default: mongoose } = require("mongoose");
+const { invalidObj } = require("../helper/objectIdHendler");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.registerPartner = async (req, res) => {
   const { firstName, lastName, email, password, gender } = req.body;
@@ -350,18 +354,34 @@ exports.resetPasswordPartner = tryCatchWrapper(async (req, res) => {
 
 exports.allPartners = tryCatchWrapper(async (req, res) => {
   const { limit, page, skip } = paginate(req);
+  const { status = "verified" } = req.query;
 
-  let partner = await get(`partner:${page}`);
+  if (status !== "verified" && status !== "not-verified")
+    return res.status(400).json({ success: false, message: "Invalid status" });
+
+  let partner = await get(`partner:${page}:${status}`);
   if (partner) return res.json({ success: true, data: partner });
 
   partner = await partnerModel
-    .find()
+    .find({ isVerified: status == "verified" })
+    .select("firstName lastName email photo isVerified gender createdAt")
     .skip(skip)
     .limit(limit)
     .sort({ createdAt: -1 });
 
-  const totalItems = await partnerModel.countDocuments();
-  const totalPages = Math.ceil(totalItems / limit);
+  let totalItems = await partnerModel.countDocuments();
+  let totalPages = Math.ceil(totalItems / limit);
+
+  if (status == "verified") {
+    totalItems = await partnerModel.countDocuments({ isVerified: true });
+    totalPages = Math.ceil(totalItems / limit);
+  }
+
+  if (status == "not-verified") {
+    totalItems = await partnerModel.countDocuments({ isVerified: false });
+    totalPages = Math.ceil(totalItems / limit);
+  }
+
   const data = {
     partner,
     page,
@@ -369,7 +389,44 @@ exports.allPartners = tryCatchWrapper(async (req, res) => {
     totalPages,
   };
 
-  await set(`partner:${page}`, data, 3600);
+  await set(`partner:${page}:${status}`, data, 3600);
 
   res.json({ success: true, data });
+});
+
+exports.deletePartner = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const partner = await partnerModel.findById(id);
+  if (!partner)
+    return res
+      .status(404)
+      .json({ success: false, message: "Partner not found" });
+  await partnerModel.findByIdAndDelete(id);
+  await clearCacheByPrefix("Partner");
+  res.json({ success: true, message: "Partner has been deleted." });
+});
+
+exports.deleteMultiplePartner = tryCatchWrapper(async (req, res) => {
+  const { idArray } = req.body;
+
+  const result = validationResult(req);
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  idArray.forEach(async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+    const partner = await partnerModel.findById(id);
+    if (!partner)
+      return res
+        .status(404)
+        .json({ success: false, message: "Partner not found" });
+    await partnerModel.findByIdAndDelete(id);
+  });
+  await clearCacheByPrefix("Partner");
+  res.json({ success: true, message: "Partner deleted successfully." });
 });

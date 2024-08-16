@@ -9,6 +9,8 @@ const {
   verifyResetCodePartner,
   requestForgetPassCodePartner,
   allPartners,
+  deleteMultiplePartner,
+  deletePartner,
 } = require("../controllers/partner.c");
 const { partnerProtection } = require("../middlewares/partnerProtection");
 const {
@@ -43,4 +45,18 @@ router.put(
 
 //admin routes
 router.get("/all-partners", adminProtection, allPartners);
+
+router.delete(
+  "/delete-multi-partners",
+  adminProtection,
+  body("idArray")
+    .notEmpty()
+    .withMessage("Id array is required")
+    .isArray()
+    .withMessage("id array must be an array"),
+  deleteMultiplePartner
+);
+
+router.delete("/delete-partner/:id", adminProtection, deletePartner);
+
 module.exports = router;
