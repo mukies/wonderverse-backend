@@ -160,6 +160,7 @@ exports.getSingleState = async (req, res) => {
       .json({ success: false, message: "Error while fetching state." });
   }
 };
+
 //activities
 
 exports.addActivity = async (req, res) => {
@@ -187,7 +188,7 @@ exports.addActivity = async (req, res) => {
     });
 
     await newActivity.save();
-    await clearCacheByPrefix("activity");
+    await clearCacheByPrefix("activit");
 
     res.status(201).json({
       success: true,
@@ -234,7 +235,7 @@ exports.updateActivity = async (req, res) => {
       },
       { new: true }
     );
-    await clearCacheByPrefix("activity");
+    await clearCacheByPrefix("activit");
 
     res.status(200).json({
       success: true,
@@ -259,7 +260,7 @@ exports.deleteActivity = async (req, res) => {
         .json({ success: false, message: "Unauthorized action." });
 
     await activityModel.findByIdAndDelete(id);
-    await clearCacheByPrefix("activity");
+    await clearCacheByPrefix("activit");
 
     res.status(200).json({
       success: true,
@@ -292,33 +293,27 @@ exports.deleteMultiActivity = tryCatchWrapper(async (req, res) => {
         .json({ success: false, message: "Activity not found" });
     await activityModel.findByIdAndDelete(id);
   });
-  await clearCacheByPrefix("activity");
+  await clearCacheByPrefix("activit");
   res.json({ success: true, message: "Activity deleted successfully." });
 });
 
-exports.getActivities = async (req, res) => {
-  try {
-    let activities = await get("activities");
+exports.getActivities = tryCatchWrapper(async (req, res) => {
+  let activities = await get("activities");
 
-    if (activities)
-      return res.status(200).json({
-        success: true,
-        activities,
-      });
-
-    activities = await activityModel.find();
-    await set("activities", activities, 3600);
-    res.status(200).json({
+  if (activities)
+    return res.status(200).json({
       success: true,
       activities,
     });
-  } catch (error) {
-    console.log("Error while fetching activities", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error while fetching activities." });
-  }
-};
+
+  activities = await activityModel.find();
+  await set("activities", activities, 3600);
+  res.status(200).json({
+    success: true,
+    activities,
+  });
+});
+
 exports.getSingleActivity = async (req, res) => {
   const { id } = req.params;
   try {
