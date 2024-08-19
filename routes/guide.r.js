@@ -7,9 +7,11 @@ const {
   deleteGuide,
   fetch_all_guiding_destinations_tours,
   singleGuideData,
+  allApprovedGuide,
 } = require("../controllers/guide.c");
 const { partnerProtection } = require("../middlewares/partnerProtection");
 const { guideSchema } = require("../validationSchema/guideSchema");
+const { adminProtection } = require("../middlewares/adminProtection");
 
 const router = require("express").Router();
 
@@ -37,5 +39,8 @@ router.get("/all-guide", partnerProtection, fetchAllGuide);
 router.delete("/delete-guide/:id", partnerProtection, deleteGuide);
 
 //fetchGuideByTourId function from guide.c is already included while fetching tour details
+
+//admin
+router.get("/all-approved-guide", adminProtection, allApprovedGuide);
 
 module.exports = router;

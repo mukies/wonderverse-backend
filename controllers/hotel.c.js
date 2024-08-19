@@ -1,6 +1,9 @@
 const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const hotelRegistrationModel = require("../models/hoteRegistration.m");
+const { set, get } = require("../config/cache_setup");
+const { paginate } = require("../helper/pagination");
+const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 
 exports.addHotel = async (req, res) => {
   const { tour, hotelDocuments, hotelDetails } = req.body;
@@ -301,3 +304,33 @@ exports.rejectHotel = async (req, res) => {
       .json({ success: false, message: "Error while rejecting hotel" });
   }
 };
+
+exports.allApprovedHotel = tryCatchWrapper(async (req, res) => {
+  const { limit, page, skip } = paginate(req);
+
+  let hotels = await get(`registeredHotel:${page}`);
+
+  if (hotels) return res.json({ success: true, data: hotels });
+
+  hotels = await hotelRegistrationModel
+    .find({ status: "approved" })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate("requestedBy", "photo firstName lastName gender email");
+
+  const totalItems = await hotelRegistrationModel.countDocuments({
+    status: "approved",
+  });
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const data = {
+    hotels,
+    totalItems,
+    totalPages,
+    page,
+  };
+
+  await set(`registeredHotel:${page}`, data, 3600);
+  res.json({ success: true, data });
+});

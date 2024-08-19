@@ -3,6 +3,9 @@ const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const guideRegistrationModel = require("../models/guideRegistration.m");
 const tourModel = require("../models/tour.m");
 const { validationResult } = require("express-validator");
+const { tryCatchWrapper } = require("../helper/tryCatchHandler");
+const { paginate } = require("../helper/pagination");
+const { set, get } = require("../config/cache_setup");
 
 exports.addGuide = async (req, res) => {
   const {
@@ -156,25 +159,6 @@ exports.editGuideDetails = async (req, res) => {
   }
 };
 
-// exports.fetchGuideByTourId = async (req, res) => {
-//   const { tourID } = req.params;
-//   try {
-//     const guides = await guideRegistrationModel
-//       .find({
-//         guidingDestinations: tourID,
-//         status: "approved",
-//       })
-//       .populate("requestedBy", "photo firstName lastName email");
-
-//     res.status(200).json({ success: true, guides });
-//   } catch (error) {
-//     console.log("Error while fetching guide.", error);
-//     res
-//       .status(500)
-//       .json({ success: false, message: "Error while fetching guide." });
-//   }
-// };
-
 exports.deleteGuide = async (req, res) => {
   const { id } = req.params;
   try {
@@ -272,3 +256,34 @@ exports.singleGuideData = async (req, res) => {
       .json({ success: false, message: "Error while fetching guide data" });
   }
 };
+
+//admin
+exports.allApprovedGuide = tryCatchWrapper(async (req, res) => {
+  const { limit, page, skip } = paginate(req);
+
+  let guides = await get(`registeredGuide:${page}`);
+
+  if (guides) return res.json({ success: true, data: guides });
+
+  guides = await guideRegistrationModel
+    .find({ status: "approved" })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate("requestedBy", "photo firstName lastName gender email");
+
+  const totalItems = await guideRegistrationModel.countDocuments({
+    status: "approved",
+  });
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const data = {
+    guides,
+    totalItems,
+    totalPages,
+    page,
+  };
+
+  await set(`registeredGuide:${page}`, data, 3600);
+  res.json({ success: true, data });
+});

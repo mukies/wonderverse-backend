@@ -55,6 +55,7 @@ exports.approveVehicle = tryCatchWrapper(async (req, res) => {
   await vehicle.save();
   await clearCacheByPrefix("vehicleReq");
   await clearCacheByPrefix("total");
+  await clearCacheByPrefix("registeredVehicle");
 
   res
     .status(200)
@@ -139,6 +140,8 @@ exports.approveGuide = tryCatchWrapper(async (req, res) => {
   await guide.save();
   await clearCacheByPrefix("guideRequests");
   await clearCacheByPrefix("total");
+  await clearCacheByPrefix("registeredGuide");
+
   res.status(200).json({ success: true, message: "Guide has been approved." });
 });
 
@@ -217,6 +220,8 @@ exports.approveHotel = tryCatchWrapper(async (req, res) => {
   await hotel.save();
   await clearCacheByPrefix("hotelRequest");
   await clearCacheByPrefix("total");
+  await clearCacheByPrefix("registeredHotel");
+
   res.status(200).json({ success: true, message: "Hotel has been approved." });
 });
 

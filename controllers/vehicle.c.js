@@ -2,6 +2,9 @@ const { validationResult } = require("express-validator");
 const { generateLink } = require("../helper/cloudinaryImgLinkGenerator");
 const routeModel = require("../models/route.m");
 const vehicleRegistrationModel = require("../models/vehicleRegistration.m");
+const { tryCatchWrapper } = require("../helper/tryCatchHandler");
+const { paginate } = require("../helper/pagination");
+const { get, set } = require("../config/cache_setup");
 
 exports.addVehicle = async (req, res) => {
   const {
@@ -206,3 +209,33 @@ exports.updateVehicleDetails = async (req, res) => {
     });
   }
 };
+
+exports.allApprovedVehicle = tryCatchWrapper(async (req, res) => {
+  const { limit, page, skip } = paginate(req);
+
+  let vehicles = await get(`registeredVehicle:${page}`);
+
+  if (vehicles) return res.json({ success: true, data: vehicles });
+
+  vehicles = await vehicleRegistrationModel
+    .find({ status: "approved" })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate("requestedBy", "photo firstName lastName gender email");
+
+  const totalItems = await vehicleRegistrationModel.countDocuments({
+    status: "approved",
+  });
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const data = {
+    vehicles,
+    totalItems,
+    totalPages,
+    page,
+  };
+
+  await set(`registeredVehicle:${page}`, data, 3600);
+  res.json({ success: true, data });
+});
