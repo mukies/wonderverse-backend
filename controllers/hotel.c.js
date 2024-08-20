@@ -70,6 +70,8 @@ exports.addHotel = async (req, res) => {
     });
 
     await newHotel.save();
+    await clearCacheByPrefix("hotelRequest");
+    await clearCacheByPrefix("total");
 
     res.status(201).json({
       success: true,
@@ -165,6 +167,8 @@ exports.editHotelDetails = async (req, res) => {
       { new: true }
     );
 
+    await clearCacheByPrefix("hotelRequest");
+
     res.status(200).json({
       success: true,
       message: "Hotel details sent for review.",
@@ -245,6 +249,8 @@ exports.deleteHotel = async (req, res) => {
       });
 
     await hotelRegistrationModel.findByIdAndDelete(id);
+    await clearCacheByPrefix("hotelRequest");
+    await clearCacheByPrefix("total");
 
     res
       .status(200)

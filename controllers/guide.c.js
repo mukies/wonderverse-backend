@@ -6,6 +6,7 @@ const { validationResult } = require("express-validator");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const { paginate } = require("../helper/pagination");
 const { set, get } = require("../config/cache_setup");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.addGuide = async (req, res) => {
   const {
@@ -63,6 +64,8 @@ exports.addGuide = async (req, res) => {
     });
 
     await newGuide.save();
+    await clearCacheByPrefix("guideRequests");
+    await clearCacheByPrefix("total");
 
     res.status(201).json({
       success: true,
@@ -146,6 +149,8 @@ exports.editGuideDetails = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Guide not found" });
 
+    await clearCacheByPrefix("guideRequests");
+
     res.status(200).json({
       success: true,
       message: "Guide details has been updated.",
@@ -174,6 +179,8 @@ exports.deleteGuide = async (req, res) => {
         .json({ success: false, message: "Guide not found" });
 
     await guideRegistrationModel.findByIdAndDelete(id);
+    await clearCacheByPrefix("guideRequests");
+    await clearCacheByPrefix("total");
 
     res
       .status(200)

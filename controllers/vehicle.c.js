@@ -5,6 +5,7 @@ const vehicleRegistrationModel = require("../models/vehicleRegistration.m");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const { paginate } = require("../helper/pagination");
 const { get, set } = require("../config/cache_setup");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.addVehicle = async (req, res) => {
   const {
@@ -68,6 +69,8 @@ exports.addVehicle = async (req, res) => {
     });
 
     await newVehicle.save();
+    await clearCacheByPrefix("vehicleReq");
+    await clearCacheByPrefix("total");
     res.json({
       success: true,
       message: "Vehicle submitted to review.",
@@ -93,6 +96,8 @@ exports.deleteVehicle = async (req, res) => {
 
     await routeModel.deleteMany({ vehicle: id });
     await vehicleRegistrationModel.findByIdAndDelete(id);
+    await clearCacheByPrefix("vehicleReq");
+    await clearCacheByPrefix("total");
 
     res.json({ success: true, message: "Vehicle has been deleted" });
   } catch (error) {
@@ -133,6 +138,7 @@ exports.fetchSingleVehicleData = async (req, res) => {
       .json({ success: false, message: "Error while fetching vehicle data" });
   }
 };
+
 exports.updateVehicleDetails = async (req, res) => {
   const { vehicleID } = req.params;
   const {
@@ -196,6 +202,7 @@ exports.updateVehicleDetails = async (req, res) => {
       },
       { new: true }
     );
+    await clearCacheByPrefix("vehicleReq");
     res.json({
       success: true,
       message: "Vehicle submitted for review",
