@@ -5,10 +5,10 @@ const {
 } = require("../controllers/contact_us.c");
 
 const { adminProtection } = require("../middlewares/adminProtection");
-const { userProtection } = require("../middlewares/userProtection");
+
 const router = require("express").Router();
 
-router.post("/submit-message", userProtection, submit_message); //payload  = fullName, email, subject, message
+router.post("/submit-message", submit_message); //payload  = fullName, email, subject, message
 
 //admin routes
 router.get("/messages", adminProtection, all_messages);
