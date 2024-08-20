@@ -3,7 +3,7 @@ const partnerModel = require("../models/partner.m");
 
 exports.partnerProtection = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.cookies["pjwt"];
     // console.log("token", token);
     if (!token)
       return res

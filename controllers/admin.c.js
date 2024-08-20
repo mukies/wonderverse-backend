@@ -111,7 +111,7 @@ exports.loginAdmin = async (req, res) => {
       isVerified: isRegister.isVerified,
     };
 
-    generateTokenAndSetCookie(isRegister._id, res);
+    generateTokenAndSetCookie(isRegister._id, res, "ajwt");
 
     res
       .status(200)

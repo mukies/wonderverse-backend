@@ -153,7 +153,7 @@ exports.loginUser = async (req, res) => {
       departureDate: isRegister.departureDate,
     };
 
-    await generateTokenAndSetCookie(isRegister._id, res);
+    await generateTokenAndSetCookie(isRegister._id, res, "jwt");
 
     res
       .status(200)

@@ -149,7 +149,7 @@ exports.loginPartner = async (req, res) => {
       lastName: isRegister.lastName,
     };
 
-    await generateTokenAndSetCookie(isRegister._id, res);
+    await generateTokenAndSetCookie(isRegister._id, res, "pjwt");
 
     res
       .status(200)

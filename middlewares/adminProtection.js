@@ -3,7 +3,7 @@ const adminModel = require("../models/admin.m");
 
 exports.adminProtection = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.cookies["ajwt"];
 
     if (!token)
       return res
