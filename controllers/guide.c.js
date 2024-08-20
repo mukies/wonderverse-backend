@@ -150,6 +150,7 @@ exports.editGuideDetails = async (req, res) => {
         .json({ success: false, message: "Guide not found" });
 
     await clearCacheByPrefix("guideRequests");
+    await clearCacheByPrefix("total");
 
     res.status(200).json({
       success: true,

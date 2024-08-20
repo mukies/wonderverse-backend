@@ -203,6 +203,8 @@ exports.updateVehicleDetails = async (req, res) => {
       { new: true }
     );
     await clearCacheByPrefix("vehicleReq");
+    await clearCacheByPrefix("total");
+
     res.json({
       success: true,
       message: "Vehicle submitted for review",

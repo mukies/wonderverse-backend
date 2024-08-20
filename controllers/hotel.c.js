@@ -168,6 +168,7 @@ exports.editHotelDetails = async (req, res) => {
     );
 
     await clearCacheByPrefix("hotelRequest");
+    await clearCacheByPrefix("total");
 
     res.status(200).json({
       success: true,
