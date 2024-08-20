@@ -4,6 +4,8 @@ const hotelRegistrationModel = require("../models/hoteRegistration.m");
 const { set, get } = require("../config/cache_setup");
 const { paginate } = require("../helper/pagination");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
+const { default: mongoose } = require("mongoose");
+const { invalidObj } = require("../helper/objectIdHendler");
 
 exports.addHotel = async (req, res) => {
   const { tour, hotelDocuments, hotelDetails } = req.body;
@@ -265,53 +267,6 @@ exports.deleteHotel = async (req, res) => {
 };
 
 //admin action
-
-exports.approveHotel = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const hotel = await hotelRegistrationModel.findById(id);
-
-    if (!hotel)
-      return res
-        .status(404)
-        .json({ success: false, message: "Hotel not found" });
-
-    hotel.status = "approved";
-
-    await hotel.save();
-
-    res.json({ success: true, message: "Hotel has been approved." });
-  } catch (error) {
-    console.log("Error while approving hotel", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error while approving hotel" });
-  }
-};
-
-exports.rejectHotel = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const hotel = await hotelRegistrationModel.findById(id);
-
-    if (!hotel)
-      return res
-        .status(404)
-        .json({ success: false, message: "Hotel not found" });
-
-    hotel.status = "rejected";
-
-    await hotel.save();
-
-    res.json({ success: true, message: "Hotel has been rejected." });
-  } catch (error) {
-    console.log("Error while rejecting hotel", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error while rejecting hotel" });
-  }
-};
-
 exports.allApprovedHotel = tryCatchWrapper(async (req, res) => {
   const { limit, page, skip } = paginate(req);
 
@@ -340,4 +295,36 @@ exports.allApprovedHotel = tryCatchWrapper(async (req, res) => {
 
   await set(`registeredHotel:${page}`, data, 3600);
   res.json({ success: true, data });
+});
+
+exports.toggleHotelAvailability = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const result = validationResult(req);
+
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  const hotel = await hotelRegistrationModel.findOne({
+    _id: id,
+    status: "approved",
+  });
+  if (!hotel)
+    return res.status(404).json({ success: false, message: "Hotel not found" });
+
+  if (req.partner) {
+    if (hotel.requestedBy.toString() !== req.partner)
+      return res
+        .status(401)
+        .json({ success: false, message: "You didn't created this hotel." });
+  }
+
+  hotel.isAvailable = !hotel.isAvailable;
+  await hotel.save();
+
+  res.json({ success: true, message: "Hotel availability changed" });
 });

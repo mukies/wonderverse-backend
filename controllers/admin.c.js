@@ -182,7 +182,7 @@ exports.verifyAdmin = async (req, res) => {
 
 exports.logoutAdmin = async (req, res) => {
   try {
-    res.cookie("jwt", "", {
+    res.cookie("ajwt", "", {
       maxAge: 0,
     });
     res.status(200).json({ success: true, message: "Logout successfull" });

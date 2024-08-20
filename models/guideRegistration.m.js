@@ -22,6 +22,9 @@ const guideRegistrationSchema = new mongoose.Schema(
       required: true,
     },
     plans: { type: [mongoose.Schema.Types.ObjectId], ref: "Plan", default: [] },
+
+    isAvailable: { type: Boolean, default: true },
+
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

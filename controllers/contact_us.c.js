@@ -35,7 +35,7 @@ exports.all_messages = async (req, res) => {
   try {
     const messages = await contactUsModel.find();
 
-    res.status(201).json({ success: true, messages });
+    res.json({ success: true, messages });
   } catch (error) {
     console.log("Error while fetching contact us messages.");
     res.status(500).json({

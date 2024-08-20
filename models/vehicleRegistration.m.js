@@ -32,6 +32,8 @@ const vehicleRegistrationSchema = new mongoose.Schema(
       conducterName: { type: String, sparse: true },
     },
 
+    isAvailable: { type: Boolean, default: true },
+
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

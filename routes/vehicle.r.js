@@ -6,10 +6,12 @@ const {
   fetch_Personal_Vehicles,
   updateVehicleDetails,
   allApprovedVehicle,
+  toggleVehicleAvailability,
 } = require("../controllers/vehicle.c");
 const { partnerProtection } = require("../middlewares/partnerProtection");
 const { vehicleSchema } = require("../validationSchema/vehicleSchema");
 const { adminProtection } = require("../middlewares/adminProtection");
+const { adminAndPartnerGuard } = require("../middlewares/adminAndPartnerGuard");
 
 const router = require("express").Router();
 
@@ -37,5 +39,10 @@ router.put(
 
 //admin
 router.get("/all-approved-vehicle", adminProtection, allApprovedVehicle);
+router.patch(
+  "/toggle-availability/:id",
+  adminAndPartnerGuard,
+  toggleVehicleAvailability
+);
 
 module.exports = router;

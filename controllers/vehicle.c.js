@@ -6,6 +6,8 @@ const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const { paginate } = require("../helper/pagination");
 const { get, set } = require("../config/cache_setup");
 const { clearCacheByPrefix } = require("../helper/clearCache");
+const { default: mongoose } = require("mongoose");
+const { invalidObj } = require("../helper/objectIdHendler");
 
 exports.addVehicle = async (req, res) => {
   const {
@@ -247,4 +249,39 @@ exports.allApprovedVehicle = tryCatchWrapper(async (req, res) => {
 
   await set(`registeredVehicle:${page}`, data, 3600);
   res.json({ success: true, data });
+});
+
+exports.toggleVehicleAvailability = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  const result = validationResult(req);
+
+  if (!result.isEmpty())
+    return res
+      .status(400)
+      .json({ success: false, message: result.array()[0].msg });
+
+  const vehicle = await vehicleRegistrationModel.findOne({
+    _id: id,
+    status: "approved",
+  });
+
+  if (!vehicle)
+    return res
+      .status(404)
+      .json({ success: false, message: "Vehicle not found" });
+
+  if (req.partner) {
+    if (vehicle.requestedBy.toString() !== req.partner)
+      return res
+        .status(401)
+        .json({ success: false, message: "You didn't created this vehicle." });
+  }
+
+  vehicle.isAvailable = !vehicle.isAvailable;
+  await vehicle.save();
+
+  res.json({ success: true, message: "Vehicle availability changed" });
 });

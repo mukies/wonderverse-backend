@@ -30,6 +30,9 @@ const hotelRegistrationSchema = new mongoose.Schema(
       hotelDesc: { type: String, sparse: true },
       featureImages: { type: [String], default: [] },
     },
+
+    isAvailable: { type: Boolean, default: true },
+
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

@@ -6,10 +6,12 @@ const {
   fetch_Single_Hotel_data,
   deleteHotel,
   allApprovedHotel,
+  toggleHotelAvailability,
 } = require("../controllers/hotel.c");
 const { partnerProtection } = require("../middlewares/partnerProtection");
 const { hotelSchema } = require("../validationSchema/hotelSchema");
 const { adminProtection } = require("../middlewares/adminProtection");
+const { adminAndPartnerGuard } = require("../middlewares/adminAndPartnerGuard");
 
 const router = require("express").Router();
 
@@ -37,5 +39,10 @@ router.delete("/delete-hotel/:id", partnerProtection, deleteHotel);
 
 //admin
 router.get("/all-approved-hotel", adminProtection, allApprovedHotel);
+router.patch(
+  "/toggle-availability/:id",
+  adminAndPartnerGuard,
+  toggleHotelAvailability
+);
 
 module.exports = router;

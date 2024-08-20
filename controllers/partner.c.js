@@ -215,7 +215,7 @@ exports.verifyPartner = async (req, res) => {
 };
 exports.logoutPartner = async (req, res) => {
   try {
-    res.clearCookie("jwt");
+    res.clearCookie("pjwt");
 
     res.status(200).json({ success: true, message: "Logout successfull" });
   } catch (error) {
