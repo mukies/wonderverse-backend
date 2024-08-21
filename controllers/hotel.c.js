@@ -326,7 +326,7 @@ exports.toggleHotelAvailability = tryCatchWrapper(async (req, res) => {
 
   hotel.isAvailable = !hotel.isAvailable;
   await hotel.save();
-  await clearCacheByPrefix("hotel");
+  await clearCacheByPrefix("registeredHotel");
 
   res.json({ success: true, message: "Hotel availability changed" });
 });
