@@ -325,6 +325,7 @@ exports.toggleGuideAvailability = tryCatchWrapper(async (req, res) => {
 
   guide.isAvailable = !guide.isAvailable;
   await guide.save();
+  await clearCacheByPrefix("guide");
 
   res.json({ success: true, message: "Guide availability changed" });
 });

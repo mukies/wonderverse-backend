@@ -6,6 +6,7 @@ const { paginate } = require("../helper/pagination");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const { default: mongoose } = require("mongoose");
 const { invalidObj } = require("../helper/objectIdHendler");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.addHotel = async (req, res) => {
   const { tour, hotelDocuments, hotelDetails } = req.body;
@@ -325,6 +326,7 @@ exports.toggleHotelAvailability = tryCatchWrapper(async (req, res) => {
 
   hotel.isAvailable = !hotel.isAvailable;
   await hotel.save();
+  await clearCacheByPrefix("hotel");
 
   res.json({ success: true, message: "Hotel availability changed" });
 });

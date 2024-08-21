@@ -282,6 +282,7 @@ exports.toggleVehicleAvailability = tryCatchWrapper(async (req, res) => {
 
   vehicle.isAvailable = !vehicle.isAvailable;
   await vehicle.save();
+  await clearCacheByPrefix("vehicle");
 
   res.json({ success: true, message: "Vehicle availability changed" });
 });
