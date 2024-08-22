@@ -7,6 +7,11 @@ const topDestinationSchema = new mongoose.Schema(
       ref: "Tour",
       required: true,
     },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
   },
   { timestamps: true }
 );

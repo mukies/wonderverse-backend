@@ -279,7 +279,8 @@ exports.allApprovedGuide = tryCatchWrapper(async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .populate("requestedBy", "photo firstName lastName gender email");
+    .populate("requestedBy", "photo firstName lastName gender email")
+    .populate("guidingDestinations", "placeName mainImage");
 
   const totalItems = await guideRegistrationModel.countDocuments({
     status: "approved",
