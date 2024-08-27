@@ -54,6 +54,23 @@ exports.getAllSponsor = tryCatchWrapper(async (req, res) => {
   });
 });
 
+exports.singleSponsor = tryCatchWrapper(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
+
+  let sponsor = await get(`sponsor${id}`);
+  if (sponsor) return res.json({ success: true, data: sponsor });
+
+  sponsor = await sponsorModel.findById(id);
+
+  await set(`sponsor${id}`, sponsor, 3600);
+  res.json({
+    success: true,
+    data: sponsor,
+  });
+});
+
 exports.getAllActiveSponsor = tryCatchWrapper(async (req, res) => {
   let sponsor = await get("sponsorActive");
 

@@ -6,6 +6,8 @@ const {
   deleteSponsor,
   sponsorMultiDelete,
   sponsorToggleStatus,
+  getAllSponsor,
+  singleSponsor,
 } = require("../controllers/sponsor.c");
 const { adminProtection } = require("../middlewares/adminProtection");
 
@@ -14,7 +16,9 @@ const router = require("express").Router();
 router.get("/all-active", getAllActiveSponsor);
 
 //admin routes
-router.get("/all", adminProtection, getAllActiveSponsor);
+router.get("/all", adminProtection, getAllSponsor);
+
+router.get("/single/:id", adminProtection, singleSponsor);
 
 router.post("/add", adminProtection, addSponsor);
 
