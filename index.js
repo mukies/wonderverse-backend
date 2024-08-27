@@ -17,6 +17,7 @@ const hotelRoute = require("./routes/hotel.r");
 const state_and_activities_route = require("./routes/state_and_activities.r");
 const userRoute = require("./routes/user.r");
 const faqRoute = require("./routes/faq.r");
+const sponsorRoute = require("./routes/sponsor.r");
 const planRoute = require("./routes/guidePlan.r");
 const chargesRoute = require("./routes/charges.r");
 const adminRoute = require("./routes/admin.r");
@@ -67,6 +68,7 @@ app.use("/api/user", userRoute);
 app.use("/api/faq", faqRoute);
 app.use("/api/charges", chargesRoute);
 app.use("/api/partner", partnerRoute);
+app.use("/api/sponsor", sponsorRoute);
 app.use("/api/partner-request", partnerRequestRoute);
 app.use("/api/hotel", hotelRoute);
 app.use("/api/guide", guideRoute);
@@ -76,6 +78,7 @@ app.use("/api/blog", blogRoute);
 app.use("/api/top-destination", topDestinationRoute);
 app.use("/api/contact-us", contactUsRoute);
 app.use("/api/category", state_and_activities_route);
+
 app.get("/", (req, res) => {
   res.status(200).json({ success: true, message: "server is ok." });
 });

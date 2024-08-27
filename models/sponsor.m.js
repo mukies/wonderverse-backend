@@ -4,7 +4,11 @@ const sponsorSchema = new mongoose.Schema(
   {
     sponsorName: { type: String, required: true },
     sponsorImage: { type: String, required: true },
-    sponsorDescription: { type: [String], default: [] },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
   },
   { timestamps: true }
 );
