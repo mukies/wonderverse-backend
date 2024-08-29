@@ -28,6 +28,7 @@ const contactUsRoute = require("./routes/contact_us.r");
 const blogRoute = require("./routes/blog.r");
 const googleAuthRoute = require("./routes/googleAuth.r");
 const partnerRoute = require("./routes/partner.r");
+const termRoute = require("./routes/termCondition.r");
 const partnerRequestRoute = require("./routes/partnerRequests.r");
 
 //multer
@@ -66,6 +67,7 @@ app.use("/api/vehicle-route", vehicle_Route);
 app.use("/api/vehicle", vehicle);
 app.use("/api/user", userRoute);
 app.use("/api/faq", faqRoute);
+app.use("/api/term", termRoute);
 app.use("/api/charges", chargesRoute);
 app.use("/api/partner", partnerRoute);
 app.use("/api/sponsor", sponsorRoute);
