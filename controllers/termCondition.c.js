@@ -7,10 +7,10 @@ const { get, set } = require("../config/cache_setup");
 const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.createTerm = tryCatchWrapper(async (req, res) => {
-  const { content } = req.body;
+  const { content, title, useFor } = req.body;
 
   const result = validationResult(req);
-  if (!result.array())
+  if (!result.isEmpty())
     return res
       .status(400)
       .json({ success: false, message: result.array()[0].msg });
@@ -20,6 +20,8 @@ exports.createTerm = tryCatchWrapper(async (req, res) => {
   const newTerm = new termModel({
     content,
     status: activeTerm.length > 0 ? "inactive" : "active",
+    title,
+    useFor,
   });
 
   await newTerm.save();
@@ -33,13 +35,13 @@ exports.createTerm = tryCatchWrapper(async (req, res) => {
 });
 
 exports.editTerm = tryCatchWrapper(async (req, res) => {
-  const { content } = req.body;
+  const { content, useFor } = req.body;
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
 
   const result = validationResult(req);
-  if (!result.array())
+  if (!result.isEmpty())
     return res
       .status(400)
       .json({ success: false, message: result.array()[0].msg });
@@ -48,6 +50,7 @@ exports.editTerm = tryCatchWrapper(async (req, res) => {
     id,
     {
       content,
+      useFor,
     },
     { new: true }
   );
