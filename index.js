@@ -29,6 +29,7 @@ const blogRoute = require("./routes/blog.r");
 const googleAuthRoute = require("./routes/googleAuth.r");
 const partnerRoute = require("./routes/partner.r");
 const termRoute = require("./routes/termCondition.r");
+const policyRoute = require("./routes/dataPolicy.r");
 const partnerRequestRoute = require("./routes/partnerRequests.r");
 
 //multer
@@ -68,6 +69,7 @@ app.use("/api/vehicle", vehicle);
 app.use("/api/user", userRoute);
 app.use("/api/faq", faqRoute);
 app.use("/api/term", termRoute);
+app.use("/api/policy", policyRoute);
 app.use("/api/charges", chargesRoute);
 app.use("/api/partner", partnerRoute);
 app.use("/api/sponsor", sponsorRoute);
