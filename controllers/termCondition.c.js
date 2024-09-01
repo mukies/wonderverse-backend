@@ -15,7 +15,7 @@ exports.createTerm = tryCatchWrapper(async (req, res) => {
       .status(400)
       .json({ success: false, message: result.array()[0].msg });
 
-  const activeTerm = await termModel.find({ status: "active" });
+  const activeTerm = await termModel.find({ status: "active", useFor });
 
   const newTerm = new termModel({
     content,
@@ -35,7 +35,7 @@ exports.createTerm = tryCatchWrapper(async (req, res) => {
 });
 
 exports.editTerm = tryCatchWrapper(async (req, res) => {
-  const { content, useFor } = req.body;
+  const { content, useFor, title } = req.body;
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
@@ -51,6 +51,7 @@ exports.editTerm = tryCatchWrapper(async (req, res) => {
     {
       content,
       useFor,
+      title,
     },
     { new: true }
   );
@@ -158,7 +159,7 @@ exports.termStatusToggle = tryCatchWrapper(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
 
   const term = await termModel.findById(id);
-  const terms = await termModel.find({ status: "active" });
+  const terms = await termModel.find({ status: "active", useFor: term.useFor });
   if (!term)
     return res
       .status(404)

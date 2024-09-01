@@ -15,7 +15,7 @@ exports.createPolicy = tryCatchWrapper(async (req, res) => {
       .status(400)
       .json({ success: false, message: result.array()[0].msg });
 
-  const activePolicy = await policyModel.find({ status: "active" });
+  const activePolicy = await policyModel.find({ status: "active", useFor });
 
   const newPolicy = new policyModel({
     content,
@@ -35,7 +35,7 @@ exports.createPolicy = tryCatchWrapper(async (req, res) => {
 });
 
 exports.editPolicy = tryCatchWrapper(async (req, res) => {
-  const { content, useFor } = req.body;
+  const { content, useFor, title } = req.body;
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
@@ -51,6 +51,7 @@ exports.editPolicy = tryCatchWrapper(async (req, res) => {
     {
       content,
       useFor,
+      title,
     },
     { new: true }
   );
@@ -158,7 +159,10 @@ exports.policyStatusToggle = tryCatchWrapper(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) return invalidObj(res);
 
   const policy = await policyModel.findById(id);
-  const policies = await policyModel.find({ status: "active" });
+  const policies = await policyModel.find({
+    status: "active",
+    useFor: policy.useFor,
+  });
   if (!policy)
     return res
       .status(404)
