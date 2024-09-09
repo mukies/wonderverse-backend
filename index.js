@@ -20,6 +20,7 @@ const faqRoute = require("./routes/faq.r");
 const sponsorRoute = require("./routes/sponsor.r");
 const planRoute = require("./routes/guidePlan.r");
 const chargesRoute = require("./routes/charges.r");
+const bookingRoute = require("./routes/booking.r");
 const adminRoute = require("./routes/admin.r");
 const locationRoute = require("./routes/location.r");
 const passport = require("passport");
@@ -27,6 +28,7 @@ const topDestinationRoute = require("./routes/top_Destination.r");
 const contactUsRoute = require("./routes/contact_us.r");
 const blogRoute = require("./routes/blog.r");
 const googleAuthRoute = require("./routes/googleAuth.r");
+const esewaRoute = require("./routes/esewa.r");
 const partnerRoute = require("./routes/partner.r");
 const termRoute = require("./routes/termCondition.r");
 const policyRoute = require("./routes/dataPolicy.r");
@@ -39,8 +41,7 @@ app.use(upload.none());
 
 app.use(
   cors({
-    origin:
-      "https://rnmsx-2405-acc0-1100-37a1-855d-df42-c99d-1b8.a.free.pinggy.link",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -62,11 +63,13 @@ v2.config({
 //routes
 app.use("/auth", googleAuthRoute);
 app.use("/api/tour", tourRoute);
+app.use("/api/booking", bookingRoute);
 app.use("/api/package", packageRoute);
 app.use("/api/location", locationRoute);
 app.use("/api/vehicle-route", vehicle_Route);
 app.use("/api/vehicle", vehicle);
 app.use("/api/user", userRoute);
+app.use("/api/pay/esewa", esewaRoute);
 app.use("/api/faq", faqRoute);
 app.use("/api/term", termRoute);
 app.use("/api/policy", policyRoute);
@@ -82,10 +85,6 @@ app.use("/api/blog", blogRoute);
 app.use("/api/top-destination", topDestinationRoute);
 app.use("/api/contact-us", contactUsRoute);
 app.use("/api/category", state_and_activities_route);
-
-app.get("/", (req, res) => {
-  res.status(200).json({ success: true, message: "server is ok." });
-});
 
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Invalid API endpoint." });

@@ -40,6 +40,14 @@ exports.bookingSchema = {
         "stayingDays property of Selected Hotel must be in numeric format.",
     },
   },
+  "selectedHotel.checkInDate": {
+    notEmpty: {
+      errorMessage: "check In Date property of Selected Hotel is required.",
+    },
+    isString: {
+      errorMessage: "Check in date must be in string format.",
+    },
+  },
   "selectedHotel.totalHotelCost": {
     notEmpty: {
       errorMessage: "totalHotelCost property of Selected Hotel is required.",
@@ -89,22 +97,14 @@ exports.bookingSchema = {
         "totalCost property of Selected Transportation must be in numeric format.",
     },
   },
-
-  tourStartingDate: {
+  "selectedTransportation.journeyStartingDate": {
     notEmpty: {
-      errorMessage: "Tour starting date is required.",
+      errorMessage:
+        "journeyStartingDate of Selected Transportation is required.",
     },
     isString: {
-      errorMessage: "Tour starting date must be in string format.",
-    },
-  },
-
-  participants: {
-    notEmpty: {
-      errorMessage: "Participants is required.",
-    },
-    isNumeric: {
-      errorMessage: "Participants must be in numeric format.",
+      errorMessage:
+        "journeyStartingDate of Selected Transportation must be in string format.",
     },
   },
 
@@ -121,12 +121,12 @@ exports.bookingSchema = {
     notEmpty: {
       errorMessage: "User details is required.",
     },
-    isArray: {
-      errorMessage: "User details must be an array",
+    isObject: {
+      errorMessage: "User details must be in object format.",
     },
   },
 
-  "userDetails.*.fullName": {
+  "userDetails.fullName": {
     notEmpty: {
       errorMessage: "Full name in user details array is required.",
     },
@@ -134,7 +134,7 @@ exports.bookingSchema = {
       errorMessage: "Full name in user details array must be in string format.",
     },
   },
-  "userDetails.*.email": {
+  "userDetails.email": {
     notEmpty: {
       errorMessage: "Email in user details array is required.",
     },
@@ -142,7 +142,7 @@ exports.bookingSchema = {
       errorMessage: "Invalid email format.",
     },
   },
-  "userDetails.*.contactNumber": {
+  "userDetails.contactNumber": {
     notEmpty: {
       errorMessage: "Contact number in user details array is required.",
     },
@@ -151,7 +151,7 @@ exports.bookingSchema = {
         "Contact number in user details array must be in string format.",
     },
   },
-  "userDetails.*.country": {
+  "userDetails.country": {
     notEmpty: {
       errorMessage: "Country in user details array is required.",
     },
@@ -159,7 +159,7 @@ exports.bookingSchema = {
       errorMessage: "Country in user details array must be in string format.",
     },
   },
-  "userDetails.*.passportNumber": {
+  "userDetails.passportNumber": {
     optional: true,
     isString: {
       errorMessage:
