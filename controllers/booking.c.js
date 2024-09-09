@@ -59,7 +59,7 @@ exports.newTourBooking = async (req, res) => {
       bookingId = newBooking._id;
     }
 
-    //todo:send booking confirmation email
+    //todo: booking confirmation emails will send after verifying payment
 
     let url;
     if (via == "esewa") {
