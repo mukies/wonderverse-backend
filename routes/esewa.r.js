@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const { newPayment } = require("../helper/createPayment");
 const bookingModel = require("../models/booking.m");
 
@@ -23,7 +24,10 @@ router.get("/complete-payment", async (req, res) => {
       Number(response.data.total_amount).toFixed(0) !==
         Number(decodedData.total_amount.replace(/,/g, "")).toFixed(0)
     ) {
-      await bookingModel.findByIdAndDelete(response.transaction_uuid);
+      await bookingModel.findByIdAndUpdate(response.transaction_uuid, {
+        status: "failed",
+        paymentStatus: "failed",
+      });
 
       return res.status(402).json({
         success: false,
@@ -31,6 +35,12 @@ router.get("/complete-payment", async (req, res) => {
         isConfirmed: false,
       });
     }
+
+    bookingModel.deleteMany({
+      userID: mongoose.Types.ObjectId(booking.userID),
+      status: "pending",
+      paymentStatus: "pending",
+    });
 
     booking.status = "confirmed";
     booking.paymentStatus = "paid";
