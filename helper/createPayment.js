@@ -11,6 +11,10 @@ exports.newPayment = async (
   res
 ) => {
   try {
+    const isExist = await paymentModel.findOne({ transaction_code });
+
+    if (isExist) return;
+
     const newPay = new paymentModel({
       amount,
       booking,

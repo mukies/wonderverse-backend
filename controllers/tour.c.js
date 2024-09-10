@@ -222,10 +222,17 @@ exports.singleTour = async (req, res) => {
     let tourDetails = await get(`tour:${slug}`);
     if (tourDetails) return res.json({ success: true, tourDetails });
 
-    const tour = await tourModel
+    let tour = await tourModel
       .findOne({ slug })
       .populate("activity")
       .populate("reviews.userID", "firstName lastName photo country");
+
+    if (!tour) {
+      tour = await tourModel
+        .findOne({ _id: slug })
+        .populate("activity")
+        .populate("reviews.userID", "firstName lastName photo country");
+    }
 
     if (!tour)
       return res

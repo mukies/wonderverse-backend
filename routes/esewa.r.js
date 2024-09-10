@@ -1,4 +1,3 @@
-const { default: mongoose } = require("mongoose");
 const { newPayment } = require("../helper/createPayment");
 const bookingModel = require("../models/booking.m");
 const { verifyEsewaPayment } = require("../config/esewa");
@@ -20,9 +19,9 @@ router.get("/complete-payment", async (req, res) => {
         .json({ success: false, message: "Unable to find the booking." });
 
     if (
-      response.data.status !== "COMPLETE" ||
-      response.data.transaction_uuid !== decodedData.transaction_uuid ||
-      Number(response.data.total_amount).toFixed(0) !==
+      response.status !== "COMPLETE" ||
+      response.transaction_uuid !== decodedData.transaction_uuid ||
+      Number(response.total_amount).toFixed(0) !==
         Number(decodedData.total_amount.replace(/,/g, "")).toFixed(0)
     ) {
       await bookingModel.findByIdAndUpdate(response.transaction_uuid, {
@@ -37,12 +36,6 @@ router.get("/complete-payment", async (req, res) => {
       });
     }
 
-    bookingModel.deleteMany({
-      userID: mongoose.Types.ObjectId(booking.userID),
-      status: "pending",
-      paymentStatus: "pending",
-    });
-
     booking.status = "confirmed";
     booking.paymentStatus = "paid";
     await booking.save();
@@ -52,7 +45,7 @@ router.get("/complete-payment", async (req, res) => {
     newPayment(
       booking._id,
       booking.userID,
-      response.data.total_amount,
+      response.total_amount,
       decodedData.transaction_code,
       "npr",
       "succeeded",
@@ -60,7 +53,11 @@ router.get("/complete-payment", async (req, res) => {
       res
     );
 
-    //send emails
+    await bookingModel.deleteMany({
+      userID: booking.userID,
+      status: "pending",
+      paymentStatus: "pending",
+    });
 
     // Respond with success message
     res.json({
