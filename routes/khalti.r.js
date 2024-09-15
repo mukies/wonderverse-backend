@@ -18,7 +18,6 @@ router.get("/complete-khalti-payment", async (req, res) => {
 
     // Extract necessary information from the query parameters
     const { pidx } = req.query;
-    console.log("queried", req.query);
 
     if (!pidx) {
       throw new Error("Payment IDX not provided");

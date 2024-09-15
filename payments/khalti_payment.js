@@ -40,8 +40,8 @@ exports.initializeKhaltiPayment = async (details) => {
     amount: 550 * 100,
     purchase_order_id: crypto.randomUUID(),
     purchase_order_name: "this-is-name",
-    // return_url: `${process.env.BACKEND}/api/pay/khalti/complete-khalti-payment/`,
-    return_url: `${process.env.FRONTEND_URL}/slider/`,
+    return_url: `${process.env.BACKEND}/api/pay/khalti/complete-khalti-payment/`,
+    // return_url: `${process.env.FRONTEND_URL}/slider/`,
     website_url: `${process.env.FRONTEND_URL}`,
   };
 

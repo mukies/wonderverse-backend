@@ -4,7 +4,12 @@ const mongoose = require("mongoose");
 const paymentSchema = new mongoose.Schema({
   booking: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Booking",
+    refPath: "tourType",
+    required: true,
+  },
+  tourType: {
+    type: String,
+    enum: ["Booking", "PackageBooking"],
     required: true,
   },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },

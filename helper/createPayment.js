@@ -8,6 +8,7 @@ exports.newPayment = async (
   currency,
   status,
   paymentMethod,
+  tourType,
   res
 ) => {
   try {
@@ -23,6 +24,7 @@ exports.newPayment = async (
       user,
       status,
       transaction_code,
+      tourType,
     });
 
     await newPay.save();

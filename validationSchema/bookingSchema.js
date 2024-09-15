@@ -167,3 +167,91 @@ exports.bookingSchema = {
     },
   },
 };
+
+exports.packageBookingSchema = {
+  selectedPlaces: {
+    notEmpty: {
+      errorMessage: "Selected places is required.",
+    },
+    isArray: {
+      errorMessage: "Selected places must be in array format.",
+    },
+  },
+
+  numberOfPeople: {
+    notEmpty: {
+      errorMessage: "NumberOfPeople is required.",
+    },
+    isNumeric: {
+      errorMessage: "numberOfPeople must be in numeric format.",
+    },
+  },
+
+  startingDate: {
+    notEmpty: {
+      errorMessage: "startingDate is required.",
+    },
+    isString: {
+      errorMessage: "startingDate must be in string format.",
+    },
+  },
+
+  totalPackageCost: {
+    notEmpty: {
+      errorMessage: "Total package cost is required.",
+    },
+    isNumeric: {
+      errorMessage: "Total package cost must be in numeric format.",
+    },
+  },
+
+  userDetails: {
+    notEmpty: {
+      errorMessage: "User details is required.",
+    },
+    isObject: {
+      errorMessage: "User details must be in object format.",
+    },
+  },
+
+  "userDetails.fullName": {
+    notEmpty: {
+      errorMessage: "Full name in user details array is required.",
+    },
+    isString: {
+      errorMessage: "Full name in user details array must be in string format.",
+    },
+  },
+  "userDetails.email": {
+    notEmpty: {
+      errorMessage: "Email in user details array is required.",
+    },
+    isEmail: {
+      errorMessage: "Invalid email format.",
+    },
+  },
+  "userDetails.contactNumber": {
+    notEmpty: {
+      errorMessage: "Contact number in user details array is required.",
+    },
+    isString: {
+      errorMessage:
+        "Contact number in user details array must be in string format.",
+    },
+  },
+  "userDetails.country": {
+    notEmpty: {
+      errorMessage: "Country in user details array is required.",
+    },
+    isString: {
+      errorMessage: "Country in user details array must be in string format.",
+    },
+  },
+  "userDetails.passportNumber": {
+    optional: true,
+    isString: {
+      errorMessage:
+        "Passport number in user details array must be in string format.",
+    },
+  },
+};

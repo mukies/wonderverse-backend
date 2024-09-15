@@ -1,6 +1,6 @@
 const { getEsewaPaymentHash } = require("../config/esewa");
 
-exports.initializeEsewa = async (amount, bookingID, res) => {
+exports.initializeEsewa = async (amount, bookingID, res, title) => {
   try {
     const transaction_uuid = bookingID;
     const totalAmount = parseFloat(amount).toFixed(2);
@@ -9,8 +9,8 @@ exports.initializeEsewa = async (amount, bookingID, res) => {
       transaction_uuid
     );
 
-    const failureUrl = `${process.env.FRONTEND_URL}/tour/booking-failed`;
-    const successUrl = `${process.env.FRONTEND_URL}/tour/booking-success`;
+    const failureUrl = `${process.env.FRONTEND_URL}/${title}/booking-failed`;
+    const successUrl = `${process.env.FRONTEND_URL}/${title}/booking-success`;
 
     const payload = {
       amount: totalAmount,

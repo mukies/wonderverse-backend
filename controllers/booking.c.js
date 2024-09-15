@@ -1,3 +1,5 @@
+const { default: mongoose } = require("mongoose");
+const { invalidObj } = require("../helper/objectIdHendler");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const bookingModel = require("../models/booking.m");
 const userModel = require("../models/user.m");
@@ -18,12 +20,18 @@ exports.newTourBooking = tryCatchWrapper(async (req, res) => {
   } = req.body;
 
   //todo:vaidations
+  if (!tourID)
+    return res
+      .status(400)
+      .json({ success: false, message: "Tour id is required" });
 
   const result = validationResult(req);
   if (!result.isEmpty())
     return res
       .status(400)
       .json({ success: false, message: result.array()[0].msg });
+
+  if (!mongoose.Types.ObjectId.isValid(tourID)) return invalidObj(res);
 
   const existedBooking = await bookingModel.findOne({
     userID,
@@ -52,7 +60,7 @@ exports.newTourBooking = tryCatchWrapper(async (req, res) => {
 
   let url;
   if (via == "esewa") {
-    url = await initializeEsewa(totalTourCost, newBooking._id, res);
+    url = await initializeEsewa(totalTourCost, newBooking._id, res, "tour");
   }
 
   if (!url)
