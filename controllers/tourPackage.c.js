@@ -176,17 +176,17 @@ exports.getSinglePackage = tryCatchWrapper(async (req, res) => {
 
   if (packageDetails) return res.json({ success: true, packageDetails });
 
-  let package = await packageModel
-    .findOne({ slug })
+  const package = await packageModel
+    .findOne({ $or: [{ slug }, { _id: slug }] })
     .populate("activity")
     .populate("places");
 
-  if (!package) {
-    package = await packageModel
-      .findOne({ _id: slug })
-      .populate("activity")
-      .populate("places");
-  }
+  // if(!package){
+  //   package = await packageModel
+  //   .findOne({ _id:slug })
+  //   .populate("activity")
+  //   .populate("places");
+  // }
 
   if (!package)
     return res
