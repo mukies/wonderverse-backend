@@ -36,6 +36,7 @@ const policyRoute = require("./routes/dataPolicy.r");
 const partnerRequestRoute = require("./routes/partnerRequests.r");
 // const { initializeKhaltiPayment } = require("./payments/khalti_payment");
 
+//testing
 //multer
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
