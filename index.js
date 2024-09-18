@@ -34,7 +34,7 @@ const partnerRoute = require("./routes/partner.r");
 const termRoute = require("./routes/termCondition.r");
 const policyRoute = require("./routes/dataPolicy.r");
 const partnerRequestRoute = require("./routes/partnerRequests.r");
-const { initializeKhaltiPayment } = require("./payments/khalti_payment");
+// const { initializeKhaltiPayment } = require("./payments/khalti_payment");
 
 //multer
 const storage = multer.memoryStorage();
@@ -89,15 +89,15 @@ app.use("/api/top-destination", topDestinationRoute);
 app.use("/api/contact-us", contactUsRoute);
 app.use("/api/category", state_and_activities_route);
 
-app.post("/khalti", async (req, res) => {
-  try {
-    const data = await initializeKhaltiPayment();
+// app.post("/khalti", async (req, res) => {
+//   try {
+//     const data = await initializeKhaltiPayment();
 
-    res.json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+//     res.json({ success: true, data });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Invalid API endpoint." });

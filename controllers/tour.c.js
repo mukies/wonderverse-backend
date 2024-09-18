@@ -217,22 +217,16 @@ exports.getAllToursByActivity = tryCatchWrapper(async (req, res) => {
 exports.singleTour = async (req, res) => {
   try {
     const { slug } = req.params;
+    const isValidId = mongoose.Types.ObjectId.isValid(slug);
 
     // const availableTransportations = await transportationModel.find({ tourID });
     let tourDetails = await get(`tour:${slug}`);
     if (tourDetails) return res.json({ success: true, tourDetails });
 
     let tour = await tourModel
-      .findOne({ slug })
+      .findOne(isValidId ? { _id: slug } : { slug })
       .populate("activity")
       .populate("reviews.userID", "firstName lastName photo country");
-
-    if (!tour) {
-      tour = await tourModel
-        .findOne({ _id: slug })
-        .populate("activity")
-        .populate("reviews.userID", "firstName lastName photo country");
-    }
 
     if (!tour)
       return res

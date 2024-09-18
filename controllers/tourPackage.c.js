@@ -171,22 +171,16 @@ exports.updatePackage = tryCatchWrapper(async (req, res) => {
 
 exports.getSinglePackage = tryCatchWrapper(async (req, res) => {
   const { slug } = req.params;
+  const isValidId = mongoose.Types.ObjectId.isValid(slug);
 
   let packageDetails = await get(`package:${slug}`);
 
   if (packageDetails) return res.json({ success: true, packageDetails });
 
   const package = await packageModel
-    .findOne({ $or: [{ slug }, { _id: slug }] })
+    .findOne(isValidId ? { _id: slug } : { slug })
     .populate("activity")
     .populate("places");
-
-  // if(!package){
-  //   package = await packageModel
-  //   .findOne({ _id:slug })
-  //   .populate("activity")
-  //   .populate("places");
-  // }
 
   if (!package)
     return res
