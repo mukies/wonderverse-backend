@@ -32,7 +32,7 @@ exports.newPackageBooking = tryCatchWrapper(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(packageID)) return invalidObj(res);
 
   const existedBooking = await packageBookingModel.findOne({
-    userID,
+    userID: req.user,
     packageID,
     paymentStatus: "pending",
   });
