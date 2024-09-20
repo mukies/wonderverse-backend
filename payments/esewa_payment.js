@@ -9,8 +9,8 @@ exports.initializeEsewa = async (amount, bookingID, res, title) => {
       transaction_uuid
     );
 
-    const failureUrl = `${process.env.FRONTEND_URL}/${title}/booking/failed`;
-    const successUrl = `${process.env.FRONTEND_URL}/${title}/booking/success`;
+    const failureUrl = `${process.env.FRONTEND_URL}/booking/failed`;
+    const successUrl = `${process.env.FRONTEND_URL}/booking/success`;
 
     const payload = {
       amount: totalAmount,

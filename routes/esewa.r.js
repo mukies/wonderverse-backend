@@ -13,8 +13,11 @@ router.get("/complete-payment", async (req, res) => {
     const { response, decodedData } = await verifyEsewaPayment(data);
 
     const booking = await bookingModel.findById(response.transaction_uuid);
+    const packageBooking = await packageBookingModel.findById(
+      response.transaction_uuid
+    );
 
-    if (!booking)
+    if (!booking && !packageBooking)
       return res
         .status(404)
         .json({ success: false, message: "Unable to find the booking." });
@@ -25,10 +28,17 @@ router.get("/complete-payment", async (req, res) => {
       Number(response.total_amount).toFixed(0) !==
         Number(decodedData.total_amount.replace(/,/g, "")).toFixed(0)
     ) {
-      await bookingModel.findByIdAndUpdate(response.transaction_uuid, {
-        status: "failed",
-        paymentStatus: "failed",
-      });
+      if (booking) {
+        await bookingModel.findByIdAndUpdate(response.transaction_uuid, {
+          status: "failed",
+          paymentStatus: "failed",
+        });
+      } else {
+        await packageBookingModel.findByIdAndUpdate(response.transaction_uuid, {
+          status: "failed",
+          paymentStatus: "failed",
+        });
+      }
 
       return res.status(402).json({
         success: false,
@@ -37,30 +47,43 @@ router.get("/complete-payment", async (req, res) => {
       });
     }
 
-    booking.status = "confirmed";
-    booking.paymentStatus = "paid";
-    await booking.save();
+    if (booking) {
+      booking.status = "confirmed";
+      booking.paymentStatus = "paid";
+      await booking.save();
+    } else {
+      packageBooking.status = "confirmed";
+      packageBooking.paymentStatus = "paid";
+      await packageBooking.save();
+    }
 
     // Create a new payment record in the database
 
     newPayment(
-      booking._id,
-      booking.userID,
+      booking._id ?? packageBooking._id,
+      booking.userID ?? packageBooking.userID,
       response.total_amount,
       decodedData.transaction_code,
       "npr",
       "succeeded",
       "esewa",
-      "Booking",
+      booking ? "Booking" : "PackageBooking",
       res
     );
 
-    await bookingModel.deleteMany({
-      userID: booking.userID,
-      status: "pending",
-      paymentStatus: "pending",
-    });
-
+    if (booking) {
+      await bookingModel.deleteMany({
+        userID: booking.userID,
+        status: "pending",
+        paymentStatus: "pending",
+      });
+    } else {
+      await packageBookingModel.deleteMany({
+        userID: packageBooking.userID,
+        status: "pending",
+        paymentStatus: "pending",
+      });
+    }
     // Respond with success message
     res.json({
       success: true,
