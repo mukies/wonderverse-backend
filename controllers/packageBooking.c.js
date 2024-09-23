@@ -4,6 +4,8 @@ const packageBookingModel = require("../models/packageBooking.m");
 const { initializeEsewa } = require("../payments/esewa_payment");
 const { default: mongoose } = require("mongoose");
 const { invalidObj } = require("../helper/objectIdHendler");
+const { get, set } = require("../config/cache_setup");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.newPackageBooking = tryCatchWrapper(async (req, res) => {
   const {
@@ -67,6 +69,40 @@ exports.newPackageBooking = tryCatchWrapper(async (req, res) => {
     return res
       .status(401)
       .json({ success: false, message: "Invalid payment method" });
+  await clearCacheByPrefix("allPackageBookings");
+  await clearCacheByPrefix("allUserPackageBookings");
 
   res.json({ success: true, data: url });
+});
+
+exports.allPackageBookings = tryCatchWrapper(async (req, res) => {
+  let bookings = await get("allPackageBookings");
+
+  if (bookings) return res.json({ success: true, data: bookings });
+
+  bookings = await packageBookingModel
+    .find()
+    .populate("userID", "firstName lastName gender photo")
+    .populate("packageID")
+    .populate("selectedPlaces")
+    .sort({ createdAt: -1 });
+
+  await set("allPackageBookings", bookings, 3600);
+  res.json({ success: true, data: bookings });
+});
+
+exports.allUsersPackageBookings = tryCatchWrapper(async (req, res) => {
+  let bookings = await get("allUserPackageBookings");
+
+  if (bookings) return res.json({ success: true, data: bookings });
+
+  bookings = await packageBookingModel
+    .find({ userID: req.user })
+    .populate("userID", "firstName lastName gender photo")
+    .populate("packageID")
+    .populate("selectedPlaces")
+    .sort({ createdAt: -1 });
+
+  await set("allUserPackageBookings", bookings, 3600);
+  res.json({ success: true, data: bookings });
 });

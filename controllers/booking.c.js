@@ -5,6 +5,8 @@ const bookingModel = require("../models/booking.m");
 const userModel = require("../models/user.m");
 const { initializeEsewa } = require("../payments/esewa_payment");
 const { validationResult } = require("express-validator");
+const { get, set } = require("../config/cache_setup");
+const { clearCacheByPrefix } = require("../helper/clearCache");
 
 exports.newTourBooking = tryCatchWrapper(async (req, res) => {
   const { tourID } = req.params;
@@ -68,8 +70,47 @@ exports.newTourBooking = tryCatchWrapper(async (req, res) => {
       .status(401)
       .json({ success: false, message: "Invalid payment method" });
 
+  await clearCacheByPrefix("allBookings");
+  await clearCacheByPrefix("allUserBookings");
+
   res.status(200).json({
     success: true,
     data: url,
   });
+});
+
+exports.allBookings = tryCatchWrapper(async (req, res) => {
+  let bookings = await get("allBookings");
+
+  if (bookings) return res.json({ success: true, data: bookings });
+
+  bookings = await bookingModel
+    .find()
+    .populate("userID", "firstName lastName gender photo")
+    .populate("tourID")
+    .populate("selectedGuide")
+    .populate("selectedTransportation.transportationID")
+    .populate("selectedHotel.hotelID")
+    .sort({ createdAt: -1 });
+
+  await set("allBookings", bookings, 3600);
+  res.json({ success: true, data: bookings });
+});
+
+exports.allUsersBookings = tryCatchWrapper(async (req, res) => {
+  let bookings = await get("allUserBookings");
+
+  if (bookings) return res.json({ success: true, data: bookings });
+
+  bookings = await bookingModel
+    .find({ userID: req.user })
+    .populate("userID", "firstName lastName gender photo")
+    .populate("tourID")
+    .populate("selectedGuide")
+    .populate("selectedTransportation.transportationID")
+    .populate("selectedHotel.hotelID")
+    .sort({ createdAt: -1 });
+
+  await set("allUserBookings", bookings, 3600);
+  res.json({ success: true, data: bookings });
 });

@@ -1,11 +1,20 @@
 const { checkSchema } = require("express-validator");
-const { newTourBooking } = require("../controllers/booking.c");
+const {
+  newTourBooking,
+  allBookings,
+  allUsersBookings,
+} = require("../controllers/booking.c");
 const {
   bookingSchema,
   packageBookingSchema,
 } = require("../validationSchema/bookingSchema");
 const { userProtection } = require("../middlewares/userProtection");
-const { newPackageBooking } = require("../controllers/packageBooking.c");
+const {
+  newPackageBooking,
+  allPackageBookings,
+  allUsersPackageBookings,
+} = require("../controllers/packageBooking.c");
+const { adminProtection } = require("../middlewares/adminProtection");
 
 const router = require("express").Router();
 
@@ -21,6 +30,16 @@ router.post(
   userProtection,
   checkSchema(packageBookingSchema),
   newPackageBooking
+);
+
+router.get("/all-tour-booking", adminProtection, allBookings);
+router.get("/users-all-tour-booking", userProtection, allUsersBookings);
+
+router.get("/all-package-booking", adminProtection, allPackageBookings);
+router.get(
+  "/users-all-package-booking",
+  userProtection,
+  allUsersPackageBookings
 );
 
 module.exports = router;
