@@ -2,7 +2,6 @@ const { default: mongoose } = require("mongoose");
 const { invalidObj } = require("../helper/objectIdHendler");
 const { tryCatchWrapper } = require("../helper/tryCatchHandler");
 const bookingModel = require("../models/booking.m");
-const userModel = require("../models/user.m");
 const { initializeEsewa } = require("../payments/esewa_payment");
 const { validationResult } = require("express-validator");
 const { get, set } = require("../config/cache_setup");
@@ -90,7 +89,7 @@ exports.allBookings = tryCatchWrapper(async (req, res) => {
     .populate("tourID")
     .populate("selectedGuide")
     .populate("selectedTransportation.transportationID")
-    .populate("selectedHotel.hotelID")
+    .populate("selectedHotel.hotelID", "hotelDetails")
     .sort({ createdAt: -1 });
 
   await set("allBookings", bookings, 3600);

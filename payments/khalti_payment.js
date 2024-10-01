@@ -29,22 +29,24 @@ exports.verifyKhaltiPayment = async (pidx) => {
 };
 
 // Function to initialize Khalti Payment
-exports.initializeKhaltiPayment = async (details) => {
+exports.initializeKhaltiPayment = async () => {
   const headersList = {
     Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
     "Content-Type": "application/json",
   };
 
   //   const bodyContent = JSON.stringify(details);
-  const bodyContent = {
-    amount: 550 * 100,
+  let bodyContent = {
+    amount: 1000 * 100,
     purchase_order_id: crypto.randomUUID(),
     purchase_order_name: "this-is-name",
-    return_url: `${process.env.BACKEND}/api/pay/khalti/complete-khalti-payment/`,
+    return_url: `${process.env.FRONTEND_URL}/add-tour`,
     // return_url: `${process.env.FRONTEND_URL}/slider/`,
     website_url: `${process.env.FRONTEND_URL}`,
   };
 
+  bodyContent = JSON.stringify(bodyContent);
+  console.log("body-con", bodyContent);
   const reqOptions = {
     url: `${process.env.KHALTI_GATEWAY_URL}/api/v2/epayment/initiate/`,
     method: "POST",
