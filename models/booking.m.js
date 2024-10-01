@@ -30,7 +30,7 @@ const bookingschema = new mongoose.Schema(
     selectedTransportation: {
       transportationID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Transportation",
+        ref: "Route",
         required: true,
       },
 
