@@ -60,8 +60,8 @@ router.get("/complete-payment", async (req, res) => {
     // Create a new payment record in the database
 
     newPayment(
-      booking._id ?? packageBooking._id,
-      booking.userID ?? packageBooking.userID,
+      booking ? booking._id : packageBooking._id,
+      booking ? booking.userID : packageBooking.userID,
       response.total_amount,
       decodedData.transaction_code,
       "npr",

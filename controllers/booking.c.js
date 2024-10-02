@@ -88,7 +88,10 @@ exports.allBookings = tryCatchWrapper(async (req, res) => {
     .populate("userID", "firstName lastName gender photo")
     .populate("tourID")
     .populate("selectedGuide")
-    .populate("selectedTransportation.transportationID")
+    .populate({
+      path: "selectedTransportation.transportationID",
+      populate: { path: "vehicle", model: "Vehicle" },
+    })
     .populate("selectedHotel.hotelID", "hotelDetails")
     .sort({ createdAt: -1 });
 
@@ -106,8 +109,11 @@ exports.allUsersBookings = tryCatchWrapper(async (req, res) => {
     .populate("userID", "firstName lastName gender photo")
     .populate("tourID")
     .populate("selectedGuide")
-    .populate("selectedTransportation.transportationID")
     .populate("selectedHotel.hotelID")
+    .populate({
+      path: "selectedTransportation.transportationID",
+      populate: { path: "vehicle", model: "Vehicle" },
+    })
     .sort({ createdAt: -1 });
 
   await set("allUserBookings", bookings, 3600);
